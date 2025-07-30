@@ -14,7 +14,7 @@ export class Root extends APIResource {
 }
 
 /**
- * Response model for the root endpoint.
+ * Response model for the root endpoint of the Dedalus API.
  */
 export interface RootGetResponse {
   message: string;
