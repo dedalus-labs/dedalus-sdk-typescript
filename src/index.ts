@@ -1,12 +1,12 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export { DedalusSDK as default } from './client';
+export { Dedalus as default } from './client';
 
 export { type Uploadable, toFile } from './core/uploads';
 export { APIPromise } from './core/api-promise';
-export { DedalusSDK, type ClientOptions } from './client';
+export { Dedalus, type ClientOptions } from './client';
 export {
-  DedalusSDKError,
+  DedalusError,
   APIError,
   APIConnectionError,
   APIConnectionTimeoutError,

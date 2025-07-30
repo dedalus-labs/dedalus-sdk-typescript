@@ -15,12 +15,11 @@ import { VERSION } from './version';
 import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
-import * as TopLevelAPI from './resources/top-level';
-import { GetRootResponse } from './resources/top-level';
 import { APIPromise } from './core/api-promise';
-import { Chat, ChatCompletionTokenLogprob, ChatCreateParams, ChatCreateResponse } from './resources/chat';
+import { Chat, ChatCreateParams, Completion, CompletionRequest } from './resources/chat';
 import { Health, HealthCheckResponse } from './resources/health';
-import { Model, ModelListResponse, Models } from './resources/models';
+import { Model, Models, ModelsResponse } from './resources/models';
+import { Root, RootGetResponse } from './resources/root';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -36,14 +35,14 @@ import { isEmptyObj } from './internal/utils/values';
 
 export interface ClientOptions {
   /**
-   * Defaults to process.env['DEDALUS_SDK_BEARER_TOKEN'].
+   * Defaults to process.env['DEDALUS_API_KEY'].
    */
-  bearerToken?: string | undefined;
+  apiKey?: string | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
    *
-   * Defaults to process.env['DEDALUS_SDK_BASE_URL'].
+   * Defaults to process.env['DEDALUS_BASE_URL'].
    */
   baseURL?: string | null | undefined;
 
@@ -97,7 +96,7 @@ export interface ClientOptions {
   /**
    * Set the log level.
    *
-   * Defaults to process.env['DEDALUS_SDK_LOG'] or 'warn' if it isn't set.
+   * Defaults to process.env['DEDALUS_LOG'] or 'warn' if it isn't set.
    */
   logLevel?: LogLevel | undefined;
 
@@ -110,10 +109,10 @@ export interface ClientOptions {
 }
 
 /**
- * API Client for interfacing with the Dedalus SDK API.
+ * API Client for interfacing with the Dedalus API.
  */
-export class DedalusSDK {
-  bearerToken: string;
+export class Dedalus {
+  apiKey: string;
 
   baseURL: string;
   maxRetries: number;
@@ -128,10 +127,10 @@ export class DedalusSDK {
   private _options: ClientOptions;
 
   /**
-   * API Client for interfacing with the Dedalus SDK API.
+   * API Client for interfacing with the Dedalus API.
    *
-   * @param {string | undefined} [opts.bearerToken=process.env['DEDALUS_SDK_BEARER_TOKEN'] ?? undefined]
-   * @param {string} [opts.baseURL=process.env['DEDALUS_SDK_BASE_URL'] ?? https://api.example.com] - Override the default base URL for the API.
+   * @param {string | undefined} [opts.apiKey=process.env['DEDALUS_API_KEY'] ?? undefined]
+   * @param {string} [opts.baseURL=process.env['DEDALUS_BASE_URL'] ?? https://api.dedaluslabs.ai] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
    * @param {Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
@@ -140,31 +139,31 @@ export class DedalusSDK {
    * @param {Record<string, string | undefined>} opts.defaultQuery - Default query parameters to include with every request to the API.
    */
   constructor({
-    baseURL = readEnv('DEDALUS_SDK_BASE_URL'),
-    bearerToken = readEnv('DEDALUS_SDK_BEARER_TOKEN'),
+    baseURL = readEnv('DEDALUS_BASE_URL'),
+    apiKey = readEnv('DEDALUS_API_KEY'),
     ...opts
   }: ClientOptions = {}) {
-    if (bearerToken === undefined) {
-      throw new Errors.DedalusSDKError(
-        "The DEDALUS_SDK_BEARER_TOKEN environment variable is missing or empty; either provide it, or instantiate the DedalusSDK client with an bearerToken option, like new DedalusSDK({ bearerToken: 'My Bearer Token' }).",
+    if (apiKey === undefined) {
+      throw new Errors.DedalusError(
+        "The DEDALUS_API_KEY environment variable is missing or empty; either provide it, or instantiate the Dedalus client with an apiKey option, like new Dedalus({ apiKey: 'My API Key' }).",
       );
     }
 
     const options: ClientOptions = {
-      bearerToken,
+      apiKey,
       ...opts,
-      baseURL: baseURL || `https://api.example.com`,
+      baseURL: baseURL || `https://api.dedaluslabs.ai`,
     };
 
     this.baseURL = options.baseURL!;
-    this.timeout = options.timeout ?? DedalusSDK.DEFAULT_TIMEOUT /* 1 minute */;
+    this.timeout = options.timeout ?? Dedalus.DEFAULT_TIMEOUT /* 1 minute */;
     this.logger = options.logger ?? console;
     const defaultLogLevel = 'warn';
     // Set default logLevel early so that we can log a warning in parseLogLevel.
     this.logLevel = defaultLogLevel;
     this.logLevel =
       parseLogLevel(options.logLevel, 'ClientOptions.logLevel', this) ??
-      parseLogLevel(readEnv('DEDALUS_SDK_LOG'), "process.env['DEDALUS_SDK_LOG']", this) ??
+      parseLogLevel(readEnv('DEDALUS_LOG'), "process.env['DEDALUS_LOG']", this) ??
       defaultLogLevel;
     this.fetchOptions = options.fetchOptions;
     this.maxRetries = options.maxRetries ?? 2;
@@ -173,7 +172,7 @@ export class DedalusSDK {
 
     this._options = options;
 
-    this.bearerToken = bearerToken;
+    this.apiKey = apiKey;
   }
 
   /**
@@ -189,7 +188,7 @@ export class DedalusSDK {
       logLevel: this.logLevel,
       fetch: this.fetch,
       fetchOptions: this.fetchOptions,
-      bearerToken: this.bearerToken,
+      apiKey: this.apiKey,
       ...options,
     });
     return client;
@@ -199,14 +198,7 @@ export class DedalusSDK {
    * Check whether the base URL is set to its default.
    */
   #baseURLOverridden(): boolean {
-    return this.baseURL !== 'https://api.example.com';
-  }
-
-  /**
-   * Root
-   */
-  getRoot(options?: RequestOptions): APIPromise<TopLevelAPI.GetRootResponse> {
-    return this.get('/', options);
+    return this.baseURL !== 'https://api.dedaluslabs.ai';
   }
 
   protected defaultQuery(): Record<string, string | undefined> | undefined {
@@ -218,7 +210,7 @@ export class DedalusSDK {
   }
 
   protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
-    return buildHeaders([{ Authorization: `Bearer ${this.bearerToken}` }]);
+    return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
   }
 
   /**
@@ -234,7 +226,7 @@ export class DedalusSDK {
         if (value === null) {
           return `${encodeURIComponent(key)}=`;
         }
-        throw new Errors.DedalusSDKError(
+        throw new Errors.DedalusError(
           `Cannot stringify type ${typeof value}; Expected string, number, boolean, or null. If you need to pass nested query parameters, you can manually encode them, e.g. { query: { 'foo[key1]': value1, 'foo[key2]': value2 } }, and please open a GitHub issue requesting better support for your use case.`,
         );
       })
@@ -706,10 +698,10 @@ export class DedalusSDK {
     }
   }
 
-  static DedalusSDK = this;
+  static Dedalus = this;
   static DEFAULT_TIMEOUT = 60000; // 1 minute
 
-  static DedalusSDKError = Errors.DedalusSDKError;
+  static DedalusError = Errors.DedalusError;
   static APIError = Errors.APIError;
   static APIConnectionError = Errors.APIConnectionError;
   static APIConnectionTimeoutError = Errors.APIConnectionTimeoutError;
@@ -725,26 +717,28 @@ export class DedalusSDK {
 
   static toFile = Uploads.toFile;
 
+  root: API.Root = new API.Root(this);
   health: API.Health = new API.Health(this);
   models: API.Models = new API.Models(this);
   chat: API.Chat = new API.Chat(this);
 }
-DedalusSDK.Health = Health;
-DedalusSDK.Models = Models;
-DedalusSDK.Chat = Chat;
-export declare namespace DedalusSDK {
+Dedalus.Root = Root;
+Dedalus.Health = Health;
+Dedalus.Models = Models;
+Dedalus.Chat = Chat;
+export declare namespace Dedalus {
   export type RequestOptions = Opts.RequestOptions;
 
-  export { type GetRootResponse as GetRootResponse };
+  export { Root as Root, type RootGetResponse as RootGetResponse };
 
   export { Health as Health, type HealthCheckResponse as HealthCheckResponse };
 
-  export { Models as Models, type Model as Model, type ModelListResponse as ModelListResponse };
+  export { Models as Models, type Model as Model, type ModelsResponse as ModelsResponse };
 
   export {
     Chat as Chat,
-    type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
-    type ChatCreateResponse as ChatCreateResponse,
+    type Completion as Completion,
+    type CompletionRequest as CompletionRequest,
     type ChatCreateParams as ChatCreateParams,
   };
 }

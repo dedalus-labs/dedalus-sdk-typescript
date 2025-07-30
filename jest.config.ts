@@ -7,8 +7,8 @@ const config: JestConfigWithTsJest = {
     '^.+\\.(t|j)sx?$': ['@swc/jest', { sourceMaps: 'inline' }],
   },
   moduleNameMapper: {
-    '^dedalus-sdk$': '<rootDir>/src/index.ts',
-    '^dedalus-sdk/(.*)$': '<rootDir>/src/$1',
+    '^dedalus-labs$': '<rootDir>/src/index.ts',
+    '^dedalus-labs/(.*)$': '<rootDir>/src/$1',
   },
   modulePathIgnorePatterns: [
     '<rootDir>/ecosystem-tests/',
