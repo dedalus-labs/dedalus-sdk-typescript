@@ -1,9 +1,9 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 
-const client = new DedalusSDK({
-  bearerToken: 'My Bearer Token',
+const client = new Dedalus({
+  apiKey: 'My API Key',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 

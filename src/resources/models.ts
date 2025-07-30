@@ -90,7 +90,7 @@ export class Models extends APIResource {
    *     }
    *     ```
    */
-  list(options?: RequestOptions): APIPromise<ModelListResponse> {
+  list(options?: RequestOptions): APIPromise<ModelsResponse> {
     return this._client.get('/v1/models', options);
   }
 }
@@ -162,7 +162,7 @@ export interface Model {
  * "owned_by": "openai" }, { "id": "claude-3-5-sonnet-20241022", "object": "model",
  * "owned_by": "anthropic" } ] }
  */
-export interface ModelListResponse {
+export interface ModelsResponse {
   /**
    * List of models
    */
@@ -175,5 +175,5 @@ export interface ModelListResponse {
 }
 
 export declare namespace Models {
-  export { type Model as Model, type ModelListResponse as ModelListResponse };
+  export { type Model as Model, type ModelsResponse as ModelsResponse };
 }

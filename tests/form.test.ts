@@ -1,5 +1,5 @@
-import { multipartFormRequestOptions, createForm } from 'dedalus-sdk/internal/uploads';
-import { toFile } from 'dedalus-sdk/core/uploads';
+import { multipartFormRequestOptions, createForm } from 'dedalus-labs/internal/uploads';
+import { toFile } from 'dedalus-labs/core/uploads';
 
 describe('form data validation', () => {
   test('valid values do not error', async () => {
