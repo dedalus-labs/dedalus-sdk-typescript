@@ -1,8 +1,8 @@
-# Dedalus SDK TypeScript API Library
+# Dedalus TypeScript API Library
 
-[![NPM version](<https://img.shields.io/npm/v/dedalus-sdk.svg?label=npm%20(stable)>)](https://npmjs.org/package/dedalus-sdk) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/dedalus-sdk)
+[![NPM version](<https://img.shields.io/npm/v/dedalus-labs.svg?label=npm%20(stable)>)](https://npmjs.org/package/dedalus-labs) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/dedalus-labs)
 
-This library provides convenient access to the Dedalus SDK REST API from server-side TypeScript or JavaScript.
+This library provides convenient access to the Dedalus REST API from server-side TypeScript or JavaScript.
 
 The full API of this library can be found in [api.md](api.md).
 
@@ -11,11 +11,8 @@ It is generated with [Stainless](https://www.stainless.com/).
 ## Installation
 
 ```sh
-npm install git+ssh://git@github.com:stainless-sdks/dedalus-sdk-typescript.git
+npm install dedalus-labs
 ```
-
-> [!NOTE]
-> Once this package is [published to npm](https://www.stainless.com/docs/guides/publish), this will become: `npm install dedalus-sdk`
 
 ## Usage
 
@@ -23,15 +20,18 @@ The full API of this library can be found in [api.md](api.md).
 
 <!-- prettier-ignore -->
 ```js
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 
-const client = new DedalusSDK({
-  bearerToken: process.env['DEDALUS_SDK_BEARER_TOKEN'], // This is the default and can be omitted
+const client = new Dedalus({
+  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
 });
 
-const response = await client.health.check();
+const completion = await client.chat.create({
+  messages: [{ role: 'user', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' }],
+  model: 'gpt-4o-mini',
+});
 
-console.log(response.status);
+console.log(completion.id);
 ```
 
 ### Request & Response types
@@ -40,13 +40,13 @@ This library includes TypeScript definitions for all request params and response
 
 <!-- prettier-ignore -->
 ```ts
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 
-const client = new DedalusSDK({
-  bearerToken: process.env['DEDALUS_SDK_BEARER_TOKEN'], // This is the default and can be omitted
+const client = new Dedalus({
+  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
 });
 
-const response: DedalusSDK.HealthCheckResponse = await client.health.check();
+const response: Dedalus.HealthCheckResponse = await client.health.check();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
@@ -60,7 +60,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 const response = await client.health.check().catch(async (err) => {
-  if (err instanceof DedalusSDK.APIError) {
+  if (err instanceof Dedalus.APIError) {
     console.log(err.status); // 400
     console.log(err.name); // BadRequestError
     console.log(err.headers); // {server: 'nginx', ...}
@@ -94,7 +94,7 @@ You can use the `maxRetries` option to configure or disable this:
 <!-- prettier-ignore -->
 ```js
 // Configure the default for all requests:
-const client = new DedalusSDK({
+const client = new Dedalus({
   maxRetries: 0, // default is 2
 });
 
@@ -111,7 +111,7 @@ Requests time out after 1 minute by default. You can configure this with a `time
 <!-- prettier-ignore -->
 ```ts
 // Configure the default for all requests:
-const client = new DedalusSDK({
+const client = new Dedalus({
   timeout: 20 * 1000, // 20 seconds (default is 1 minute)
 });
 
@@ -137,7 +137,7 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 
 <!-- prettier-ignore -->
 ```ts
-const client = new DedalusSDK();
+const client = new Dedalus();
 
 const response = await client.health.check().asResponse();
 console.log(response.headers.get('X-My-Header'));
@@ -158,13 +158,13 @@ console.log(response.status);
 
 The log level can be configured in two ways:
 
-1. Via the `DEDALUS_SDK_LOG` environment variable
+1. Via the `DEDALUS_LOG` environment variable
 2. Using the `logLevel` client option (overrides the environment variable if set)
 
 ```ts
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 
-const client = new DedalusSDK({
+const client = new Dedalus({
   logLevel: 'debug', // Show all log messages
 });
 ```
@@ -190,13 +190,13 @@ When providing a custom logger, the `logLevel` option still controls which messa
 below the configured level will not be sent to your logger.
 
 ```ts
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 import pino from 'pino';
 
 const logger = pino();
 
-const client = new DedalusSDK({
-  logger: logger.child({ name: 'DedalusSDK' }),
+const client = new Dedalus({
+  logger: logger.child({ name: 'Dedalus' }),
   logLevel: 'debug', // Send all messages to pino, allowing it to filter
 });
 ```
@@ -225,7 +225,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.health.check({
+client.chat.create({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',
@@ -259,10 +259,10 @@ globalThis.fetch = fetch;
 Or pass it to the client:
 
 ```ts
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 import fetch from 'my-fetch';
 
-const client = new DedalusSDK({ fetch });
+const client = new Dedalus({ fetch });
 ```
 
 ### Fetch options
@@ -270,9 +270,9 @@ const client = new DedalusSDK({ fetch });
 If you want to set custom `fetch` options without overriding the `fetch` function, you can provide a `fetchOptions` object when instantiating the client or making a request. (Request-specific options override client options.)
 
 ```ts
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 
-const client = new DedalusSDK({
+const client = new Dedalus({
   fetchOptions: {
     // `RequestInit` options
   },
@@ -287,11 +287,11 @@ options to requests:
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/node.svg" align="top" width="18" height="21"> **Node** <sup>[[docs](https://github.com/nodejs/undici/blob/main/docs/docs/api/ProxyAgent.md#example---proxyagent-with-fetch)]</sup>
 
 ```ts
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 import * as undici from 'undici';
 
 const proxyAgent = new undici.ProxyAgent('http://localhost:8888');
-const client = new DedalusSDK({
+const client = new Dedalus({
   fetchOptions: {
     dispatcher: proxyAgent,
   },
@@ -301,9 +301,9 @@ const client = new DedalusSDK({
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/bun.svg" align="top" width="18" height="21"> **Bun** <sup>[[docs](https://bun.sh/guides/http/proxy)]</sup>
 
 ```ts
-import DedalusSDK from 'dedalus-sdk';
+import Dedalus from 'dedalus-labs';
 
-const client = new DedalusSDK({
+const client = new Dedalus({
   fetchOptions: {
     proxy: 'http://localhost:8888',
   },
@@ -313,10 +313,10 @@ const client = new DedalusSDK({
 <img src="https://raw.githubusercontent.com/stainless-api/sdk-assets/refs/heads/main/deno.svg" align="top" width="18" height="21"> **Deno** <sup>[[docs](https://docs.deno.com/api/deno/~/Deno.createHttpClient)]</sup>
 
 ```ts
-import DedalusSDK from 'npm:dedalus-sdk';
+import Dedalus from 'npm:dedalus-labs';
 
 const httpClient = Deno.createHttpClient({ proxy: { url: 'http://localhost:8888' } });
-const client = new DedalusSDK({
+const client = new Dedalus({
   fetchOptions: {
     client: httpClient,
   },
@@ -335,7 +335,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/stainless-sdks/dedalus-sdk-typescript/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/dedalus-labs/dedalus-sdk-typescript/issues) with questions, bugs, or suggestions.
 
 ## Requirements
 

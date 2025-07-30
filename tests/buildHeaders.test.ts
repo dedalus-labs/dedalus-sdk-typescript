@@ -1,5 +1,5 @@
 import { inspect } from 'node:util';
-import { buildHeaders, type HeadersLike, type NullableHeaders } from 'dedalus-sdk/internal/headers';
+import { buildHeaders, type HeadersLike, type NullableHeaders } from 'dedalus-labs/internal/headers';
 
 function inspectNullableHeaders(headers: NullableHeaders) {
   return `NullableHeaders {${[

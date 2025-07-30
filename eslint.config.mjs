@@ -25,7 +25,7 @@ export default tseslint.config(
         {
           patterns: [
             {
-              regex: '^dedalus-sdk(/.*)?',
+              regex: '^dedalus-labs(/.*)?',
               message: 'Use a relative import, not a package import.',
             },
           ],

@@ -1,8 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { DedalusSDK } from 'dedalus-sdk';
+import { Dedalus } from 'dedalus-labs';
 
-const { stringifyQuery } = DedalusSDK.prototype as any;
+const { stringifyQuery } = Dedalus.prototype as any;
 
 describe(stringifyQuery, () => {
   for (const [input, expected] of [

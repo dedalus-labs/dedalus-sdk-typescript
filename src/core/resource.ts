@@ -1,11 +1,11 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import type { DedalusSDK } from '../client';
+import type { Dedalus } from '../client';
 
 export abstract class APIResource {
-  protected _client: DedalusSDK;
+  protected _client: Dedalus;
 
-  constructor(client: DedalusSDK) {
+  constructor(client: Dedalus) {
     this._client = client;
   }
 }
