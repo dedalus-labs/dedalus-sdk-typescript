@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export const tool: Tool = {
   name: 'get_root',
   description:
-    "When using this tool, always use the `jq_filter` parameter to reduce the response size and improve performance.\n\nOnly omit if you're sure you don't need the data.\n\nRoot\n\n# Response Schema\n```json\n{\n  type: 'object',\n  title: 'RootResponse',\n  description: 'Response model for the root endpoint.',\n  properties: {\n    message: {\n      type: 'string',\n      title: 'Message'\n    }\n  },\n  required: [    'message'\n  ]\n}\n```",
+    "When using this tool, always use the `jq_filter` parameter to reduce the response size and improve performance.\n\nOnly omit if you're sure you don't need the data.\n\nRoot\n\n# Response Schema\n```json\n{\n  type: 'object',\n  title: 'RootResponse',\n  description: 'Response model for the root endpoint of the Dedalus API.',\n  properties: {\n    message: {\n      type: 'string',\n      title: 'Message'\n    }\n  },\n  required: [    'message'\n  ]\n}\n```",
   inputSchema: {
     type: 'object',
     properties: {

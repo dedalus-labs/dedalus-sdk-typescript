@@ -302,9 +302,7 @@ The following tools are available in this MCP server.
 
       completion = client.chat.create(
           model="gpt-4",
-          input=[
-              {"role": "user", "content": "Hello, how are you?"}
-          ]
+          input=[{"role": "user", "content": "Hello, how are you?"}],
       )
 
       print(completion.choices[0].message.content)
@@ -314,19 +312,17 @@ The following tools are available in this MCP server.
       ```python
       completion = client.chat.create(
           model="gpt-4",
-          input=[
-              {"role": "user", "content": "Search for recent AI news"}
-          ],
+          input=[{"role": "user", "content": "Search for recent AI news"}],
           tools=[
               {
                   "type": "function",
                   "function": {
                       "name": "search_web",
-                      "description": "Search the web for information"
-                  }
+                      "description": "Search the web for information",
+                  },
               }
           ],
-          mcp_servers=["dedalus-labs/brave-search"]
+          mcp_servers=["dedalus-labs/brave-search"],
       )
       ```
 
@@ -334,13 +330,8 @@ The following tools are available in this MCP server.
       ```python
       completion = client.chat.create(
           model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
-          input=[
-              {"role": "user", "content": "Analyze this complex data"}
-          ],
-          agent_attributes={
-              "complexity": 0.8,
-              "accuracy": 0.9
-          }
+          input=[{"role": "user", "content": "Analyze this complex data"}],
+          agent_attributes={"complexity": 0.8, "accuracy": 0.9},
       )
       ```
 
@@ -348,10 +339,8 @@ The following tools are available in this MCP server.
       ```python
       stream = client.chat.create(
           model="gpt-4",
-          input=[
-              {"role": "user", "content": "Tell me a story"}
-          ],
-          stream=True
+          input=[{"role": "user", "content": "Tell me a story"}],
+          stream=True,
       )
 
       for chunk in stream:
