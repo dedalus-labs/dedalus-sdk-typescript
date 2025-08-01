@@ -41,8 +41,8 @@ export const tool: Tool = {
 };
 
 export const handler = async (client: Dedalus, args: Record<string, unknown> | undefined) => {
-  const { model_id, ...body } = args as any;
-  return asTextContentResult(await maybeFilter(args, await client.models.retrieve(model_id)));
+  const { model_id, jq_filter, ...body } = args as any;
+  return asTextContentResult(await maybeFilter(jq_filter, await client.models.retrieve(model_id)));
 };
 
 export default { metadata, tool, handler };

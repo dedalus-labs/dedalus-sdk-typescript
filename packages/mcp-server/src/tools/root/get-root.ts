@@ -37,7 +37,8 @@ export const tool: Tool = {
 };
 
 export const handler = async (client: Dedalus, args: Record<string, unknown> | undefined) => {
-  return asTextContentResult(await maybeFilter(args, await client.root.get()));
+  const { jq_filter } = args as any;
+  return asTextContentResult(await maybeFilter(jq_filter, await client.root.get()));
 };
 
 export default { metadata, tool, handler };
