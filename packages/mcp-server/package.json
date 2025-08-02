@@ -1,6 +1,6 @@
 {
   "name": "dedalus-labs-mcp",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "description": "The official MCP Server for the Dedalus API",
   "author": "Dedalus <founders@dedaluslabs.ai>",
   "types": "dist/index.d.ts",
