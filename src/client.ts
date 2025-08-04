@@ -16,14 +16,7 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
-import {
-  Chat,
-  ChatCreateParams,
-  ChatCreateParamsNonStreaming,
-  ChatCreateParamsStreaming,
-  Completion,
-  CompletionRequest,
-} from './resources/chat';
+import { Chat, ChatCreateParams, Completion, CompletionRequest } from './resources/chat';
 import { Health, HealthCheckResponse } from './resources/health';
 import { Model, Models, ModelsResponse } from './resources/models';
 import { Root, RootGetResponse } from './resources/root';
@@ -747,7 +740,5 @@ export declare namespace Dedalus {
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
     type ChatCreateParams as ChatCreateParams,
-    type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,
-    type ChatCreateParamsStreaming as ChatCreateParamsStreaming,
   };
 }
