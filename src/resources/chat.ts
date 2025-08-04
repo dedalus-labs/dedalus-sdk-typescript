@@ -1,7 +1,9 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
+import * as ChatAPI from './chat';
 import { APIPromise } from '../core/api-promise';
+import { Stream } from '../core/streaming';
 import { RequestOptions } from '../internal/request-options';
 
 export class Chat extends APIResource {
@@ -85,8 +87,16 @@ export class Chat extends APIResource {
    *             print(chunk.choices[0].delta.content, end="")
    *     ```
    */
-  create(body: ChatCreateParams, options?: RequestOptions): APIPromise<Completion> {
-    return this._client.post('/v1/chat', { body, ...options });
+  create(body: ChatCreateParamsNonStreaming, options?: RequestOptions): APIPromise<Completion>;
+  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<Completion>>;
+  create(body: ChatCreateParamsBase, options?: RequestOptions): APIPromise<Stream<Completion> | Completion>;
+  create(
+    body: ChatCreateParams,
+    options?: RequestOptions,
+  ): APIPromise<Completion> | APIPromise<Stream<Completion>> {
+    return this._client.post('/v1/chat', { body, ...options, stream: body.stream ?? false }) as
+      | APIPromise<Completion>
+      | APIPromise<Stream<Completion>>;
   }
 }
 
@@ -497,7 +507,9 @@ export interface CompletionRequest {
   user?: string | null;
 }
 
-export interface ChatCreateParams {
+export type ChatCreateParams = ChatCreateParamsNonStreaming | ChatCreateParamsStreaming;
+
+export interface ChatCreateParamsBase {
   /**
    * Attributes for the agent itself, influencing behavior and model selection.
    * Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
@@ -633,10 +645,33 @@ export interface ChatCreateParams {
   user?: string | null;
 }
 
+export namespace ChatCreateParams {
+  export type ChatCreateParamsNonStreaming = ChatAPI.ChatCreateParamsNonStreaming;
+  export type ChatCreateParamsStreaming = ChatAPI.ChatCreateParamsStreaming;
+}
+
+export interface ChatCreateParamsNonStreaming extends ChatCreateParamsBase {
+  /**
+   * Whether to stream back partial message deltas as Server-Sent Events. When true,
+   * partial message deltas will be sent as chunks in OpenAI format.
+   */
+  stream?: false | null;
+}
+
+export interface ChatCreateParamsStreaming extends ChatCreateParamsBase {
+  /**
+   * Whether to stream back partial message deltas as Server-Sent Events. When true,
+   * partial message deltas will be sent as chunks in OpenAI format.
+   */
+  stream: true;
+}
+
 export declare namespace Chat {
   export {
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
     type ChatCreateParams as ChatCreateParams,
+    type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,
+    type ChatCreateParamsStreaming as ChatCreateParamsStreaming,
   };
 }
