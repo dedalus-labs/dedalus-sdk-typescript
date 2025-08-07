@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.0-alpha.4 (2025-08-07)
+
+Full Changelog: [v0.1.0-alpha.3...v0.1.0-alpha.4](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.3...v0.1.0-alpha.4)
+
+### Features
+
+* **api:** api update ([e09da4f](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/e09da4ff73f922d4c4d18d7ed9f89a0083669f23))
+* **api:** fixing streaming again ([7455cf3](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/7455cf34ce05f9f872e4a1befde117ac4d56c64d))
+* **api:** streaming schemas ([29ff744](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/29ff744a2ad082b8aabeff68abbe2da7cc1d5c60))
+* **mcp:** add unix socket option for remote MCP ([26af07a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/26af07aaf1c5d3cdc661001c912cbc1cc18aacdd))
+* **mcp:** remote server with passthru auth ([8220c95](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/8220c955e1b85165ae19e8b90480297369a1265f))
+
+
+### Bug Fixes
+
+* **mcp:** fix bug in header handling ([b864d5d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/b864d5d8d7fd1d71f6bf8c8972e67e2efba3b393))
+
+
+### Chores
+
+* **internal:** move publish config ([dced8f7](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/dced8f7d75b28137ec30e45b1212565097a99e30))
+* **mcp:** refactor streamable http transport ([e57300c](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/e57300c2d4dff66edac8b71b9a15935feb2883fb))
+
 ## 0.1.0-alpha.3 (2025-08-05)
 
 Full Changelog: [v0.1.0-alpha.2...v0.1.0-alpha.3](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.2...v0.1.0-alpha.3)
