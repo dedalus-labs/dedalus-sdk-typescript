@@ -26,7 +26,7 @@ export const newMcpServer = () =>
   new McpServer(
     {
       name: 'dedalus_labs_api',
-      version: '0.1.0-alpha.3',
+      version: '0.1.0-alpha.4',
     },
     { capabilities: { tools: {}, logging: {} } },
   );
