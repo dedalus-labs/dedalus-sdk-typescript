@@ -88,15 +88,15 @@ export class Chat extends APIResource {
    *     ```
    */
   create(body: ChatCreateParamsNonStreaming, options?: RequestOptions): APIPromise<Completion>;
-  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<Completion>>;
-  create(body: ChatCreateParamsBase, options?: RequestOptions): APIPromise<Stream<Completion> | Completion>;
+  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<StreamChunk>>;
+  create(body: ChatCreateParamsBase, options?: RequestOptions): APIPromise<Stream<StreamChunk> | Completion>;
   create(
     body: ChatCreateParams,
     options?: RequestOptions,
-  ): APIPromise<Completion> | APIPromise<Stream<Completion>> {
+  ): APIPromise<Completion> | APIPromise<Stream<StreamChunk>> {
     return this._client.post('/v1/chat', { body, ...options, stream: body.stream ?? false }) as
       | APIPromise<Completion>
-      | APIPromise<Stream<Completion>>;
+      | APIPromise<Stream<StreamChunk>>;
   }
 }
 
@@ -507,6 +507,182 @@ export interface CompletionRequest {
   user?: string | null;
 }
 
+export interface StreamChunk {
+  id: string;
+
+  choices: Array<StreamChunk.Choice>;
+
+  created: number;
+
+  model: string;
+
+  object: 'chat.completion.chunk';
+
+  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
+
+  system_fingerprint?: string | null;
+
+  usage?: StreamChunk.Usage | null;
+
+  [k: string]: unknown;
+}
+
+export namespace StreamChunk {
+  export interface Choice {
+    delta: Choice.Delta;
+
+    index: number;
+
+    finish_reason?: 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call' | null;
+
+    logprobs?: Choice.Logprobs | null;
+
+    [k: string]: unknown;
+  }
+
+  export namespace Choice {
+    export interface Delta {
+      content?: string | null;
+
+      function_call?: Delta.FunctionCall | null;
+
+      refusal?: string | null;
+
+      role?: 'developer' | 'system' | 'user' | 'assistant' | 'tool' | null;
+
+      tool_calls?: Array<Delta.ToolCall> | null;
+
+      [k: string]: unknown;
+    }
+
+    export namespace Delta {
+      export interface FunctionCall {
+        arguments?: string | null;
+
+        name?: string | null;
+
+        [k: string]: unknown;
+      }
+
+      export interface ToolCall {
+        index: number;
+
+        id?: string | null;
+
+        function?: ToolCall.Function | null;
+
+        type?: 'function' | null;
+
+        [k: string]: unknown;
+      }
+
+      export namespace ToolCall {
+        export interface Function {
+          arguments?: string | null;
+
+          name?: string | null;
+
+          [k: string]: unknown;
+        }
+      }
+    }
+
+    export interface Logprobs {
+      content?: Array<Logprobs.Content> | null;
+
+      refusal?: Array<Logprobs.Refusal> | null;
+
+      [k: string]: unknown;
+    }
+
+    export namespace Logprobs {
+      export interface Content {
+        token: string;
+
+        logprob: number;
+
+        top_logprobs: Array<Content.TopLogprob>;
+
+        bytes?: Array<number> | null;
+
+        [k: string]: unknown;
+      }
+
+      export namespace Content {
+        export interface TopLogprob {
+          token: string;
+
+          logprob: number;
+
+          bytes?: Array<number> | null;
+
+          [k: string]: unknown;
+        }
+      }
+
+      export interface Refusal {
+        token: string;
+
+        logprob: number;
+
+        top_logprobs: Array<Refusal.TopLogprob>;
+
+        bytes?: Array<number> | null;
+
+        [k: string]: unknown;
+      }
+
+      export namespace Refusal {
+        export interface TopLogprob {
+          token: string;
+
+          logprob: number;
+
+          bytes?: Array<number> | null;
+
+          [k: string]: unknown;
+        }
+      }
+    }
+  }
+
+  export interface Usage {
+    completion_tokens: number;
+
+    prompt_tokens: number;
+
+    total_tokens: number;
+
+    completion_tokens_details?: Usage.CompletionTokensDetails | null;
+
+    prompt_tokens_details?: Usage.PromptTokensDetails | null;
+
+    [k: string]: unknown;
+  }
+
+  export namespace Usage {
+    export interface CompletionTokensDetails {
+      accepted_prediction_tokens?: number | null;
+
+      audio_tokens?: number | null;
+
+      reasoning_tokens?: number | null;
+
+      rejected_prediction_tokens?: number | null;
+
+      [k: string]: unknown;
+    }
+
+    export interface PromptTokensDetails {
+      audio_tokens?: number | null;
+
+      cached_tokens?: number | null;
+
+      [k: string]: unknown;
+    }
+  }
+}
+
 export type ChatCreateParams = ChatCreateParamsNonStreaming | ChatCreateParamsStreaming;
 
 export interface ChatCreateParamsBase {
@@ -670,6 +846,7 @@ export declare namespace Chat {
   export {
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
+    type StreamChunk as StreamChunk,
     type ChatCreateParams as ChatCreateParams,
     type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,
     type ChatCreateParamsStreaming as ChatCreateParamsStreaming,
