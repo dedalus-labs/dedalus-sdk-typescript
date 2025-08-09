@@ -2,103 +2,8 @@
 
 import { APIResource } from '../core/resource';
 import * as ChatAPI from './chat';
-import { APIPromise } from '../core/api-promise';
-import { Stream } from '../core/streaming';
-import { RequestOptions } from '../internal/request-options';
 
-export class Chat extends APIResource {
-  /**
-   * Create a chat completion using the Agent framework.
-   *
-   * This endpoint provides a vendor-agnostic chat completion API that works with
-   * 100+ LLM providers via the Agent framework. It supports both single and
-   * multi-model routing, client-side and server-side tool execution, and integration
-   * with MCP (Model Context Protocol) servers.
-   *
-   * Features: - Cross-vendor compatibility (OpenAI, Anthropic, Cohere, etc.) -
-   * Multi-model routing with intelligent agentic handoffs - Client-side tool
-   * execution (tools returned as JSON) - Server-side MCP tool execution with
-   * automatic billing - Streaming and non-streaming responses - Advanced agent
-   * attributes for routing decisions - Automatic usage tracking and billing
-   *
-   * Args: request: Chat completion request with messages, model, and configuration
-   * http_request: FastAPI request object for accessing headers and state
-   * background_tasks: FastAPI background tasks for async billing operations user:
-   * Authenticated user with validated API key and sufficient balance
-   *
-   * Returns: ChatCompletion: OpenAI-compatible completion response with usage data
-   *
-   * Raises: HTTPException: - 401 if authentication fails or insufficient balance -
-   * 400 if request validation fails - 500 if internal processing error occurs
-   *
-   * Billing: - Token usage billed automatically based on model pricing - MCP tool
-   * calls billed separately using credits system - Streaming responses billed after
-   * completion via background task
-   *
-   * Example: Basic chat completion: ```python import dedalus_labs
-   *
-   *     client = dedalus_labs.Client(api_key="your-api-key")
-   *
-   *     completion = client.chat.create(
-   *         model="gpt-4",
-   *         input=[{"role": "user", "content": "Hello, how are you?"}],
-   *     )
-   *
-   *     print(completion.choices[0].message.content)
-   *     ```
-   *
-   *     With tools and MCP servers:
-   *     ```python
-   *     completion = client.chat.create(
-   *         model="gpt-4",
-   *         input=[{"role": "user", "content": "Search for recent AI news"}],
-   *         tools=[
-   *             {
-   *                 "type": "function",
-   *                 "function": {
-   *                     "name": "search_web",
-   *                     "description": "Search the web for information",
-   *                 },
-   *             }
-   *         ],
-   *         mcp_servers=["dedalus-labs/brave-search"],
-   *     )
-   *     ```
-   *
-   *     Multi-model routing:
-   *     ```python
-   *     completion = client.chat.create(
-   *         model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
-   *         input=[{"role": "user", "content": "Analyze this complex data"}],
-   *         agent_attributes={"complexity": 0.8, "accuracy": 0.9},
-   *     )
-   *     ```
-   *
-   *     Streaming response:
-   *     ```python
-   *     stream = client.chat.create(
-   *         model="gpt-4",
-   *         input=[{"role": "user", "content": "Tell me a story"}],
-   *         stream=True,
-   *     )
-   *
-   *     for chunk in stream:
-   *         if chunk.choices[0].delta.content:
-   *             print(chunk.choices[0].delta.content, end="")
-   *     ```
-   */
-  create(body: ChatCreateParamsNonStreaming, options?: RequestOptions): APIPromise<Completion>;
-  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<StreamChunk>>;
-  create(body: ChatCreateParamsBase, options?: RequestOptions): APIPromise<Stream<StreamChunk> | Completion>;
-  create(
-    body: ChatCreateParams,
-    options?: RequestOptions,
-  ): APIPromise<Completion> | APIPromise<Stream<StreamChunk>> {
-    return this._client.post('/v1/chat', { body, ...options, stream: body.stream ?? false }) as
-      | APIPromise<Completion>
-      | APIPromise<Stream<StreamChunk>>;
-  }
-}
+export class Chat extends APIResource {}
 
 export interface Completion {
   id: string;
@@ -435,19 +340,12 @@ export interface CompletionRequest {
   mcp_servers?: Array<string> | null;
 
   /**
-   * Model(s) to use for completion. Can be a single model ID, a ModelConfig object
-   * (optionally with per-model 'settings'), or a list for multi-model routing.
-   * Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model
-   * instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or
-   * list of ModelConfig objects - agent will choose optimal model based on task
-   * complexity.
+   * Model(s) to use for completion. Can be a single model ID or a list for
+   * multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022',
+   * 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4',
+   * 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.
    */
-  model?:
-    | string
-    | Array<string>
-    | CompletionRequest.ModelConfig
-    | Array<CompletionRequest.ModelConfigList>
-    | null;
+  model?: string | Array<string> | null;
 
   /**
    * Attributes for individual models used in routing decisions during multi-model
@@ -512,224 +410,6 @@ export interface CompletionRequest {
    * detection. Should be consistent across requests from the same user.
    */
   user?: string | null;
-}
-
-export namespace CompletionRequest {
-  /**
-   * A model with optional routing attributes and per-model settings.
-   */
-  export interface ModelConfig {
-    /**
-     * Model identifier, e.g. 'gpt-4' or 'claude-3-5-sonnet-20241022'.
-     */
-    name: string;
-
-    /**
-     * Numeric attributes used by routing (0.0–1.0), e.g. intelligence, speed, cost.
-     */
-    attributes?: { [key: string]: number } | null;
-
-    /**
-     * Per-model generation settings like temperature, max_tokens, etc.
-     */
-    settings?: { [key: string]: unknown } | null;
-  }
-
-  /**
-   * A model with optional routing attributes and per-model settings.
-   */
-  export interface ModelConfigList {
-    /**
-     * Model identifier, e.g. 'gpt-4' or 'claude-3-5-sonnet-20241022'.
-     */
-    name: string;
-
-    /**
-     * Numeric attributes used by routing (0.0–1.0), e.g. intelligence, speed, cost.
-     */
-    attributes?: { [key: string]: number } | null;
-
-    /**
-     * Per-model generation settings like temperature, max_tokens, etc.
-     */
-    settings?: { [key: string]: unknown } | null;
-  }
-}
-
-export interface StreamChunk {
-  id: string;
-
-  choices: Array<StreamChunk.Choice>;
-
-  created: number;
-
-  model: string;
-
-  object: 'chat.completion.chunk';
-
-  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
-
-  system_fingerprint?: string | null;
-
-  usage?: StreamChunk.Usage | null;
-
-  [k: string]: unknown;
-}
-
-export namespace StreamChunk {
-  export interface Choice {
-    delta: Choice.Delta;
-
-    index: number;
-
-    finish_reason?: 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call' | null;
-
-    logprobs?: Choice.Logprobs | null;
-
-    [k: string]: unknown;
-  }
-
-  export namespace Choice {
-    export interface Delta {
-      content?: string | null;
-
-      function_call?: Delta.FunctionCall | null;
-
-      refusal?: string | null;
-
-      role?: 'developer' | 'system' | 'user' | 'assistant' | 'tool' | null;
-
-      tool_calls?: Array<Delta.ToolCall> | null;
-
-      [k: string]: unknown;
-    }
-
-    export namespace Delta {
-      export interface FunctionCall {
-        arguments?: string | null;
-
-        name?: string | null;
-
-        [k: string]: unknown;
-      }
-
-      export interface ToolCall {
-        index: number;
-
-        id?: string | null;
-
-        function?: ToolCall.Function | null;
-
-        type?: 'function' | null;
-
-        [k: string]: unknown;
-      }
-
-      export namespace ToolCall {
-        export interface Function {
-          arguments?: string | null;
-
-          name?: string | null;
-
-          [k: string]: unknown;
-        }
-      }
-    }
-
-    export interface Logprobs {
-      content?: Array<Logprobs.Content> | null;
-
-      refusal?: Array<Logprobs.Refusal> | null;
-
-      [k: string]: unknown;
-    }
-
-    export namespace Logprobs {
-      export interface Content {
-        token: string;
-
-        logprob: number;
-
-        top_logprobs: Array<Content.TopLogprob>;
-
-        bytes?: Array<number> | null;
-
-        [k: string]: unknown;
-      }
-
-      export namespace Content {
-        export interface TopLogprob {
-          token: string;
-
-          logprob: number;
-
-          bytes?: Array<number> | null;
-
-          [k: string]: unknown;
-        }
-      }
-
-      export interface Refusal {
-        token: string;
-
-        logprob: number;
-
-        top_logprobs: Array<Refusal.TopLogprob>;
-
-        bytes?: Array<number> | null;
-
-        [k: string]: unknown;
-      }
-
-      export namespace Refusal {
-        export interface TopLogprob {
-          token: string;
-
-          logprob: number;
-
-          bytes?: Array<number> | null;
-
-          [k: string]: unknown;
-        }
-      }
-    }
-  }
-
-  export interface Usage {
-    completion_tokens: number;
-
-    prompt_tokens: number;
-
-    total_tokens: number;
-
-    completion_tokens_details?: Usage.CompletionTokensDetails | null;
-
-    prompt_tokens_details?: Usage.PromptTokensDetails | null;
-
-    [k: string]: unknown;
-  }
-
-  export namespace Usage {
-    export interface CompletionTokensDetails {
-      accepted_prediction_tokens?: number | null;
-
-      audio_tokens?: number | null;
-
-      reasoning_tokens?: number | null;
-
-      rejected_prediction_tokens?: number | null;
-
-      [k: string]: unknown;
-    }
-
-    export interface PromptTokensDetails {
-      audio_tokens?: number | null;
-
-      cached_tokens?: number | null;
-
-      [k: string]: unknown;
-    }
-  }
 }
 
 export type ChatCreateParams = ChatCreateParamsNonStreaming | ChatCreateParamsStreaming;
@@ -798,19 +478,12 @@ export interface ChatCreateParamsBase {
   mcp_servers?: Array<string> | null;
 
   /**
-   * Model(s) to use for completion. Can be a single model ID, a ModelConfig object
-   * (optionally with per-model 'settings'), or a list for multi-model routing.
-   * Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model
-   * instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or
-   * list of ModelConfig objects - agent will choose optimal model based on task
-   * complexity.
+   * Model(s) to use for completion. Can be a single model ID or a list for
+   * multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022',
+   * 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4',
+   * 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.
    */
-  model?:
-    | string
-    | Array<string>
-    | ChatCreateParams.ModelConfig
-    | Array<ChatCreateParams.ModelConfigList>
-    | null;
+  model?: string | Array<string> | null;
 
   /**
    * Attributes for individual models used in routing decisions during multi-model
@@ -878,46 +551,6 @@ export interface ChatCreateParamsBase {
 }
 
 export namespace ChatCreateParams {
-  /**
-   * A model with optional routing attributes and per-model settings.
-   */
-  export interface ModelConfig {
-    /**
-     * Model identifier, e.g. 'gpt-4' or 'claude-3-5-sonnet-20241022'.
-     */
-    name: string;
-
-    /**
-     * Numeric attributes used by routing (0.0–1.0), e.g. intelligence, speed, cost.
-     */
-    attributes?: { [key: string]: number } | null;
-
-    /**
-     * Per-model generation settings like temperature, max_tokens, etc.
-     */
-    settings?: { [key: string]: unknown } | null;
-  }
-
-  /**
-   * A model with optional routing attributes and per-model settings.
-   */
-  export interface ModelConfigList {
-    /**
-     * Model identifier, e.g. 'gpt-4' or 'claude-3-5-sonnet-20241022'.
-     */
-    name: string;
-
-    /**
-     * Numeric attributes used by routing (0.0–1.0), e.g. intelligence, speed, cost.
-     */
-    attributes?: { [key: string]: number } | null;
-
-    /**
-     * Per-model generation settings like temperature, max_tokens, etc.
-     */
-    settings?: { [key: string]: unknown } | null;
-  }
-
   export type ChatCreateParamsNonStreaming = ChatAPI.ChatCreateParamsNonStreaming;
   export type ChatCreateParamsStreaming = ChatAPI.ChatCreateParamsStreaming;
 }
@@ -942,7 +575,6 @@ export declare namespace Chat {
   export {
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
-    type StreamChunk as StreamChunk,
     type ChatCreateParams as ChatCreateParams,
     type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,
     type ChatCreateParamsStreaming as ChatCreateParamsStreaming,
