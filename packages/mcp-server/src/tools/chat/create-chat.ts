@@ -91,17 +91,64 @@ export const tool: Tool = {
             anyOf: [
               {
                 type: 'string',
+                title: 'ModelString',
+                description: 'Single model ID',
               },
               {
                 type: 'array',
+                title: 'ModelStringArray',
+                description: 'Array of model IDs for multi-model routing',
                 items: {
                   type: 'string',
+                },
+              },
+              {
+                type: 'object',
+                title: 'ModelObject',
+                description:
+                  'Model specification for API requests.\n\nThis is used in the OpenAPI schema to properly generate named types\ninstead of anonymous union members.',
+                properties: {
+                  name: {
+                    type: 'string',
+                    title: 'Name',
+                    description: 'Model identifier',
+                  },
+                  attributes: {
+                    type: 'object',
+                    title: 'Attributes',
+                    description: 'Model attributes for routing decisions (0.0-1.0 range)',
+                  },
+                },
+                required: ['name'],
+              },
+              {
+                type: 'array',
+                title: 'ModelObjectArray',
+                description: 'Array of Model objects for multi-model routing',
+                items: {
+                  type: 'object',
+                  title: 'ModelInput',
+                  description:
+                    'Model specification for API requests.\n\nThis is used in the OpenAPI schema to properly generate named types\ninstead of anonymous union members.',
+                  properties: {
+                    name: {
+                      type: 'string',
+                      title: 'Name',
+                      description: 'Model identifier',
+                    },
+                    attributes: {
+                      type: 'object',
+                      title: 'Attributes',
+                      description: 'Model attributes for routing decisions (0.0-1.0 range)',
+                    },
+                  },
+                  required: ['name'],
                 },
               },
             ],
             title: 'Model',
             description:
-              "Model(s) to use for completion. Can be a single model ID or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.",
+              "Model(s) to use for completion. Can be a single model ID, a Model object, or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of Model objects - agent will choose optimal model based on task complexity.",
           },
           model_attributes: {
             type: 'object',
@@ -256,17 +303,64 @@ export const tool: Tool = {
             anyOf: [
               {
                 type: 'string',
+                title: 'ModelString',
+                description: 'Single model ID',
               },
               {
                 type: 'array',
+                title: 'ModelStringArray',
+                description: 'Array of model IDs for multi-model routing',
                 items: {
                   type: 'string',
+                },
+              },
+              {
+                type: 'object',
+                title: 'ModelObject',
+                description:
+                  'Model specification for API requests.\n\nThis is used in the OpenAPI schema to properly generate named types\ninstead of anonymous union members.',
+                properties: {
+                  name: {
+                    type: 'string',
+                    title: 'Name',
+                    description: 'Model identifier',
+                  },
+                  attributes: {
+                    type: 'object',
+                    title: 'Attributes',
+                    description: 'Model attributes for routing decisions (0.0-1.0 range)',
+                  },
+                },
+                required: ['name'],
+              },
+              {
+                type: 'array',
+                title: 'ModelObjectArray',
+                description: 'Array of Model objects for multi-model routing',
+                items: {
+                  type: 'object',
+                  title: 'ModelInput',
+                  description:
+                    'Model specification for API requests.\n\nThis is used in the OpenAPI schema to properly generate named types\ninstead of anonymous union members.',
+                  properties: {
+                    name: {
+                      type: 'string',
+                      title: 'Name',
+                      description: 'Model identifier',
+                    },
+                    attributes: {
+                      type: 'object',
+                      title: 'Attributes',
+                      description: 'Model attributes for routing decisions (0.0-1.0 range)',
+                    },
+                  },
+                  required: ['name'],
                 },
               },
             ],
             title: 'Model',
             description:
-              "Model(s) to use for completion. Can be a single model ID or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.",
+              "Model(s) to use for completion. Can be a single model ID, a Model object, or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of Model objects - agent will choose optimal model based on task complexity.",
           },
           model_attributes: {
             type: 'object',
