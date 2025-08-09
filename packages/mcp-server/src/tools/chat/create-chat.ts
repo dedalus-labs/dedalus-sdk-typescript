@@ -98,10 +98,41 @@ export const tool: Tool = {
                   type: 'string',
                 },
               },
+              {
+                type: 'object',
+                properties: {
+                  name: {
+                    type: 'string',
+                    title: 'Name',
+                  },
+                  attributes: {
+                    type: 'object',
+                    title: 'Attributes',
+                  },
+                },
+                required: ['name'],
+              },
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: {
+                      type: 'string',
+                      title: 'Name',
+                    },
+                    attributes: {
+                      type: 'object',
+                      title: 'Attributes',
+                    },
+                  },
+                  required: ['name'],
+                },
+              },
             ],
             title: 'Model',
             description:
-              "Model(s) to use for completion. Can be a single model ID or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.",
+              "Model(s) to use for completion. Can be a single model ID, a Model object, or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of Model objects - agent will choose optimal model based on task complexity.",
           },
           model_attributes: {
             type: 'object',
@@ -263,10 +294,41 @@ export const tool: Tool = {
                   type: 'string',
                 },
               },
+              {
+                type: 'object',
+                properties: {
+                  name: {
+                    type: 'string',
+                    title: 'Name',
+                  },
+                  attributes: {
+                    type: 'object',
+                    title: 'Attributes',
+                  },
+                },
+                required: ['name'],
+              },
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: {
+                      type: 'string',
+                      title: 'Name',
+                    },
+                    attributes: {
+                      type: 'object',
+                      title: 'Attributes',
+                    },
+                  },
+                  required: ['name'],
+                },
+              },
             ],
             title: 'Model',
             description:
-              "Model(s) to use for completion. Can be a single model ID or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.",
+              "Model(s) to use for completion. Can be a single model ID, a Model object, or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a Model instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of Model objects - agent will choose optimal model based on task complexity.",
           },
           model_attributes: {
             type: 'object',
