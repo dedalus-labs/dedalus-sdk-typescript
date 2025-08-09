@@ -4,7 +4,6 @@ export {
   Chat,
   type Completion,
   type CompletionRequest,
-  type StreamChunk,
   type ChatCreateParams,
   type ChatCreateParamsNonStreaming,
   type ChatCreateParamsStreaming,
