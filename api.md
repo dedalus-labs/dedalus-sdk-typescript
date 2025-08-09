@@ -22,12 +22,12 @@ Methods:
 
 Types:
 
+- <code><a href="./src/resources/models.ts">ModelInfo</a></code>
 - <code><a href="./src/resources/models.ts">ModelsResponse</a></code>
-- <code><a href="./src/resources/models.ts">ModelRetrieveResponse</a></code>
 
 Methods:
 
-- <code title="get /v1/models/{model_id}">client.models.<a href="./src/resources/models.ts">retrieve</a>(modelID) -> ModelRetrieveResponse</code>
+- <code title="get /v1/models/{model_id}">client.models.<a href="./src/resources/models.ts">retrieve</a>(modelID) -> ModelInfo</code>
 - <code title="get /v1/models">client.models.<a href="./src/resources/models.ts">list</a>() -> ModelsResponse</code>
 
 # Chat
@@ -36,6 +36,7 @@ Types:
 
 - <code><a href="./src/resources/chat.ts">Completion</a></code>
 - <code><a href="./src/resources/chat.ts">CompletionRequest</a></code>
+- <code><a href="./src/resources/chat.ts">StreamChunk</a></code>
 
 Methods:
 
