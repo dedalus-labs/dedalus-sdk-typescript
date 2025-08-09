@@ -4,12 +4,9 @@ import { makeReadableStream } from '../internal/shims';
 import { findDoubleNewlineIndex, LineDecoder } from '../internal/decoders/line';
 import { ReadableStreamToAsyncIterable } from '../internal/shims';
 import { isAbortError } from '../internal/errors';
-import { safeJSON } from '../internal/utils/values';
 import { encodeUTF8 } from '../internal/utils/bytes';
 import { loggerFor } from '../internal/utils/log';
 import type { Dedalus } from '../client';
-
-import { APIError } from './error';
 
 type Bytes = string | ArrayBuffer | Uint8Array | null | undefined;
 
@@ -48,25 +45,12 @@ export class Stream<Item> implements AsyncIterable<Item> {
       let done = false;
       try {
         for await (const sse of _iterSSEMessages(response, controller)) {
-          if (done) continue;
-
-          if (sse.data.startsWith('[DONE]')) {
-            done = true;
-            continue;
-          }
-
-          if (sse.event === 'error') {
-            throw new APIError(undefined, safeJSON(sse.data) ?? sse.data, undefined, response.headers);
-          }
-
-          if (sse.event === null) {
-            try {
-              yield JSON.parse(sse.data);
-            } catch (e) {
-              logger.error(`Could not parse message into JSON:`, sse.data);
-              logger.error(`From chunk:`, sse.raw);
-              throw e;
-            }
+          try {
+            yield JSON.parse(sse.data);
+          } catch (e) {
+            logger.error(`Could not parse message into JSON:`, sse.data);
+            logger.error(`From chunk:`, sse.raw);
+            throw e;
           }
         }
         done = true;

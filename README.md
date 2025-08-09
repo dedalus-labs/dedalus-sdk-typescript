@@ -27,7 +27,7 @@ const client = new Dedalus({
 });
 
 const completion = await client.chat.create({
-  input: [{ role: 'user', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' }],
+  input: [{ role: 'user', content: 'Hello, how are you?' }],
   model: 'gpt-4o-mini',
 });
 

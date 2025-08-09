@@ -1,6 +1,5 @@
 import assert from 'assert';
-import { Stream, _iterSSEMessages } from 'dedalus-labs/core/streaming';
-import { APIError } from 'dedalus-labs/core/error';
+import { _iterSSEMessages } from 'dedalus-labs/core/streaming';
 import { ReadableStreamFrom } from 'dedalus-labs/internal/shims';
 
 describe('streaming decoding', () => {
@@ -217,29 +216,4 @@ describe('streaming decoding', () => {
     event = await stream.next();
     expect(event.done).toBeTruthy();
   });
-});
-
-test('error handling', async () => {
-  async function* body(): AsyncGenerator<Buffer> {
-    yield Buffer.from('event: error\n');
-    yield Buffer.from('data: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}');
-    yield Buffer.from('\n\n');
-  }
-
-  const stream = Stream.fromSSEResponse(
-    new Response(await ReadableStreamFrom(body())),
-    new AbortController(),
-  );
-
-  const err = expect(
-    (async () => {
-      for await (const _event of stream) {
-      }
-    })(),
-  ).rejects;
-
-  await err.toMatchInlineSnapshot(
-    `[Error: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}]`,
-  );
-  await err.toBeInstanceOf(APIError);
 });

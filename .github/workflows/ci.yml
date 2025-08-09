@@ -79,13 +79,10 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - name: Bootstrap
         run: ./scripts/bootstrap
-
-      - name: Build
-        run: ./scripts/build
 
       - name: Run tests
         run: ./scripts/test
