@@ -42,7 +42,7 @@ export class Models extends APIResource {
    *     }
    *     ```
    */
-  retrieve(modelID: string, options?: RequestOptions): APIPromise<ModelRetrieveResponse> {
+  retrieve(modelID: string, options?: RequestOptions): APIPromise<ModelInfo> {
     return this._client.get(path`/v1/models/${modelID}`, options);
   }
 
@@ -96,87 +96,6 @@ export class Models extends APIResource {
 }
 
 /**
- * Response containing list of available models.
- *
- * Returns all models available to the authenticated user based on their API key
- * permissions and configured providers.
- *
- * Attributes: object: Always 'list' for compatibility with OpenAI API data: List
- * of Model objects representing available models
- *
- * Example: { "object": "list", "data": [ { "id": "gpt-4", "object": "model",
- * "owned_by": "openai" }, { "id": "claude-3-5-sonnet-20241022", "object": "model",
- * "owned_by": "anthropic" } ] }
- */
-export interface ModelsResponse {
-  /**
-   * List of models
-   */
-  data: Array<ModelsResponse.Data>;
-
-  /**
-   * Object type
-   */
-  object?: string;
-}
-
-export namespace ModelsResponse {
-  /**
-   * Model information compatible with OpenAI API.
-   *
-   * Represents a language model available through the Dedalus API. Models are
-   * aggregated from multiple providers (OpenAI, Anthropic, etc.) and made available
-   * through a unified interface.
-   *
-   * Attributes: id: Unique model identifier (e.g., 'gpt-4',
-   * 'claude-3-5-sonnet-20241022') object: Always 'model' for compatibility with
-   * OpenAI API created: Unix timestamp when model was created (may be None)
-   * owned_by: Provider organization that owns the model root: Base model identifier
-   * if this is a fine-tuned variant parent: Parent model identifier for hierarchical
-   * relationships permission: Access permissions (reserved for future use)
-   *
-   * Example: { "id": "gpt-4", "object": "model", "created": 1687882411, "owned_by":
-   * "openai" }
-   */
-  export interface Data {
-    /**
-     * Model identifier
-     */
-    id: string;
-
-    /**
-     * Creation timestamp
-     */
-    created?: number | null;
-
-    /**
-     * Object type
-     */
-    object?: string;
-
-    /**
-     * Model owner
-     */
-    owned_by?: string;
-
-    /**
-     * Parent model
-     */
-    parent?: string | null;
-
-    /**
-     * Permissions
-     */
-    permission?: Array<{ [key: string]: unknown }> | null;
-
-    /**
-     * Root model
-     */
-    root?: string | null;
-  }
-}
-
-/**
  * Model information compatible with OpenAI API.
  *
  * Represents a language model available through the Dedalus API. Models are
@@ -193,7 +112,7 @@ export namespace ModelsResponse {
  * Example: { "id": "gpt-4", "object": "model", "created": 1687882411, "owned_by":
  * "openai" }
  */
-export interface ModelRetrieveResponse {
+export interface ModelInfo {
   /**
    * Model identifier
    */
@@ -230,6 +149,31 @@ export interface ModelRetrieveResponse {
   root?: string | null;
 }
 
+/**
+ * Response containing list of available models.
+ *
+ * Returns all models available to the authenticated user based on their API key
+ * permissions and configured providers.
+ *
+ * Attributes: object: Always 'list' for compatibility with OpenAI API data: List
+ * of Model objects representing available models
+ *
+ * Example: { "object": "list", "data": [ { "id": "gpt-4", "object": "model",
+ * "owned_by": "openai" }, { "id": "claude-3-5-sonnet-20241022", "object": "model",
+ * "owned_by": "anthropic" } ] }
+ */
+export interface ModelsResponse {
+  /**
+   * List of models
+   */
+  data: Array<ModelInfo>;
+
+  /**
+   * Object type
+   */
+  object?: string;
+}
+
 export declare namespace Models {
-  export { type ModelsResponse as ModelsResponse, type ModelRetrieveResponse as ModelRetrieveResponse };
+  export { type ModelInfo as ModelInfo, type ModelsResponse as ModelsResponse };
 }
