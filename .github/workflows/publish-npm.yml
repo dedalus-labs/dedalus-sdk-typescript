@@ -4,10 +4,6 @@
 name: Publish NPM
 on:
   workflow_dispatch:
-    inputs:
-      path:
-        description: The path to run the release in, e.g. '.' or 'packages/mcp-server'
-        required: true
 
   release:
     types: [published]
@@ -31,11 +27,6 @@ jobs:
 
       - name: Publish to NPM
         run: |
-          if [ -n "${{ github.event.inputs.path }}" ]; then
-            PATHS_RELEASED='[\"${{ github.event.inputs.path }}\"]'
-          else
-            PATHS_RELEASED='[\".\", \"packages/mcp-server\"]'
-          fi
-          yarn tsn scripts/publish-packages.ts "{ \"paths_released\": \"$PATHS_RELEASED\" }"
+          bash ./bin/publish-npm
         env:
           NPM_TOKEN: ${{ secrets.DEDALUS_NPM_TOKEN || secrets.NPM_TOKEN }}
