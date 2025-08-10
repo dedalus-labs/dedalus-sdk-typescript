@@ -23,9 +23,12 @@ import {
   ChatCreateParamsStreaming,
   Completion,
   CompletionRequest,
+  DedalusModel,
+  StreamChunk,
+  TopLogprob,
 } from './resources/chat';
 import { Health, HealthCheckResponse } from './resources/health';
-import { ModelInfo, Models, ModelsResponse } from './resources/models';
+import { Model, Models, ModelsResponse } from './resources/models';
 import { Root, RootGetResponse } from './resources/root';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
@@ -740,12 +743,15 @@ export declare namespace Dedalus {
 
   export { Health as Health, type HealthCheckResponse as HealthCheckResponse };
 
-  export { Models as Models, type ModelInfo as ModelInfo, type ModelsResponse as ModelsResponse };
+  export { Models as Models, type Model as Model, type ModelsResponse as ModelsResponse };
 
   export {
     Chat as Chat,
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
+    type DedalusModel as DedalusModel,
+    type StreamChunk as StreamChunk,
+    type TopLogprob as TopLogprob,
     type ChatCreateParams as ChatCreateParams,
     type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,
     type ChatCreateParamsStreaming as ChatCreateParamsStreaming,
