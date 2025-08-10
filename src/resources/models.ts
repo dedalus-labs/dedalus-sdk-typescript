@@ -42,7 +42,7 @@ export class Models extends APIResource {
    *     }
    *     ```
    */
-  retrieve(modelID: string, options?: RequestOptions): APIPromise<ModelInfo> {
+  retrieve(modelID: string, options?: RequestOptions): APIPromise<Model> {
     return this._client.get(path`/v1/models/${modelID}`, options);
   }
 
@@ -112,7 +112,7 @@ export class Models extends APIResource {
  * Example: { "id": "gpt-4", "object": "model", "created": 1687882411, "owned_by":
  * "openai" }
  */
-export interface ModelInfo {
+export interface Model {
   /**
    * Model identifier
    */
@@ -166,7 +166,7 @@ export interface ModelsResponse {
   /**
    * List of models
    */
-  data: Array<ModelInfo>;
+  data: Array<Model>;
 
   /**
    * Object type
@@ -175,5 +175,5 @@ export interface ModelsResponse {
 }
 
 export declare namespace Models {
-  export { type ModelInfo as ModelInfo, type ModelsResponse as ModelsResponse };
+  export { type Model as Model, type ModelsResponse as ModelsResponse };
 }
