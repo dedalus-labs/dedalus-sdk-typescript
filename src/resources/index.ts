@@ -4,6 +4,8 @@ export {
   Chat,
   type Completion,
   type CompletionRequest,
+  type DedalusModel,
+  type StreamChunk,
   type TopLogprob,
   type ChatCreateParams,
   type ChatCreateParamsNonStreaming,
