@@ -36,6 +36,8 @@ Types:
 
 - <code><a href="./src/resources/chat.ts">Completion</a></code>
 - <code><a href="./src/resources/chat.ts">CompletionRequest</a></code>
+- <code><a href="./src/resources/chat.ts">DedalusModel</a></code>
+- <code><a href="./src/resources/chat.ts">StreamChunk</a></code>
 - <code><a href="./src/resources/chat.ts">TopLogprob</a></code>
 
 Methods:
