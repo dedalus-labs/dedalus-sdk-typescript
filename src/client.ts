@@ -21,11 +21,8 @@ import {
   ChatCreateParams,
   ChatCreateParamsNonStreaming,
   ChatCreateParamsStreaming,
-  ChatCreateResponse,
   Completion,
   CompletionRequest,
-  DedalusModel,
-  StreamChunk,
   TopLogprob,
 } from './resources/chat';
 import { Health, HealthCheckResponse } from './resources/health';
@@ -750,10 +747,7 @@ export declare namespace Dedalus {
     Chat as Chat,
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
-    type DedalusModel as DedalusModel,
-    type StreamChunk as StreamChunk,
     type TopLogprob as TopLogprob,
-    type ChatCreateResponse as ChatCreateResponse,
     type ChatCreateParams as ChatCreateParams,
     type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,
     type ChatCreateParamsStreaming as ChatCreateParamsStreaming,

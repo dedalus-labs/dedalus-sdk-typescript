@@ -26,10 +26,12 @@ const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
 });
 
-const chat = await client.chat.create({
+const completion = await client.chat.create({
   input: [{ role: 'user', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' }],
   model: 'gpt-4o-mini',
 });
+
+console.log(completion.id);
 ```
 
 ### Request & Response types
