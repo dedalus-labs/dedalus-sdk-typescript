@@ -2,8 +2,103 @@
 
 import { APIResource } from '../core/resource';
 import * as ChatAPI from './chat';
+import { APIPromise } from '../core/api-promise';
+import { Stream } from '../core/streaming';
+import { RequestOptions } from '../internal/request-options';
 
-export class Chat extends APIResource {}
+export class Chat extends APIResource {
+  /**
+   * Create a chat completion using the Agent framework.
+   *
+   * This endpoint provides a vendor-agnostic chat completion API that works with
+   * 100+ LLM providers via the Agent framework. It supports both single and
+   * multi-model routing, client-side and server-side tool execution, and integration
+   * with MCP (Model Context Protocol) servers.
+   *
+   * Features: - Cross-vendor compatibility (OpenAI, Anthropic, Cohere, etc.) -
+   * Multi-model routing with intelligent agentic handoffs - Client-side tool
+   * execution (tools returned as JSON) - Server-side MCP tool execution with
+   * automatic billing - Streaming and non-streaming responses - Advanced agent
+   * attributes for routing decisions - Automatic usage tracking and billing
+   *
+   * Args: request: Chat completion request with messages, model, and configuration
+   * http_request: FastAPI request object for accessing headers and state
+   * background_tasks: FastAPI background tasks for async billing operations user:
+   * Authenticated user with validated API key and sufficient balance
+   *
+   * Returns: ChatCompletion: OpenAI-compatible completion response with usage data
+   *
+   * Raises: HTTPException: - 401 if authentication fails or insufficient balance -
+   * 400 if request validation fails - 500 if internal processing error occurs
+   *
+   * Billing: - Token usage billed automatically based on model pricing - MCP tool
+   * calls billed separately using credits system - Streaming responses billed after
+   * completion via background task
+   *
+   * Example: Basic chat completion: ```python import dedalus_labs
+   *
+   *     client = dedalus_labs.Client(api_key="your-api-key")
+   *
+   *     completion = client.chat.create(
+   *         model="gpt-4",
+   *         input=[{"role": "user", "content": "Hello, how are you?"}],
+   *     )
+   *
+   *     print(completion.choices[0].message.content)
+   *     ```
+   *
+   *     With tools and MCP servers:
+   *     ```python
+   *     completion = client.chat.create(
+   *         model="gpt-4",
+   *         input=[{"role": "user", "content": "Search for recent AI news"}],
+   *         tools=[
+   *             {
+   *                 "type": "function",
+   *                 "function": {
+   *                     "name": "search_web",
+   *                     "description": "Search the web for information",
+   *                 },
+   *             }
+   *         ],
+   *         mcp_servers=["dedalus-labs/brave-search"],
+   *     )
+   *     ```
+   *
+   *     Multi-model routing:
+   *     ```python
+   *     completion = client.chat.create(
+   *         model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
+   *         input=[{"role": "user", "content": "Analyze this complex data"}],
+   *         agent_attributes={"complexity": 0.8, "accuracy": 0.9},
+   *     )
+   *     ```
+   *
+   *     Streaming response:
+   *     ```python
+   *     stream = client.chat.create(
+   *         model="gpt-4",
+   *         input=[{"role": "user", "content": "Tell me a story"}],
+   *         stream=True,
+   *     )
+   *
+   *     for chunk in stream:
+   *         if chunk.choices[0].delta.content:
+   *             print(chunk.choices[0].delta.content, end="")
+   *     ```
+   */
+  create(body: ChatCreateParamsNonStreaming, options?: RequestOptions): APIPromise<Completion>;
+  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<unknown>>;
+  create(body: ChatCreateParamsBase, options?: RequestOptions): APIPromise<Stream<unknown> | Completion>;
+  create(
+    body: ChatCreateParams,
+    options?: RequestOptions,
+  ): APIPromise<Completion> | APIPromise<Stream<unknown>> {
+    return this._client.post('/v1/chat', { body, ...options, stream: body.stream ?? false }) as
+      | APIPromise<Completion>
+      | APIPromise<Stream<unknown>>;
+  }
+}
 
 export interface Completion {
   id: string;
