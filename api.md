@@ -36,8 +36,11 @@ Types:
 
 - <code><a href="./src/resources/chat.ts">Completion</a></code>
 - <code><a href="./src/resources/chat.ts">CompletionRequest</a></code>
+- <code><a href="./src/resources/chat.ts">DedalusModel</a></code>
+- <code><a href="./src/resources/chat.ts">StreamChunk</a></code>
 - <code><a href="./src/resources/chat.ts">TopLogprob</a></code>
+- <code><a href="./src/resources/chat.ts">ChatCreateResponse</a></code>
 
 Methods:
 
-- <code title="post /v1/chat">client.chat.<a href="./src/resources/chat.ts">create</a>({ ...params }) -> Completion</code>
+- <code title="post /v1/chat">client.chat.<a href="./src/resources/chat.ts">create</a>({ ...params }) -> ChatCreateResponse</code>

@@ -87,16 +87,19 @@ export class Chat extends APIResource {
    *             print(chunk.choices[0].delta.content, end="")
    *     ```
    */
-  create(body: ChatCreateParamsNonStreaming, options?: RequestOptions): APIPromise<Completion>;
-  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<unknown>>;
-  create(body: ChatCreateParamsBase, options?: RequestOptions): APIPromise<Stream<unknown> | Completion>;
+  create(body: ChatCreateParamsNonStreaming, options?: RequestOptions): APIPromise<ChatCreateResponse>;
+  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<StreamChunk>>;
+  create(
+    body: ChatCreateParamsBase,
+    options?: RequestOptions,
+  ): APIPromise<Stream<StreamChunk> | ChatCreateResponse>;
   create(
     body: ChatCreateParams,
     options?: RequestOptions,
-  ): APIPromise<Completion> | APIPromise<Stream<unknown>> {
+  ): APIPromise<ChatCreateResponse> | APIPromise<Stream<StreamChunk>> {
     return this._client.post('/v1/chat', { body, ...options, stream: body.stream ?? false }) as
-      | APIPromise<Completion>
-      | APIPromise<Stream<unknown>>;
+      | APIPromise<ChatCreateResponse>
+      | APIPromise<Stream<StreamChunk>>;
   }
 }
 
@@ -305,23 +308,18 @@ export namespace Completion {
  * non-streaming responses - Automatic usage tracking and billing
  *
  * Examples: Basic chat completion:
- * `python request = ChatCompletionRequest( model="gpt-4", input=[ {"role": "user", "content": "Hello, how are you?"} ] ) `
+ * `python request = ChatCompletionRequest( model="gpt-4", input=[{"role": "user", "content": "Hello, how are you?"}], ) `
  *
  *     Multi-model routing with attributes:
  *     ```python
  *     request = ChatCompletionRequest(
  *         model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
- *         input=[
- *             {"role": "user", "content": "Analyze this complex problem"}
- *         ],
- *         agent_attributes={
- *             "complexity": 0.8,
- *             "accuracy": 0.9
- *         },
+ *         input=[{"role": "user", "content": "Analyze this complex problem"}],
+ *         agent_attributes={"complexity": 0.8, "accuracy": 0.9},
  *         model_attributes={
  *             "gpt-4": {"intelligence": 0.9, "cost": 0.8},
- *             "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7}
- *         }
+ *             "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7},
+ *         },
  *     )
  *     ```
  *
@@ -329,32 +327,31 @@ export namespace Completion {
  *     ```python
  *     request = ChatCompletionRequest(
  *         model="gpt-4",
- *         input=[
- *             {"role": "user", "content": "Search for AI news"}
- *         ],
+ *         input=[{"role": "user", "content": "Search for AI news"}],
  *         tools=[
  *             {
  *                 "type": "function",
  *                 "function": {
  *                     "name": "search_web",
- *                     "description": "Search the web"
- *                 }
+ *                     "description": "Search the web",
+ *                 },
  *             }
  *         ],
  *         mcp_servers=["dedalus-labs/brave-search"],
  *         temperature=0.7,
- *         max_tokens=1000
+ *         max_tokens=1000,
  *     )
  *     ```
  */
 export interface CompletionRequest {
   /**
-   * Attributes for the agent itself, influencing behavior and model selection.
-   * Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
-   * 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher
-   * values indicate stronger preference for that characteristic.
+   * Metadata for the agent itself, used for documentation and handoffs. Format:
+   * {'attribute': value}. Supports flexible types for rich agent description. Common
+   * attributes: 'complexity', 'accuracy', 'efficiency', 'creativity',
+   * 'friendliness'. Higher values indicate stronger preference for that
+   * characteristic.
    */
-  agent_attributes?: { [key: string]: number } | null;
+  agent_attributes?: { [key: string]: unknown } | null;
 
   /**
    * Frequency penalty (-2 to 2). Positive values penalize new tokens based on their
@@ -411,20 +408,21 @@ export interface CompletionRequest {
   mcp_servers?: Array<string> | null;
 
   /**
-   * Model(s) to use for completion. Can be a single model ID or a list for
-   * multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022',
-   * 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4',
-   * 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.
+   * Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
+   * or a list for multi-model routing. Single model: 'gpt-4',
+   * 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a DedalusModel instance.
+   * Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of
+   * DedalusModel objects - agent will choose optimal model based on task complexity.
    */
-  model?: string | Array<string> | null;
+  model?: string | Array<string> | DedalusModel | Array<DedalusModel> | null;
 
   /**
-   * Attributes for individual models used in routing decisions during multi-model
-   * execution. Format: {'model_name': {'attribute': value}}, where values are
-   * 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity',
-   * 'accuracy'. Used by agent to select optimal model based on task requirements.
+   * Metadata for individual models used in schema documentation and handoffs.
+   * Format: {'model_name': {'attribute': value}}. Supports flexible types: strings,
+   * numbers, booleans, lists. Used for model documentation and capability
+   * description.
    */
-  model_attributes?: { [key: string]: { [key: string]: number } } | null;
+  model_attributes?: { [key: string]: { [key: string]: unknown } } | null;
 
   /**
    * Number of completions to generate. Note: only n=1 is currently supported.
@@ -483,6 +481,179 @@ export interface CompletionRequest {
   user?: string | null;
 }
 
+/**
+ * The interface for calling an LLM through the Dedalus API.
+ *
+ * Only the model name is required; all other parameters are optional and passed as
+ * kwargs.
+ */
+export interface DedalusModel {
+  /**
+   * Model identifier (e.g., 'openai/gpt-4.1', 'anthropic/claude-3-5-sonnet')
+   */
+  name: string;
+
+  /**
+   * Model metadata for schema documentation and handoffs. Supports flexible types:
+   * strings, numbers, booleans, lists, dicts.
+   */
+  attributes?: { [key: string]: unknown } | null;
+
+  [k: string]: unknown;
+}
+
+export interface StreamChunk {
+  id: string;
+
+  choices: Array<StreamChunk.Choice>;
+
+  created: number;
+
+  model: string;
+
+  object: 'chat.completion.chunk';
+
+  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
+
+  system_fingerprint?: string | null;
+
+  usage?: StreamChunk.Usage | null;
+
+  [k: string]: unknown;
+}
+
+export namespace StreamChunk {
+  export interface Choice {
+    delta: Choice.Delta;
+
+    index: number;
+
+    finish_reason?: 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call' | null;
+
+    logprobs?: Choice.Logprobs | null;
+
+    [k: string]: unknown;
+  }
+
+  export namespace Choice {
+    export interface Delta {
+      content?: string | null;
+
+      function_call?: Delta.FunctionCall | null;
+
+      refusal?: string | null;
+
+      role?: 'developer' | 'system' | 'user' | 'assistant' | 'tool' | null;
+
+      tool_calls?: Array<Delta.ToolCall> | null;
+
+      [k: string]: unknown;
+    }
+
+    export namespace Delta {
+      export interface FunctionCall {
+        arguments?: string | null;
+
+        name?: string | null;
+
+        [k: string]: unknown;
+      }
+
+      export interface ToolCall {
+        index: number;
+
+        id?: string | null;
+
+        function?: ToolCall.Function | null;
+
+        type?: 'function' | null;
+
+        [k: string]: unknown;
+      }
+
+      export namespace ToolCall {
+        export interface Function {
+          arguments?: string | null;
+
+          name?: string | null;
+
+          [k: string]: unknown;
+        }
+      }
+    }
+
+    export interface Logprobs {
+      content?: Array<Logprobs.Content> | null;
+
+      refusal?: Array<Logprobs.Refusal> | null;
+
+      [k: string]: unknown;
+    }
+
+    export namespace Logprobs {
+      export interface Content {
+        token: string;
+
+        logprob: number;
+
+        top_logprobs: Array<ChatAPI.TopLogprob>;
+
+        bytes?: Array<number> | null;
+
+        [k: string]: unknown;
+      }
+
+      export interface Refusal {
+        token: string;
+
+        logprob: number;
+
+        top_logprobs: Array<ChatAPI.TopLogprob>;
+
+        bytes?: Array<number> | null;
+
+        [k: string]: unknown;
+      }
+    }
+  }
+
+  export interface Usage {
+    completion_tokens: number;
+
+    prompt_tokens: number;
+
+    total_tokens: number;
+
+    completion_tokens_details?: Usage.CompletionTokensDetails | null;
+
+    prompt_tokens_details?: Usage.PromptTokensDetails | null;
+
+    [k: string]: unknown;
+  }
+
+  export namespace Usage {
+    export interface CompletionTokensDetails {
+      accepted_prediction_tokens?: number | null;
+
+      audio_tokens?: number | null;
+
+      reasoning_tokens?: number | null;
+
+      rejected_prediction_tokens?: number | null;
+
+      [k: string]: unknown;
+    }
+
+    export interface PromptTokensDetails {
+      audio_tokens?: number | null;
+
+      cached_tokens?: number | null;
+
+      [k: string]: unknown;
+    }
+  }
+}
+
 export interface TopLogprob {
   token: string;
 
@@ -493,16 +664,19 @@ export interface TopLogprob {
   [k: string]: unknown;
 }
 
+export type ChatCreateResponse = Completion | StreamChunk;
+
 export type ChatCreateParams = ChatCreateParamsNonStreaming | ChatCreateParamsStreaming;
 
 export interface ChatCreateParamsBase {
   /**
-   * Attributes for the agent itself, influencing behavior and model selection.
-   * Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
-   * 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher
-   * values indicate stronger preference for that characteristic.
+   * Metadata for the agent itself, used for documentation and handoffs. Format:
+   * {'attribute': value}. Supports flexible types for rich agent description. Common
+   * attributes: 'complexity', 'accuracy', 'efficiency', 'creativity',
+   * 'friendliness'. Higher values indicate stronger preference for that
+   * characteristic.
    */
-  agent_attributes?: { [key: string]: number } | null;
+  agent_attributes?: { [key: string]: unknown } | null;
 
   /**
    * Frequency penalty (-2 to 2). Positive values penalize new tokens based on their
@@ -559,20 +733,21 @@ export interface ChatCreateParamsBase {
   mcp_servers?: Array<string> | null;
 
   /**
-   * Model(s) to use for completion. Can be a single model ID or a list for
-   * multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022',
-   * 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4',
-   * 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.
+   * Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
+   * or a list for multi-model routing. Single model: 'gpt-4',
+   * 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a DedalusModel instance.
+   * Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of
+   * DedalusModel objects - agent will choose optimal model based on task complexity.
    */
-  model?: string | Array<string> | null;
+  model?: string | Array<string> | DedalusModel | Array<DedalusModel> | null;
 
   /**
-   * Attributes for individual models used in routing decisions during multi-model
-   * execution. Format: {'model_name': {'attribute': value}}, where values are
-   * 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity',
-   * 'accuracy'. Used by agent to select optimal model based on task requirements.
+   * Metadata for individual models used in schema documentation and handoffs.
+   * Format: {'model_name': {'attribute': value}}. Supports flexible types: strings,
+   * numbers, booleans, lists. Used for model documentation and capability
+   * description.
    */
-  model_attributes?: { [key: string]: { [key: string]: number } } | null;
+  model_attributes?: { [key: string]: { [key: string]: unknown } } | null;
 
   /**
    * Number of completions to generate. Note: only n=1 is currently supported.
@@ -656,7 +831,10 @@ export declare namespace Chat {
   export {
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
+    type DedalusModel as DedalusModel,
+    type StreamChunk as StreamChunk,
     type TopLogprob as TopLogprob,
+    type ChatCreateResponse as ChatCreateResponse,
     type ChatCreateParams as ChatCreateParams,
     type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,
     type ChatCreateParamsStreaming as ChatCreateParamsStreaming,
