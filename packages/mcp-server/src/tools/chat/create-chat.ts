@@ -28,7 +28,7 @@ export const tool: Tool = {
             type: 'object',
             title: 'Agent Attributes',
             description:
-              "Metadata for the agent itself, used for documentation and handoffs. Format: {'attribute': value}. Supports flexible types for rich agent description. Common attributes: 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher values indicate stronger preference for that characteristic.",
+              "Attributes for the agent itself, influencing behavior and model selection. Format: {'attribute': value}, where values are 0.0-1.0. Common attributes: 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher values indicate stronger preference for that characteristic.",
           },
           frequency_penalty: {
             type: 'number',
@@ -98,25 +98,16 @@ export const tool: Tool = {
                   type: 'string',
                 },
               },
-              {
-                $ref: '#/$defs/dedalus_model',
-              },
-              {
-                type: 'array',
-                items: {
-                  $ref: '#/$defs/dedalus_model',
-                },
-              },
             ],
             title: 'Model',
             description:
-              "Model(s) to use for completion. Can be a single model ID, a DedalusModel object, or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a DedalusModel instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of DedalusModel objects - agent will choose optimal model based on task complexity.",
+              "Model(s) to use for completion. Can be a single model ID or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.",
           },
           model_attributes: {
             type: 'object',
             title: 'Model Attributes',
             description:
-              "Metadata for individual models used in schema documentation and handoffs. Format: {'model_name': {'attribute': value}}. Supports flexible types: strings, numbers, booleans, lists. Used for model documentation and capability description.",
+              "Attributes for individual models used in routing decisions during multi-model execution. Format: {'model_name': {'attribute': value}}, where values are 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity', 'accuracy'. Used by agent to select optimal model based on task requirements.",
           },
           n: {
             type: 'integer',
@@ -202,7 +193,7 @@ export const tool: Tool = {
             type: 'object',
             title: 'Agent Attributes',
             description:
-              "Metadata for the agent itself, used for documentation and handoffs. Format: {'attribute': value}. Supports flexible types for rich agent description. Common attributes: 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher values indicate stronger preference for that characteristic.",
+              "Attributes for the agent itself, influencing behavior and model selection. Format: {'attribute': value}, where values are 0.0-1.0. Common attributes: 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher values indicate stronger preference for that characteristic.",
           },
           frequency_penalty: {
             type: 'number',
@@ -272,25 +263,16 @@ export const tool: Tool = {
                   type: 'string',
                 },
               },
-              {
-                $ref: '#/$defs/dedalus_model',
-              },
-              {
-                type: 'array',
-                items: {
-                  $ref: '#/$defs/dedalus_model',
-                },
-              },
             ],
             title: 'Model',
             description:
-              "Model(s) to use for completion. Can be a single model ID, a DedalusModel object, or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini', or a DedalusModel instance. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] or list of DedalusModel objects - agent will choose optimal model based on task complexity.",
+              "Model(s) to use for completion. Can be a single model ID or a list for multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022', 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4', 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.",
           },
           model_attributes: {
             type: 'object',
             title: 'Model Attributes',
             description:
-              "Metadata for individual models used in schema documentation and handoffs. Format: {'model_name': {'attribute': value}}. Supports flexible types: strings, numbers, booleans, lists. Used for model documentation and capability description.",
+              "Attributes for individual models used in routing decisions during multi-model execution. Format: {'model_name': {'attribute': value}}, where values are 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity', 'accuracy'. Used by agent to select optimal model based on task requirements.",
           },
           n: {
             type: 'integer',
@@ -356,28 +338,6 @@ export const tool: Tool = {
         required: ['stream'],
       },
     ],
-    $defs: {
-      dedalus_model: {
-        type: 'object',
-        title: 'DedalusModel',
-        description:
-          'The interface for calling an LLM through the Dedalus API.\n\nOnly the model name is required; all other parameters are optional and passed as kwargs.',
-        properties: {
-          name: {
-            type: 'string',
-            title: 'Name',
-            description: "Model identifier (e.g., 'openai/gpt-4.1', 'anthropic/claude-3-5-sonnet')",
-          },
-          attributes: {
-            type: 'object',
-            title: 'Attributes',
-            description:
-              'Model metadata for schema documentation and handoffs. Supports flexible types: strings, numbers, booleans, lists, dicts.',
-          },
-        },
-        required: ['name'],
-      },
-    },
   },
   annotations: {},
 };
