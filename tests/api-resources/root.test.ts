@@ -8,7 +8,7 @@ const client = new Dedalus({
 });
 
 describe('resource root', () => {
-  // skipped: tests are disabled for the time being
+  // Prism tests are disabled
   test.skip('get', async () => {
     const responsePromise = client.root.get();
     const rawResponse = await responsePromise.asResponse();
