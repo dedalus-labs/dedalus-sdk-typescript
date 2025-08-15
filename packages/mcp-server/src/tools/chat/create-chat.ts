@@ -29,6 +29,7 @@ export const tool: Tool = {
             title: 'Agent Attributes',
             description:
               "Attributes for the agent itself, influencing behavior and model selection. Format: {'attribute': value}, where values are 0.0-1.0. Common attributes: 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher values indicate stronger preference for that characteristic.",
+            additionalProperties: true,
           },
           frequency_penalty: {
             type: 'number',
@@ -43,6 +44,7 @@ export const tool: Tool = {
               'Guardrails to apply to the agent for input/output validation and safety checks. Reserved for future use - guardrails configuration format not yet finalized.',
             items: {
               type: 'object',
+              additionalProperties: true,
             },
           },
           handoff_config: {
@@ -50,6 +52,7 @@ export const tool: Tool = {
             title: 'Handoff Config',
             description:
               'Configuration for multi-model handoffs and agent orchestration. Reserved for future use - handoff configuration format not yet finalized.',
+            additionalProperties: true,
           },
           input: {
             type: 'array',
@@ -58,6 +61,7 @@ export const tool: Tool = {
               'Input to the model - can be messages, images, or other modalities. Supports OpenAI chat format with role/content structure. For multimodal inputs, content can include text, images, or other media types.',
             items: {
               type: 'object',
+              additionalProperties: true,
             },
           },
           logit_bias: {
@@ -65,6 +69,7 @@ export const tool: Tool = {
             title: 'Logit Bias',
             description:
               'Modify likelihood of specified tokens appearing in the completion. Maps token IDs (as strings) to bias values (-100 to 100). -100 = completely ban token, +100 = strongly favor token.',
+            additionalProperties: true,
           },
           max_tokens: {
             type: 'integer',
@@ -108,6 +113,7 @@ export const tool: Tool = {
             title: 'Model Attributes',
             description:
               "Attributes for individual models used in routing decisions during multi-model execution. Format: {'model_name': {'attribute': value}}, where values are 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity', 'accuracy'. Used by agent to select optimal model based on task requirements.",
+            additionalProperties: true,
           },
           n: {
             type: 'integer',
@@ -149,6 +155,7 @@ export const tool: Tool = {
               },
               {
                 type: 'object',
+                additionalProperties: true,
               },
             ],
             title: 'Tool Choice',
@@ -162,6 +169,7 @@ export const tool: Tool = {
               "List of tools available to the model in OpenAI function calling format. Tools are executed client-side and returned as JSON for the application to handle. Use 'mcp_servers' for server-side tool execution.",
             items: {
               type: 'object',
+              additionalProperties: true,
             },
           },
           top_p: {
@@ -194,6 +202,7 @@ export const tool: Tool = {
             title: 'Agent Attributes',
             description:
               "Attributes for the agent itself, influencing behavior and model selection. Format: {'attribute': value}, where values are 0.0-1.0. Common attributes: 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher values indicate stronger preference for that characteristic.",
+            additionalProperties: true,
           },
           frequency_penalty: {
             type: 'number',
@@ -208,6 +217,7 @@ export const tool: Tool = {
               'Guardrails to apply to the agent for input/output validation and safety checks. Reserved for future use - guardrails configuration format not yet finalized.',
             items: {
               type: 'object',
+              additionalProperties: true,
             },
           },
           handoff_config: {
@@ -215,6 +225,7 @@ export const tool: Tool = {
             title: 'Handoff Config',
             description:
               'Configuration for multi-model handoffs and agent orchestration. Reserved for future use - handoff configuration format not yet finalized.',
+            additionalProperties: true,
           },
           input: {
             type: 'array',
@@ -223,6 +234,7 @@ export const tool: Tool = {
               'Input to the model - can be messages, images, or other modalities. Supports OpenAI chat format with role/content structure. For multimodal inputs, content can include text, images, or other media types.',
             items: {
               type: 'object',
+              additionalProperties: true,
             },
           },
           logit_bias: {
@@ -230,6 +242,7 @@ export const tool: Tool = {
             title: 'Logit Bias',
             description:
               'Modify likelihood of specified tokens appearing in the completion. Maps token IDs (as strings) to bias values (-100 to 100). -100 = completely ban token, +100 = strongly favor token.',
+            additionalProperties: true,
           },
           max_tokens: {
             type: 'integer',
@@ -273,6 +286,7 @@ export const tool: Tool = {
             title: 'Model Attributes',
             description:
               "Attributes for individual models used in routing decisions during multi-model execution. Format: {'model_name': {'attribute': value}}, where values are 0.0-1.0. Common attributes: 'intelligence', 'speed', 'cost', 'creativity', 'accuracy'. Used by agent to select optimal model based on task requirements.",
+            additionalProperties: true,
           },
           n: {
             type: 'integer',
@@ -307,6 +321,7 @@ export const tool: Tool = {
               },
               {
                 type: 'object',
+                additionalProperties: true,
               },
             ],
             title: 'Tool Choice',
@@ -320,6 +335,7 @@ export const tool: Tool = {
               "List of tools available to the model in OpenAI function calling format. Tools are executed client-side and returned as JSON for the application to handle. Use 'mcp_servers' for server-side tool execution.",
             items: {
               type: 'object',
+              additionalProperties: true,
             },
           },
           top_p: {
