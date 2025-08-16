@@ -137,13 +137,13 @@ Additionally, authorization can be provided via the following headers:
 | ------------------- | ------------------------ | --------------- |
 | `x-dedalus-api-key` | `apiKey` | HTTPBearer |
 
-A configuration JSON for this server might look like this:
+A configuration JSON for this server might look like this, assuming the server is hosted at `http://localhost:3000`:
 
 ```json
 {
   "mcpServers": {
     "dedalus_labs_api": {
-      "url": "http://localhost:3000", # or wherever the server is hosted
+      "url": "http://localhost:3000",
       "headers": {
         "Authorization": "Bearer <auth value>"
       }
