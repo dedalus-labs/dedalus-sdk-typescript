@@ -730,10 +730,12 @@ export class Dedalus {
   models: API.Models = new API.Models(this);
   chat: API.Chat = new API.Chat(this);
 }
+
 Dedalus.Root = Root;
 Dedalus.Health = Health;
 Dedalus.Models = Models;
 Dedalus.Chat = Chat;
+
 export declare namespace Dedalus {
   export type RequestOptions = Opts.RequestOptions;
 
