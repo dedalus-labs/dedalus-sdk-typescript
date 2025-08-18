@@ -18,7 +18,7 @@ import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import { _Private } from './resources/-private';
 import { Health, HealthCheckResponse } from './resources/health';
-import { Model, Models, ModelsResponse } from './resources/models';
+import { ModelRetrieveResponse, Models, ModelsResponse } from './resources/models';
 import { Root, RootGetResponse } from './resources/root';
 import { Chat } from './resources/chat/chat';
 import { type Fetch } from './internal/builtin-types';
@@ -815,7 +815,11 @@ export declare namespace Dedalus {
 
   export { Health as Health, type HealthCheckResponse as HealthCheckResponse };
 
-  export { Models as Models, type Model as Model, type ModelsResponse as ModelsResponse };
+  export {
+    Models as Models,
+    type ModelsResponse as ModelsResponse,
+    type ModelRetrieveResponse as ModelRetrieveResponse,
+  };
 
   export { Chat as Chat };
 }

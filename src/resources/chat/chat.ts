@@ -5,12 +5,8 @@ import * as CompletionsAPI from './completions';
 import {
   ChatCompletionTokenLogprob,
   Completion,
-  CompletionCreateParams,
-  CompletionCreateParamsNonStreaming,
-  CompletionCreateParamsStreaming,
   CompletionRequest,
   Completions,
-  StreamChunk,
   TopLogprob,
 } from './completions';
 
@@ -26,10 +22,6 @@ export declare namespace Chat {
     type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
-    type StreamChunk as StreamChunk,
     type TopLogprob as TopLogprob,
-    type CompletionCreateParams as CompletionCreateParams,
-    type CompletionCreateParamsNonStreaming as CompletionCreateParamsNonStreaming,
-    type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming,
   };
 }
