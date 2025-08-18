@@ -4,7 +4,7 @@
 
 This library provides convenient access to the Dedalus REST API from server-side TypeScript or JavaScript.
 
-The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [docs.dedaluslabs.ai](https://docs.dedaluslabs.ai). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
@@ -24,15 +24,41 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
+  environment: 'staging', // or 'production' | 'development'; defaults to 'production'
 });
 
-const completion = await client.chat.create({
-  input: [{ role: 'user', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' }],
-  model: 'gpt-4o-mini',
+const streamChunk = await client.chat.create({
+  input: [{ role: 'user', content: 'Hello, how can you help me today?' }],
+  model: 'openai/gpt-5',
 });
 
-console.log(completion.id);
+console.log(streamChunk.id);
 ```
+
+## Streaming responses
+
+We provide support for streaming responses using Server Sent Events (SSE).
+
+```ts
+import Dedalus from 'dedalus-labs';
+
+const client = new Dedalus();
+
+const stream = await client.chat.create({
+  stream: true,
+  input: [
+    { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+    { role: 'user', content: 'What do you think of artificial intelligence?' },
+  ],
+  model: 'openai/gpt-5',
+});
+for await (const streamChunk of stream) {
+  console.log(streamChunk.id);
+}
+```
+
+If you need to cancel a stream, you can `break` from the loop
+or call `stream.controller.abort()`.
 
 ### Request & Response types
 
@@ -44,6 +70,7 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
+  environment: 'staging', // or 'production' | 'development'; defaults to 'production'
 });
 
 const response: Dedalus.HealthCheckResponse = await client.health.check();
@@ -124,6 +151,25 @@ await client.health.check({
 On timeout, an `APIConnectionTimeoutError` is thrown.
 
 Note that requests which time out will be [retried twice by default](#retries).
+
+## Default Headers
+
+We automatically send the following headers with all requests.
+
+| Header          | Value         |
+| --------------- | ------------- |
+| `User-Agent`    | `Dedalus-SDK` |
+| `X-SDK-Version` | `1.0.0`       |
+
+If you need to, you can override these headers by setting default headers on a per-request basis.
+
+```ts
+import Dedalus from 'dedalus-labs';
+
+const client = new Dedalus();
+
+const response = await client.health.check({ headers: { 'User-Agent': 'My-Custom-Value' } });
+```
 
 ## Advanced Usage
 

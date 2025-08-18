@@ -2,6 +2,7 @@
 
 import { APIResource } from '../core/resource';
 import * as ChatAPI from './chat';
+import * as ModelsAPI from './models';
 import { APIPromise } from '../core/api-promise';
 import { Stream } from '../core/streaming';
 import { RequestOptions } from '../internal/request-options';
@@ -35,12 +36,12 @@ export class Chat extends APIResource {
    * calls billed separately using credits system - Streaming responses billed after
    * completion via background task
    *
-   * Example: Basic chat completion: ```python import dedalus_labs
+   * Example: Basic chat completion: ```python from dedalus_labs import Dedalus
    *
-   *     client = dedalus_labs.Client(api_key="your-api-key")
+   *     client = Dedalus(api_key="your-api-key")
    *
    *     completion = client.chat.create(
-   *         model="gpt-4",
+   *         model="openai/gpt-5",
    *         input=[{"role": "user", "content": "Hello, how are you?"}],
    *     )
    *
@@ -50,7 +51,7 @@ export class Chat extends APIResource {
    *     With tools and MCP servers:
    *     ```python
    *     completion = client.chat.create(
-   *         model="gpt-4",
+   *         model="openai/gpt-5",
    *         input=[{"role": "user", "content": "Search for recent AI news"}],
    *         tools=[
    *             {
@@ -68,7 +69,7 @@ export class Chat extends APIResource {
    *     Multi-model routing:
    *     ```python
    *     completion = client.chat.create(
-   *         model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
+   *         model=["openai/gpt-4o-mini", "openai/gpt-5", "anthropic/claude-sonnet-4-20250514"],
    *         input=[{"role": "user", "content": "Analyze this complex data"}],
    *         agent_attributes={"complexity": 0.8, "accuracy": 0.9},
    *     )
@@ -77,7 +78,7 @@ export class Chat extends APIResource {
    *     Streaming response:
    *     ```python
    *     stream = client.chat.create(
-   *         model="gpt-4",
+   *         model="openai/gpt-5",
    *         input=[{"role": "user", "content": "Tell me a story"}],
    *         stream=True,
    *     )
@@ -86,38 +87,98 @@ export class Chat extends APIResource {
    *         if chunk.choices[0].delta.content:
    *             print(chunk.choices[0].delta.content, end="")
    *     ```
+   *
+   * @example
+   * ```ts
+   * const streamChunk = await client.chat.create();
+   * ```
    */
-  create(body: ChatCreateParamsNonStreaming, options?: RequestOptions): APIPromise<Completion>;
-  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<unknown>>;
-  create(body: ChatCreateParamsBase, options?: RequestOptions): APIPromise<Stream<unknown> | Completion>;
+  create(body: ChatCreateParamsNonStreaming, options?: RequestOptions): APIPromise<StreamChunk>;
+  create(body: ChatCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<StreamChunk>>;
+  create(body: ChatCreateParamsBase, options?: RequestOptions): APIPromise<Stream<StreamChunk> | StreamChunk>;
   create(
     body: ChatCreateParams,
     options?: RequestOptions,
-  ): APIPromise<Completion> | APIPromise<Stream<unknown>> {
-    return this._client.post('/v1/chat', { body, ...options, stream: body.stream ?? false }) as
-      | APIPromise<Completion>
-      | APIPromise<Stream<unknown>>;
+  ): APIPromise<StreamChunk> | APIPromise<Stream<StreamChunk>> {
+    return this._client.post('/v1/chat/completions', { body, ...options, stream: body.stream ?? false }) as
+      | APIPromise<StreamChunk>
+      | APIPromise<Stream<StreamChunk>>;
   }
 }
 
-export interface Completion {
-  id: string;
+export interface ChatCompletionTokenLogprob {
+  token: string;
 
-  choices: Array<Completion.Choice>;
+  logprob: number;
 
-  created: number;
+  top_logprobs: Array<TopLogprob>;
 
-  model: string;
-
-  object: 'chat.completion';
-
-  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
-
-  system_fingerprint?: string | null;
-
-  usage?: Completion.Usage | null;
+  bytes?: Array<number> | null;
 
   [k: string]: unknown;
+}
+
+/**
+ * Chat completion response for Dedalus API.
+ *
+ * OpenAI-compatible chat completion response with Dedalus extensions. Maintains
+ * full compatibility with OpenAI API while providing additional features like
+ * server-side tool execution tracking and MCP error reporting.
+ */
+export interface Completion {
+  /**
+   * Unique identifier for the chat completion
+   */
+  id: string;
+
+  /**
+   * List of completion choices
+   */
+  choices: Array<Completion.Choice>;
+
+  /**
+   * Unix timestamp when the completion was created
+   */
+  created: number;
+
+  /**
+   * ID of the model used for the completion
+   */
+  model: string;
+
+  /**
+   * Information about MCP server failures, if any occurred during the request.
+   * Contains details about which servers failed and why, along with recommendations
+   * for the user. Only present when MCP server failures occurred.
+   */
+  mcp_server_errors?: { [key: string]: unknown } | null;
+
+  /**
+   * Object type, always 'chat.completion'
+   */
+  object?: 'chat.completion';
+
+  /**
+   * Service tier used for processing the request
+   */
+  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
+
+  /**
+   * System fingerprint that represents the backend configuration
+   */
+  system_fingerprint?: string | null;
+
+  /**
+   * List of tool names that were executed server-side (e.g., MCP tools). Only
+   * present when tools were executed on the server rather than returned for
+   * client-side execution.
+   */
+  tools_executed?: Array<string> | null;
+
+  /**
+   * Usage statistics for the completion
+   */
+  usage?: Completion.Usage | null;
 }
 
 export namespace Completion {
@@ -147,7 +208,9 @@ export namespace Completion {
 
       refusal?: string | null;
 
-      tool_calls?: Array<Message.ToolCall> | null;
+      tool_calls?: Array<
+        Message.ChatCompletionMessageFunctionToolCall | Message.ChatCompletionMessageCustomToolCall
+      > | null;
 
       [k: string]: unknown;
     }
@@ -195,19 +258,39 @@ export namespace Completion {
         [k: string]: unknown;
       }
 
-      export interface ToolCall {
+      export interface ChatCompletionMessageFunctionToolCall {
         id: string;
 
-        function: ToolCall.Function;
+        function: ChatCompletionMessageFunctionToolCall.Function;
 
         type: 'function';
 
         [k: string]: unknown;
       }
 
-      export namespace ToolCall {
+      export namespace ChatCompletionMessageFunctionToolCall {
         export interface Function {
           arguments: string;
+
+          name: string;
+
+          [k: string]: unknown;
+        }
+      }
+
+      export interface ChatCompletionMessageCustomToolCall {
+        id: string;
+
+        custom: ChatCompletionMessageCustomToolCall.Custom;
+
+        type: 'custom';
+
+        [k: string]: unknown;
+      }
+
+      export namespace ChatCompletionMessageCustomToolCall {
+        export interface Custom {
+          input: string;
 
           name: string;
 
@@ -217,40 +300,17 @@ export namespace Completion {
     }
 
     export interface Logprobs {
-      content?: Array<Logprobs.Content> | null;
+      content?: Array<ChatAPI.ChatCompletionTokenLogprob> | null;
 
-      refusal?: Array<Logprobs.Refusal> | null;
+      refusal?: Array<ChatAPI.ChatCompletionTokenLogprob> | null;
 
       [k: string]: unknown;
     }
-
-    export namespace Logprobs {
-      export interface Content {
-        token: string;
-
-        logprob: number;
-
-        top_logprobs: Array<ChatAPI.TopLogprob>;
-
-        bytes?: Array<number> | null;
-
-        [k: string]: unknown;
-      }
-
-      export interface Refusal {
-        token: string;
-
-        logprob: number;
-
-        top_logprobs: Array<ChatAPI.TopLogprob>;
-
-        bytes?: Array<number> | null;
-
-        [k: string]: unknown;
-      }
-    }
   }
 
+  /**
+   * Usage statistics for the completion
+   */
   export interface Usage {
     completion_tokens: number;
 
@@ -305,45 +365,38 @@ export namespace Completion {
  * non-streaming responses - Automatic usage tracking and billing
  *
  * Examples: Basic chat completion:
- * `python request = ChatCompletionRequest( model="gpt-4", input=[ {"role": "user", "content": "Hello, how are you?"} ] ) `
+ * `python request = ChatCompletionRequest( model="openai/gpt-4", input=[{"role": "user", "content": "Hello, how are you?"}], ) `
  *
  *     Multi-model routing with attributes:
  *     ```python
  *     request = ChatCompletionRequest(
- *         model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
- *         input=[
- *             {"role": "user", "content": "Analyze this complex problem"}
- *         ],
- *         agent_attributes={
- *             "complexity": 0.8,
- *             "accuracy": 0.9
- *         },
+ *         model=["openai/gpt-4o-mini", "openai/gpt-4", "anthropic/claude-3-5-sonnet"],
+ *         input=[{"role": "user", "content": "Analyze this complex problem"}],
+ *         agent_attributes={"complexity": 0.8, "accuracy": 0.9},
  *         model_attributes={
  *             "gpt-4": {"intelligence": 0.9, "cost": 0.8},
- *             "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7}
- *         }
+ *             "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7},
+ *         },
  *     )
  *     ```
  *
  *     With tools and MCP servers:
  *     ```python
  *     request = ChatCompletionRequest(
- *         model="gpt-4",
- *         input=[
- *             {"role": "user", "content": "Search for AI news"}
- *         ],
+ *         model="openai/gpt-5",
+ *         input=[{"role": "user", "content": "Search for AI news"}],
  *         tools=[
  *             {
  *                 "type": "function",
  *                 "function": {
  *                     "name": "search_web",
- *                     "description": "Search the web"
- *                 }
+ *                     "description": "Search the web",
+ *                 },
  *             }
  *         ],
  *         mcp_servers=["dedalus-labs/brave-search"],
  *         temperature=0.7,
- *         max_tokens=1000
+ *         max_tokens=1000,
  *     )
  *     ```
  */
@@ -376,9 +429,8 @@ export interface CompletionRequest {
   handoff_config?: { [key: string]: unknown } | null;
 
   /**
-   * Input to the model - can be messages, images, or other modalities. Supports
-   * OpenAI chat format with role/content structure. For multimodal inputs, content
-   * can include text, images, or other media types.
+   * Input/messages to the model – accepts either 'input' (Dedalus) or 'messages'
+   * (OpenAI). Supports role/content structure and multimodal content arrays.
    */
   input?: Array<{ [key: string]: unknown }> | null;
 
@@ -411,12 +463,14 @@ export interface CompletionRequest {
   mcp_servers?: Array<string> | null;
 
   /**
-   * Model(s) to use for completion. Can be a single model ID or a list for
-   * multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022',
-   * 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4',
-   * 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.
+   * Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
+   * or a list for multi-model routing. Single model: 'openai/gpt-4',
+   * 'anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o-mini', or a DedalusModel
+   * instance. Multi-model routing: ['openai/gpt-4o-mini', 'openai/gpt-4',
+   * 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
+   * choose optimal model based on task complexity.
    */
-  model?: string | Array<string> | null;
+  model?: string | ModelsAPI.Model | Array<string | ModelsAPI.Model> | null;
 
   /**
    * Attributes for individual models used in routing decisions during multi-model
@@ -464,7 +518,7 @@ export interface CompletionRequest {
   tool_choice?: string | { [key: string]: unknown } | null;
 
   /**
-   * List of tools available to the model in OpenAI function calling format. Tools
+   * list of tools available to the model in OpenAI function calling format. Tools
    * are executed client-side and returned as JSON for the application to handle. Use
    * 'mcp_servers' for server-side tool execution.
    */
@@ -481,6 +535,160 @@ export interface CompletionRequest {
    * detection. Should be consistent across requests from the same user.
    */
   user?: string | null;
+}
+
+/**
+ * Server-Sent Event streaming format for chat completions
+ */
+export interface StreamChunk {
+  /**
+   * Unique identifier for the chat completion
+   */
+  id: string;
+
+  /**
+   * List of completion choice chunks
+   */
+  choices: Array<StreamChunk.Choice>;
+
+  /**
+   * Unix timestamp when the chunk was created
+   */
+  created: number;
+
+  /**
+   * ID of the model used for the completion
+   */
+  model: string;
+
+  /**
+   * Object type, always 'chat.completion.chunk'
+   */
+  object?: 'chat.completion.chunk';
+
+  /**
+   * Service tier used for processing the request
+   */
+  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
+
+  /**
+   * System fingerprint representing backend configuration
+   */
+  system_fingerprint?: string | null;
+
+  /**
+   * Usage statistics (only in final chunk with stream_options.include_usage=true)
+   */
+  usage?: StreamChunk.Usage | null;
+}
+
+export namespace StreamChunk {
+  export interface Choice {
+    delta: Choice.Delta;
+
+    index: number;
+
+    finish_reason?: 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call' | null;
+
+    logprobs?: Choice.Logprobs | null;
+
+    [k: string]: unknown;
+  }
+
+  export namespace Choice {
+    export interface Delta {
+      content?: string | null;
+
+      function_call?: Delta.FunctionCall | null;
+
+      refusal?: string | null;
+
+      role?: 'developer' | 'system' | 'user' | 'assistant' | 'tool' | null;
+
+      tool_calls?: Array<Delta.ToolCall> | null;
+
+      [k: string]: unknown;
+    }
+
+    export namespace Delta {
+      export interface FunctionCall {
+        arguments?: string | null;
+
+        name?: string | null;
+
+        [k: string]: unknown;
+      }
+
+      export interface ToolCall {
+        index: number;
+
+        id?: string | null;
+
+        function?: ToolCall.Function | null;
+
+        type?: 'function' | null;
+
+        [k: string]: unknown;
+      }
+
+      export namespace ToolCall {
+        export interface Function {
+          arguments?: string | null;
+
+          name?: string | null;
+
+          [k: string]: unknown;
+        }
+      }
+    }
+
+    export interface Logprobs {
+      content?: Array<ChatAPI.ChatCompletionTokenLogprob> | null;
+
+      refusal?: Array<ChatAPI.ChatCompletionTokenLogprob> | null;
+
+      [k: string]: unknown;
+    }
+  }
+
+  /**
+   * Usage statistics (only in final chunk with stream_options.include_usage=true)
+   */
+  export interface Usage {
+    completion_tokens: number;
+
+    prompt_tokens: number;
+
+    total_tokens: number;
+
+    completion_tokens_details?: Usage.CompletionTokensDetails | null;
+
+    prompt_tokens_details?: Usage.PromptTokensDetails | null;
+
+    [k: string]: unknown;
+  }
+
+  export namespace Usage {
+    export interface CompletionTokensDetails {
+      accepted_prediction_tokens?: number | null;
+
+      audio_tokens?: number | null;
+
+      reasoning_tokens?: number | null;
+
+      rejected_prediction_tokens?: number | null;
+
+      [k: string]: unknown;
+    }
+
+    export interface PromptTokensDetails {
+      audio_tokens?: number | null;
+
+      cached_tokens?: number | null;
+
+      [k: string]: unknown;
+    }
+  }
 }
 
 export interface TopLogprob {
@@ -524,9 +732,8 @@ export interface ChatCreateParamsBase {
   handoff_config?: { [key: string]: unknown } | null;
 
   /**
-   * Input to the model - can be messages, images, or other modalities. Supports
-   * OpenAI chat format with role/content structure. For multimodal inputs, content
-   * can include text, images, or other media types.
+   * Input/messages to the model – accepts either 'input' (Dedalus) or 'messages'
+   * (OpenAI). Supports role/content structure and multimodal content arrays.
    */
   input?: Array<{ [key: string]: unknown }> | null;
 
@@ -559,12 +766,14 @@ export interface ChatCreateParamsBase {
   mcp_servers?: Array<string> | null;
 
   /**
-   * Model(s) to use for completion. Can be a single model ID or a list for
-   * multi-model routing. Single model: 'gpt-4', 'claude-3-5-sonnet-20241022',
-   * 'gpt-4o-mini'. Multi-model routing: ['gpt-4o-mini', 'gpt-4',
-   * 'claude-3-5-sonnet'] - agent will choose optimal model based on task complexity.
+   * Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
+   * or a list for multi-model routing. Single model: 'openai/gpt-4',
+   * 'anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o-mini', or a DedalusModel
+   * instance. Multi-model routing: ['openai/gpt-4o-mini', 'openai/gpt-4',
+   * 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
+   * choose optimal model based on task complexity.
    */
-  model?: string | Array<string> | null;
+  model?: string | ModelsAPI.Model | Array<string | ModelsAPI.Model> | null;
 
   /**
    * Attributes for individual models used in routing decisions during multi-model
@@ -612,7 +821,7 @@ export interface ChatCreateParamsBase {
   tool_choice?: string | { [key: string]: unknown } | null;
 
   /**
-   * List of tools available to the model in OpenAI function calling format. Tools
+   * list of tools available to the model in OpenAI function calling format. Tools
    * are executed client-side and returned as JSON for the application to handle. Use
    * 'mcp_servers' for server-side tool execution.
    */
@@ -654,8 +863,10 @@ export interface ChatCreateParamsStreaming extends ChatCreateParamsBase {
 
 export declare namespace Chat {
   export {
+    type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
+    type StreamChunk as StreamChunk,
     type TopLogprob as TopLogprob,
     type ChatCreateParams as ChatCreateParams,
     type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,

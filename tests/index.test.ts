@@ -311,6 +311,19 @@ describe('instantiate client', () => {
       expect(client.baseURL).toEqual('https://api.dedaluslabs.ai');
     });
 
+    test('env variable with environment', () => {
+      process.env['DEDALUS_BASE_URL'] = 'https://example.com/from_env';
+
+      expect(
+        () => new Dedalus({ apiKey: 'My API Key', environment: 'production' }),
+      ).toThrowErrorMatchingInlineSnapshot(
+        `"Ambiguous URL; The \`baseURL\` option (or DEDALUS_BASE_URL env var) and the \`environment\` option are given. If you want to use the environment you must pass baseURL: null"`,
+      );
+
+      const client = new Dedalus({ apiKey: 'My API Key', baseURL: null, environment: 'production' });
+      expect(client.baseURL).toEqual('https://api.dedaluslabs.ai');
+    });
+
     test('in request options', () => {
       const client = new Dedalus({ apiKey: 'My API Key' });
       expect(client.buildURL('/foo', null, 'http://localhost:5000/option')).toEqual(
@@ -423,6 +436,16 @@ describe('instantiate client', () => {
     process.env['DEDALUS_API_KEY'] = 'another My API Key';
     const client = new Dedalus({ apiKey: 'My API Key' });
     expect(client.apiKey).toBe('My API Key');
+  });
+});
+
+describe('idempotency', () => {
+  test('key can be set per-request', async () => {
+    const client = new Dedalus({
+      baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
+      apiKey: 'My API Key',
+    });
+    await client.chat.create({}, { idempotencyKey: 'my-idempotency-key' });
   });
 });
 
