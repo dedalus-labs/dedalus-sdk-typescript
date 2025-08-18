@@ -34,14 +34,16 @@ Methods:
 
 # Chat
 
+## Completions
+
 Types:
 
-- <code><a href="./src/resources/chat.ts">ChatCompletionTokenLogprob</a></code>
-- <code><a href="./src/resources/chat.ts">Completion</a></code>
-- <code><a href="./src/resources/chat.ts">CompletionRequest</a></code>
-- <code><a href="./src/resources/chat.ts">StreamChunk</a></code>
-- <code><a href="./src/resources/chat.ts">TopLogprob</a></code>
+- <code><a href="./src/resources/chat/completions.ts">ChatCompletionTokenLogprob</a></code>
+- <code><a href="./src/resources/chat/completions.ts">Completion</a></code>
+- <code><a href="./src/resources/chat/completions.ts">CompletionRequest</a></code>
+- <code><a href="./src/resources/chat/completions.ts">StreamChunk</a></code>
+- <code><a href="./src/resources/chat/completions.ts">TopLogprob</a></code>
 
 Methods:
 
-- <code title="post /v1/chat/completions">client.chat.<a href="./src/resources/chat.ts">create</a>({ ...params }) -> StreamChunk</code>
+- <code title="post /v1/chat/completions">client.chat.completions.<a href="./src/resources/chat/completions.ts">create</a>({ ...params }) -> StreamChunk</code>

@@ -6,7 +6,7 @@ import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import Dedalus from 'dedalus-labs';
 
 export const metadata: Metadata = {
-  resource: 'chat',
+  resource: 'chat.completions',
   operation: 'write',
   tags: [],
   httpMethod: 'post',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export const tool: Tool = {
-  name: 'create_chat',
+  name: 'create_chat_completions',
   description:
     'Create a chat completion using the Agent framework.\n\nThis endpoint provides a vendor-agnostic chat completion API that works with\n100+ LLM providers via the Agent framework. It supports both single and\nmulti-model routing, client-side and server-side tool execution, and\nintegration with MCP (Model Context Protocol) servers.\n\nFeatures:\n    - Cross-vendor compatibility (OpenAI, Anthropic, Cohere, etc.)\n    - Multi-model routing with intelligent agentic handoffs\n    - Client-side tool execution (tools returned as JSON)\n    - Server-side MCP tool execution with automatic billing\n    - Streaming and non-streaming responses\n    - Advanced agent attributes for routing decisions\n    - Automatic usage tracking and billing\n\nArgs:\n    request: Chat completion request with messages, model, and configuration\n    http_request: FastAPI request object for accessing headers and state\n    background_tasks: FastAPI background tasks for async billing operations\n    user: Authenticated user with validated API key and sufficient balance\n\nReturns:\n    ChatCompletion: OpenAI-compatible completion response with usage data\n\nRaises:\n    HTTPException:\n        - 401 if authentication fails or insufficient balance\n        - 400 if request validation fails\n        - 500 if internal processing error occurs\n\nBilling:\n    - Token usage billed automatically based on model pricing\n    - MCP tool calls billed separately using credits system\n    - Streaming responses billed after completion via background task\n\nExample:\n    Basic chat completion:\n    ```python\n    from dedalus_labs import Dedalus\n\n    client = Dedalus(api_key="your-api-key")\n\n    completion = client.chat.completions.create(\n        model="openai/gpt-5",\n        messages=[{"role": "user", "content": "Hello, how are you?"}],\n    )\n\n    print(completion.choices[0].message.content)\n    ```\n\n    With tools and MCP servers:\n    ```python\n    completion = client.chat.completions.create(\n        model="openai/gpt-5",\n        messages=[{"role": "user", "content": "Search for recent AI news"}],\n        tools=[\n            {\n                "type": "function",\n                "function": {\n                    "name": "search_web",\n                    "description": "Search the web for information",\n                },\n            }\n        ],\n        mcp_servers=["dedalus-labs/brave-search"],\n    )\n    ```\n\n    Multi-model routing:\n    ```python\n    completion = client.chat.completions.create(\n        model=[\n            "openai/gpt-4o-mini",\n            "openai/gpt-5",\n            "anthropic/claude-sonnet-4-20250514",\n        ],\n        messages=[{"role": "user", "content": "Analyze this complex data"}],\n        agent_attributes={"complexity": 0.8, "accuracy": 0.9},\n    )\n    ```\n\n    Streaming response:\n    ```python\n    stream = client.chat.completions.create(\n        model="openai/gpt-5",\n        messages=[{"role": "user", "content": "Tell me a story"}],\n        stream=True,\n    )\n\n    for chunk in stream:\n        if chunk.choices[0].delta.content:\n            print(chunk.choices[0].delta.content, end="")\n    ```',
   inputSchema: {
@@ -592,7 +592,7 @@ export const tool: Tool = {
 
 export const handler = async (client: Dedalus, args: Record<string, unknown> | undefined) => {
   const body = args as any;
-  return asTextContentResult(await client.chat.create(body));
+  return asTextContentResult(await client.chat.completions.create(body));
 };
 
 export default { metadata, tool, handler };

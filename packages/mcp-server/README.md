@@ -300,9 +300,9 @@ The following tools are available in this MCP server.
       ```
   ````
 
-### Resource `chat`:
+### Resource `chat.completions`:
 
-- `create_chat` (`write`): Create a chat completion using the Agent framework.
+- `create_chat_completions` (`write`): Create a chat completion using the Agent framework.
 
   This endpoint provides a vendor-agnostic chat completion API that works with
   100+ LLM providers via the Agent framework. It supports both single and
