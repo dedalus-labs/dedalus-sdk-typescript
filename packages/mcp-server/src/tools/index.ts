@@ -8,6 +8,7 @@ import get_root from './root/get-root';
 import check_health from './health/check-health';
 import retrieve_models from './models/retrieve-models';
 import list_models from './models/list-models';
+import create_chat from './chat/create-chat';
 
 export const endpoints: Endpoint[] = [];
 
@@ -19,6 +20,7 @@ addEndpoint(get_root);
 addEndpoint(check_health);
 addEndpoint(retrieve_models);
 addEndpoint(list_models);
+addEndpoint(create_chat);
 
 export type Filter = {
   type: 'resource' | 'operation' | 'tag' | 'tool';
