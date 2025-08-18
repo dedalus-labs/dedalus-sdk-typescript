@@ -5,8 +5,15 @@ import * as CompletionsAPI from './completions';
 import {
   ChatCompletionTokenLogprob,
   Completion,
+  CompletionCreateParams,
+  CompletionCreateParamsNonStreaming,
+  CompletionCreateParamsStreaming,
   CompletionRequest,
   Completions,
+  DedalusModelChoice,
+  ModelID,
+  Models,
+  StreamChunk,
   TopLogprob,
 } from './completions';
 
@@ -22,6 +29,13 @@ export declare namespace Chat {
     type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
+    type DedalusModelChoice as DedalusModelChoice,
+    type ModelID as ModelID,
+    type Models as Models,
+    type StreamChunk as StreamChunk,
     type TopLogprob as TopLogprob,
+    type CompletionCreateParams as CompletionCreateParams,
+    type CompletionCreateParamsNonStreaming as CompletionCreateParamsNonStreaming,
+    type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming,
   };
 }

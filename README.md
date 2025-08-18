@@ -27,10 +27,38 @@ const client = new Dedalus({
   environment: 'staging', // or 'production' | 'development'; defaults to 'production'
 });
 
-const response = await client.health.check();
+const streamChunk = await client.chat.completions.create({
+  messages: [{ role: 'user', content: 'Hello, how can you help me today?' }],
+  model: 'openai/gpt-5',
+});
 
-console.log(response.status);
+console.log(streamChunk.id);
 ```
+
+## Streaming responses
+
+We provide support for streaming responses using Server Sent Events (SSE).
+
+```ts
+import Dedalus from 'dedalus-labs';
+
+const client = new Dedalus();
+
+const stream = await client.chat.completions.create({
+  stream: true,
+  messages: [
+    { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+    { role: 'user', content: 'What do you think of artificial intelligence?' },
+  ],
+  model: 'openai/gpt-5',
+});
+for await (const streamChunk of stream) {
+  console.log(streamChunk.id);
+}
+```
+
+If you need to cancel a stream, you can `break` from the loop
+or call `stream.controller.abort()`.
 
 ### Request & Response types
 
@@ -243,7 +271,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.health.check({
+client.chat.completions.create({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',
