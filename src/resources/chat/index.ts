@@ -6,9 +6,5 @@ export {
   type ChatCompletionTokenLogprob,
   type Completion,
   type CompletionRequest,
-  type StreamChunk,
   type TopLogprob,
-  type CompletionCreateParams,
-  type CompletionCreateParamsNonStreaming,
-  type CompletionCreateParamsStreaming,
 } from './completions';
