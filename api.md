@@ -8,6 +8,8 @@ Methods:
 
 - <code title="get /">client.root.<a href="./src/resources/root.ts">get</a>() -> RootGetResponse</code>
 
+# \_Private
+
 # Health
 
 Types:
@@ -34,10 +36,12 @@ Methods:
 
 Types:
 
+- <code><a href="./src/resources/chat.ts">ChatCompletionTokenLogprob</a></code>
 - <code><a href="./src/resources/chat.ts">Completion</a></code>
 - <code><a href="./src/resources/chat.ts">CompletionRequest</a></code>
+- <code><a href="./src/resources/chat.ts">StreamChunk</a></code>
 - <code><a href="./src/resources/chat.ts">TopLogprob</a></code>
 
 Methods:
 
-- <code title="post /v1/chat">client.chat.<a href="./src/resources/chat.ts">create</a>({ ...params }) -> Completion</code>
+- <code title="post /v1/chat/completions">client.chat.<a href="./src/resources/chat.ts">create</a>({ ...params }) -> StreamChunk</code>

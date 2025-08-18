@@ -2,8 +2,10 @@
 
 export {
   Chat,
+  type ChatCompletionTokenLogprob,
   type Completion,
   type CompletionRequest,
+  type StreamChunk,
   type TopLogprob,
   type ChatCreateParams,
   type ChatCreateParamsNonStreaming,
@@ -12,3 +14,4 @@ export {
 export { Health, type HealthCheckResponse } from './health';
 export { Models, type Model, type ModelsResponse } from './models';
 export { Root, type RootGetResponse } from './root';
+export { _Private } from './-private';

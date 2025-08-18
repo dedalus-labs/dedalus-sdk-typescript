@@ -10,6 +10,9 @@ You can run the MCP Server directly via `npx`:
 
 ```sh
 export DEDALUS_API_KEY="My API Key"
+export DEDALUS_API_KEY="My API Key Header"
+export DEDALUS_ORG_ID="My Organization"
+export DEDALUS_ENVIRONMENT="production"
 npx -y dedalus-labs-mcp@latest
 ```
 
@@ -27,7 +30,10 @@ For clients with a configuration JSON, it might look something like this:
       "command": "npx",
       "args": ["-y", "dedalus-labs-mcp", "--client=claude", "--tools=all"],
       "env": {
-        "DEDALUS_API_KEY": "My API Key"
+        "DEDALUS_API_KEY": "My API Key",
+        "DEDALUS_API_KEY": "My API Key Header",
+        "DEDALUS_ORG_ID": "My Organization",
+        "DEDALUS_ENVIRONMENT": "production"
       }
     }
   }
@@ -136,6 +142,7 @@ Additionally, authorization can be provided via the following headers:
 | Header | Equivalent client option | Security scheme |
 | ------------------- | ------------------------ | --------------- |
 | `x-dedalus-api-key` | `apiKey` | HTTPBearer |
+| `x-api-key` | `apiKeyHeader` | ApiKeyAuth |
 
 A configuration JSON for this server might look like this, assuming the server is hosted at `http://localhost:3000`:
 
@@ -207,11 +214,11 @@ The following tools are available in this MCP server.
   The model must be available to your API key's configured providers.
 
   Args:
-  model_id: The ID of the model to retrieve (e.g., 'gpt-4', 'claude-3-5-sonnet-20241022')
+  model_id: The ID of the model to retrieve (e.g., 'openai/gpt-4', 'anthropic/claude-3-5-sonnet-20241022')
   user: Authenticated user obtained from API key validation
 
   Returns:
-  Model: Information about the requested model
+  DedalusModel: Information about the requested model
 
   Raises:
   HTTPException: - 401 if authentication fails - 404 if model not found or not accessible with current API key - 500 if internal error occurs
@@ -225,7 +232,7 @@ The following tools are available in this MCP server.
   import dedalus_labs
 
       client = dedalus_labs.Client(api_key="your-api-key")
-      model = client.models.retrieve("gpt-4")
+      model = client.models.retrieve("openai/gpt-4")
 
       print(f"Model: {model.id}")
       print(f"Owner: {model.owned_by}")
@@ -234,7 +241,7 @@ The following tools are available in this MCP server.
       Response:
       ```json
       {
-          "id": "gpt-4",
+          "id": "openai/gpt-4",
           "object": "model",
           "created": 1687882411,
           "owned_by": "openai"
@@ -279,12 +286,12 @@ The following tools are available in this MCP server.
           "object": "list",
           "data": [
               {
-                  "id": "gpt-4",
+                  "id": "openai/gpt-4",
                   "object": "model",
                   "owned_by": "openai"
               },
               {
-                  "id": "claude-3-5-sonnet-20241022",
+                  "id": "anthropic/claude-3-5-sonnet-20241022",
                   "object": "model",
                   "owned_by": "anthropic"
               }
@@ -322,12 +329,12 @@ The following tools are available in this MCP server.
   Basic chat completion:
 
   ````python
-  import dedalus_labs
+  from dedalus_labs import Dedalus
 
-      client = dedalus_labs.Client(api_key="your-api-key")
+      client = Dedalus(api_key="your-api-key")
 
       completion = client.chat.create(
-          model="gpt-4",
+          model="openai/gpt-5",
           input=[{"role": "user", "content": "Hello, how are you?"}],
       )
 
@@ -337,7 +344,7 @@ The following tools are available in this MCP server.
       With tools and MCP servers:
       ```python
       completion = client.chat.create(
-          model="gpt-4",
+          model="openai/gpt-5",
           input=[{"role": "user", "content": "Search for recent AI news"}],
           tools=[
               {
@@ -355,7 +362,7 @@ The following tools are available in this MCP server.
       Multi-model routing:
       ```python
       completion = client.chat.create(
-          model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
+          model=["openai/gpt-4o-mini", "openai/gpt-5", "anthropic/claude-sonnet-4-20250514"],
           input=[{"role": "user", "content": "Analyze this complex data"}],
           agent_attributes={"complexity": 0.8, "accuracy": 0.9},
       )
@@ -364,7 +371,7 @@ The following tools are available in this MCP server.
       Streaming response:
       ```python
       stream = client.chat.create(
-          model="gpt-4",
+          model="openai/gpt-5",
           input=[{"role": "user", "content": "Tell me a story"}],
           stream=True,
       )

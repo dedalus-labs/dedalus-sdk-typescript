@@ -80,7 +80,12 @@ export function init(params: {
   };
 
   const client =
-    params.client || new Dedalus({ defaultHeaders: { 'X-Stainless-MCP': 'true' }, logger: logger });
+    params.client ||
+    new Dedalus({
+      environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any,
+      defaultHeaders: { 'X-Stainless-MCP': 'true' },
+      logger: logger,
+    });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
