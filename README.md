@@ -27,8 +27,8 @@ const client = new Dedalus({
   environment: 'staging', // or 'production' | 'development'; defaults to 'production'
 });
 
-const streamChunk = await client.chat.create({
-  messages: [{ role: 'user', content: 'Hello, how can you help me today?' }],
+const streamChunk = await client.chat.completions.create({
+  messages: [{ role: 'user', content: 'Hello, how are you today?' }],
   model: 'openai/gpt-5',
 });
 
@@ -44,7 +44,7 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus();
 
-const stream = await client.chat.create({
+const stream = await client.chat.completions.create({
   stream: true,
   messages: [
     { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
@@ -271,7 +271,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.chat.create({
+client.chat.completions.create({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',

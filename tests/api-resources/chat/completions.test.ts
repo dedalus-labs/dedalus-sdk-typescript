@@ -7,10 +7,10 @@ const client = new Dedalus({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource chat', () => {
+describe('resource completions', () => {
   // Prism tests are disabled
   test.skip('create', async () => {
-    const responsePromise = client.chat.create({});
+    const responsePromise = client.chat.completions.create({});
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
