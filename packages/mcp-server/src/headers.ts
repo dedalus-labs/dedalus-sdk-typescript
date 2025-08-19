@@ -17,10 +17,10 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
   }
 
   const apiKey =
-    req.headers['x-dedalus-api-key'] instanceof Array ?
+    Array.isArray(req.headers['x-dedalus-api-key']) ?
       req.headers['x-dedalus-api-key'][0]
     : req.headers['x-dedalus-api-key'];
   const apiKeyHeader =
-    req.headers['x-api-key'] instanceof Array ? req.headers['x-api-key'][0] : req.headers['x-api-key'];
+    Array.isArray(req.headers['x-api-key']) ? req.headers['x-api-key'][0] : req.headers['x-api-key'];
   return { apiKey, apiKeyHeader };
 };
