@@ -41,7 +41,7 @@ Types:
 
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionTokenLogprob</a></code>
 - <code><a href="./src/resources/chat/completions.ts">Completion</a></code>
-- <code><a href="./src/resources/chat/completions.ts">CompletionRequest</a></code>
+- <code><a href="./src/resources/chat/completions.ts">CompletionRequestMessages</a></code>
 - <code><a href="./src/resources/chat/completions.ts">DedalusModelChoice</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ModelID</a></code>
 - <code><a href="./src/resources/chat/completions.ts">Models</a></code>
