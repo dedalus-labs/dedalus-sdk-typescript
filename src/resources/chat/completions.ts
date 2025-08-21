@@ -94,7 +94,9 @@ export class Completions extends APIResource {
    *
    * @example
    * ```ts
-   * const streamChunk = await client.chat.completions.create();
+   * const streamChunk = await client.chat.completions.create({
+   *   messages: [{ content: 'bar', role: 'bar' }],
+   * });
    * ```
    */
   create(body: CompletionCreateParamsNonStreaming, options?: RequestOptions): APIPromise<StreamChunk>;
@@ -397,58 +399,15 @@ export namespace Completion {
 }
 
 /**
- * Request model for chat completions.
- *
- * Validates incoming chat requests with support for multimodality, multi-model
- * routing, and agent-enhanced features. Compatible with OpenAI API format while
- * extending functionality for advanced use cases.
- *
- * This model supports both the 'messages' field and the 'input' field for maximum
- * compatibility. The 'input' field can handle various modalities beyond text
- * messages.
- *
- * Key Features: - Multi-model routing with intelligent handoffs - MCP (Model
- * Context Protocol) server integration - Advanced agent attributes for routing
- * decisions - Client-side and server-side tool execution - Streaming and
- * non-streaming responses - Automatic usage tracking and billing
- *
- * Examples: Basic chat completion:
- * `python request = ChatCompletionRequest( model="openai/gpt-4", messages=[{"role": "user", "content": "Hello, how are you?"}], ) `
- *
- *     Multi-model routing with attributes:
- *     ```python
- *     request = ChatCompletionRequest(
- *         model=["openai/gpt-4o-mini", "openai/gpt-4", "anthropic/claude-3-5-sonnet"],
- *         messages=[{"role": "user", "content": "Analyze this complex problem"}],
- *         agent_attributes={"complexity": 0.8, "accuracy": 0.9},
- *         model_attributes={
- *             "gpt-4": {"intelligence": 0.9, "cost": 0.8},
- *             "claude-3-5-sonnet": {"intelligence": 0.95, "cost": 0.7},
- *         },
- *     )
- *     ```
- *
- *     With tools and MCP servers:
- *     ```python
- *     request = ChatCompletionRequest(
- *         model="openai/gpt-5",
- *         messages=[{"role": "user", "content": "Search for AI news"}],
- *         tools=[
- *             {
- *                 "type": "function",
- *                 "function": {
- *                     "name": "search_web",
- *                     "description": "Search the web",
- *                 },
- *             }
- *         ],
- *         mcp_servers=["dedalus-labs/brave-search"],
- *         temperature=0.7,
- *         max_tokens=1000,
- *     )
- *     ```
+ * Chat completion request with 'messages' field (OpenAI standard).
  */
-export interface CompletionRequest {
+export interface CompletionRequestMessages {
+  /**
+   * Messages to the model. Supports role/content structure and multimodal content
+   * arrays.
+   */
+  messages: Array<{ [key: string]: unknown }>;
+
   /**
    * Attributes for the agent itself, influencing behavior and model selection.
    * Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
@@ -503,12 +462,6 @@ export interface CompletionRequest {
    * separately.
    */
   mcp_servers?: Array<string> | null;
-
-  /**
-   * Messages to the model - accepts either 'messages' (OpenAI) or 'input' (Dedalus).
-   * Supports role/content structure and multimodal content arrays.
-   */
-  messages?: Array<{ [key: string]: unknown }> | null;
 
   /**
    * Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
@@ -804,6 +757,12 @@ export type CompletionCreateParams = CompletionCreateParamsNonStreaming | Comple
 
 export interface CompletionCreateParamsBase {
   /**
+   * Messages to the model. Supports role/content structure and multimodal content
+   * arrays.
+   */
+  messages: Array<{ [key: string]: unknown }>;
+
+  /**
    * Attributes for the agent itself, influencing behavior and model selection.
    * Format: {'attribute': value}, where values are 0.0-1.0. Common attributes:
    * 'complexity', 'accuracy', 'efficiency', 'creativity', 'friendliness'. Higher
@@ -857,12 +816,6 @@ export interface CompletionCreateParamsBase {
    * separately.
    */
   mcp_servers?: Array<string> | null;
-
-  /**
-   * Messages to the model - accepts either 'messages' (OpenAI) or 'input' (Dedalus).
-   * Supports role/content structure and multimodal content arrays.
-   */
-  messages?: Array<{ [key: string]: unknown }> | null;
 
   /**
    * Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
@@ -964,7 +917,7 @@ export declare namespace Completions {
   export {
     type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
     type Completion as Completion,
-    type CompletionRequest as CompletionRequest,
+    type CompletionRequestMessages as CompletionRequestMessages,
     type DedalusModelChoice as DedalusModelChoice,
     type ModelID as ModelID,
     type Models as Models,
