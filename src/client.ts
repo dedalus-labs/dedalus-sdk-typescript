@@ -36,7 +36,6 @@ import { isEmptyObj } from './internal/utils/values';
 
 const environments = {
   production: 'https://api.dedaluslabs.ai',
-  staging: 'https://staging-api.dedaluslabs.ai',
   development: 'http://localhost:8080',
 };
 type Environment = keyof typeof environments;
@@ -62,7 +61,6 @@ export interface ClientOptions {
    *
    * Each environment maps to a different base URL:
    * - `production` corresponds to `https://api.dedaluslabs.ai`
-   * - `staging` corresponds to `https://staging-api.dedaluslabs.ai`
    * - `development` corresponds to `http://localhost:8080`
    */
   environment?: Environment | undefined;

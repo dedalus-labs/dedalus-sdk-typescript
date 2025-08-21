@@ -96,11 +96,11 @@ export class Models extends APIResource {
 }
 
 /**
- * Extended model with configuration capabilities.
+ * Model configuration for chat completions.
  *
- * Inherits basic metadata from Model and adds configuration fields that can be
- * used when creating chat completions. This allows bundling model selection with
- * model-specific parameters.
+ * A user-friendly model configuration object that bundles model selection with
+ * model-specific parameters. Unlike the Model class (which represents API response
+ * data), this class is designed for request configuration.
  *
  * Use this when you want to:
  *
@@ -108,7 +108,7 @@ export class Models extends APIResource {
  * - Pass model-specific settings
  * - Use intelligent routing with attributes
  *
- * Example: model = DedalusModel( id="gpt-4", temperature=0.7, max_tokens=1000,
+ * Example: model = DedalusModel( name="gpt-4", temperature=0.7, max_tokens=1000,
  * attributes={"intelligence": 0.9, "cost": 0.8} )
  *
  *     completion = client.chat.completions.create(
@@ -118,20 +118,15 @@ export class Models extends APIResource {
  */
 export interface DedalusModel {
   /**
-   * Model identifier
+   * Model name (e.g., 'gpt-4', 'claude-3-5-sonnet')
    */
-  id: string;
+  name: string;
 
   /**
    * [Dedalus] Custom attributes for intelligent model routing (e.g., intelligence,
    * speed, creativity, cost).
    */
   attributes?: { [key: string]: number } | null;
-
-  /**
-   * Unix timestamp of model creation
-   */
-  created?: number;
 
   /**
    * Penalize new tokens based on their frequency in the text so far.
@@ -167,21 +162,6 @@ export interface DedalusModel {
    * Number of completions to generate for each prompt.
    */
   n?: number | null;
-
-  /**
-   * Model name (alias for id)
-   */
-  name?: string | null;
-
-  /**
-   * Object type, always 'model'
-   */
-  object?: string;
-
-  /**
-   * Organization that owns this model
-   */
-  owned_by?: string;
 
   /**
    * Whether to enable parallel function calling.
