@@ -45,11 +45,11 @@ import Dedalus from 'dedalus-labs';
 const client = new Dedalus();
 
 const stream = await client.chat.completions.create({
+  stream: true,
   messages: [
     { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
     { role: 'user', content: 'What do you think of artificial intelligence?' },
   ],
-  stream: true,
   model: 'openai/gpt-5',
 });
 for await (const streamChunk of stream) {

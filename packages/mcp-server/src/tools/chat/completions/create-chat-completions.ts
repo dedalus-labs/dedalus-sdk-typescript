@@ -24,16 +24,6 @@ export const tool: Tool = {
       {
         type: 'object',
         properties: {
-          messages: {
-            type: 'array',
-            title: 'Messages',
-            description:
-              'Messages to the model. Supports role/content structure and multimodal content arrays.',
-            items: {
-              type: 'object',
-              additionalProperties: true,
-            },
-          },
           agent_attributes: {
             type: 'object',
             title: 'Agent Attributes',
@@ -90,6 +80,16 @@ export const tool: Tool = {
               "MCP (Model Context Protocol) server addresses to make available for server-side tool execution. Can be URLs (e.g., 'https://mcp.example.com') or slugs (e.g., 'dedalus-labs/brave-search'). MCP tools are executed server-side and billed separately.",
             items: {
               type: 'string',
+            },
+          },
+          messages: {
+            type: 'array',
+            title: 'Messages',
+            description:
+              "Messages to the model - accepts either 'messages' (OpenAI) or 'input' (Dedalus). Supports role/content structure and multimodal content arrays.",
+            items: {
+              type: 'object',
+              additionalProperties: true,
             },
           },
           model: {
@@ -185,21 +185,11 @@ export const tool: Tool = {
               'Unique identifier representing your end-user. Used for monitoring and abuse detection. Should be consistent across requests from the same user.',
           },
         },
-        required: ['messages'],
+        required: [],
       },
       {
         type: 'object',
         properties: {
-          messages: {
-            type: 'array',
-            title: 'Messages',
-            description:
-              'Messages to the model. Supports role/content structure and multimodal content arrays.',
-            items: {
-              type: 'object',
-              additionalProperties: true,
-            },
-          },
           stream: {
             type: 'string',
             title: 'Stream',
@@ -263,6 +253,16 @@ export const tool: Tool = {
               "MCP (Model Context Protocol) server addresses to make available for server-side tool execution. Can be URLs (e.g., 'https://mcp.example.com') or slugs (e.g., 'dedalus-labs/brave-search'). MCP tools are executed server-side and billed separately.",
             items: {
               type: 'string',
+            },
+          },
+          messages: {
+            type: 'array',
+            title: 'Messages',
+            description:
+              "Messages to the model - accepts either 'messages' (OpenAI) or 'input' (Dedalus). Supports role/content structure and multimodal content arrays.",
+            items: {
+              type: 'object',
+              additionalProperties: true,
             },
           },
           model: {
@@ -351,7 +351,7 @@ export const tool: Tool = {
               'Unique identifier representing your end-user. Used for monitoring and abuse detection. Should be consistent across requests from the same user.',
           },
         },
-        required: ['messages', 'stream'],
+        required: ['stream'],
       },
     ],
     $defs: {
@@ -364,12 +364,12 @@ export const tool: Tool = {
         type: 'object',
         title: 'DedalusModel',
         description:
-          'Model configuration for chat completions.\n\nA user-friendly model configuration object that bundles model selection\nwith model-specific parameters. Unlike the Model class (which represents\nAPI response data), this class is designed for request configuration.\n\nUse this when you want to:\n- Pre-configure model parameters\n- Pass model-specific settings\n- Use intelligent routing with attributes\n\nExample:\n    model = DedalusModel(\n        name="gpt-4",\n        temperature=0.7,\n        max_tokens=1000,\n        attributes={"intelligence": 0.9, "cost": 0.8}\n    )\n\n    completion = client.chat.completions.create(\n        model=model,  # Pass the configured model\n        messages=[...]\n    )',
+          'Extended model with configuration capabilities.\n\nInherits basic metadata from Model and adds configuration fields\nthat can be used when creating chat completions. This allows bundling\nmodel selection with model-specific parameters.\n\nUse this when you want to:\n- Pre-configure model parameters\n- Pass model-specific settings\n- Use intelligent routing with attributes\n\nExample:\n    model = DedalusModel(\n        id="gpt-4",\n        temperature=0.7,\n        max_tokens=1000,\n        attributes={"intelligence": 0.9, "cost": 0.8}\n    )\n\n    completion = client.chat.completions.create(\n        model=model,  # Pass the configured model\n        messages=[...]\n    )',
         properties: {
-          name: {
+          id: {
             type: 'string',
-            title: 'Name',
-            description: "Model name (e.g., 'gpt-4', 'claude-3-5-sonnet')",
+            title: 'Id',
+            description: 'Model identifier',
           },
           attributes: {
             type: 'object',
@@ -377,6 +377,11 @@ export const tool: Tool = {
             description:
               '[Dedalus] Custom attributes for intelligent model routing (e.g., intelligence, speed, creativity, cost).',
             additionalProperties: true,
+          },
+          created: {
+            type: 'integer',
+            title: 'Created',
+            description: 'Unix timestamp of model creation',
           },
           frequency_penalty: {
             type: 'number',
@@ -414,6 +419,21 @@ export const tool: Tool = {
             type: 'integer',
             title: 'N',
             description: 'Number of completions to generate for each prompt.',
+          },
+          name: {
+            type: 'string',
+            title: 'Name',
+            description: 'Model name (alias for id)',
+          },
+          object: {
+            type: 'string',
+            title: 'Object',
+            description: "Object type, always 'model'",
+          },
+          owned_by: {
+            type: 'string',
+            title: 'Owned By',
+            description: 'Organization that owns this model',
           },
           parallel_tool_calls: {
             type: 'boolean',
@@ -510,7 +530,7 @@ export const tool: Tool = {
             description: 'A unique identifier representing your end-user.',
           },
         },
-        required: ['name'],
+        required: ['id'],
       },
       models: {
         type: 'array',
