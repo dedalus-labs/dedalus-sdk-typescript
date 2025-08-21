@@ -24,7 +24,7 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
-  environment: 'staging', // or 'production' | 'development'; defaults to 'production'
+  environment: 'development', // defaults to 'production'
 });
 
 const streamChunk = await client.chat.completions.create({
@@ -45,11 +45,11 @@ import Dedalus from 'dedalus-labs';
 const client = new Dedalus();
 
 const stream = await client.chat.completions.create({
-  stream: true,
   messages: [
     { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
     { role: 'user', content: 'What do you think of artificial intelligence?' },
   ],
+  stream: true,
   model: 'openai/gpt-5',
 });
 for await (const streamChunk of stream) {
@@ -70,7 +70,7 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
-  environment: 'staging', // or 'production' | 'development'; defaults to 'production'
+  environment: 'development', // defaults to 'production'
 });
 
 const response: Dedalus.HealthCheckResponse = await client.health.check();
