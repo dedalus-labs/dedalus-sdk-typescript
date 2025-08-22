@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type ClientOptions } from 'dedalus-labs/client';
+import { ClientOptions } from 'dedalus-labs';
 
 export type WorkerInput = {
   opts: ClientOptions;
