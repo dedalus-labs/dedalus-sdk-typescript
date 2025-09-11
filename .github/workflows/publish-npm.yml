@@ -42,4 +42,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.DEDALUS_NPM_TOKEN || secrets.NPM_TOKEN }}
 
       - name: Upload MCP Server DXT GitHub release asset
-        run: gh release upload packages/mcp-server/dedalus_labs_api.dxt
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} \
+            packages/mcp-server/dedalus_labs_api.dxt
