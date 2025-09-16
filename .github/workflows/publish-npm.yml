@@ -16,6 +16,8 @@ jobs:
   publish:
     name: publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     environment: production
 
     steps:
@@ -45,3 +47,5 @@ jobs:
         run: |
           gh release upload ${{ github.event.release.tag_name }} \
             packages/mcp-server/dedalus_labs_api.dxt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
