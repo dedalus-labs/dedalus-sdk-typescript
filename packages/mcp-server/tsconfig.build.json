@@ -5,8 +5,8 @@
   "compilerOptions": {
     "rootDir": "./dist/src",
     "paths": {
-      "dedalus-labs-mcp/*": ["dist/src/*"],
-      "dedalus-labs-mcp": ["dist/src/index.ts"]
+      "dedalus-labs-mcp/*": ["./dist/src/*"],
+      "dedalus-labs-mcp": ["./dist/src/index.ts"]
     },
     "noEmit": false,
     "declaration": true,

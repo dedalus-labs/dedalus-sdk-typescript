@@ -7,10 +7,9 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "baseUrl": "./",
     "paths": {
-      "dedalus-labs/*": ["src/*"],
-      "dedalus-labs": ["src/index.ts"]
+      "dedalus-labs/*": ["./src/*"],
+      "dedalus-labs": ["./src/index.ts"]
     },
     "noEmit": true,
 

@@ -7,10 +7,9 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "baseUrl": "./",
     "paths": {
-      "dedalus-labs-mcp/*": ["src/*"],
-      "dedalus-labs-mcp": ["src/index.ts"]
+      "dedalus-labs-mcp/*": ["./src/*"],
+      "dedalus-labs-mcp": ["./src/index.ts"]
     },
     "noEmit": true,
 
