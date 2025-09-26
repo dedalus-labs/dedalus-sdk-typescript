@@ -240,8 +240,7 @@ The following tools are available in this MCP server.
   Valid API key with 'read' scope permission
 
   Example:
-
-  ````python
+  ```python
   import dedalus_labs
 
       client = dedalus_labs.Client(api_key="your-api-key")
@@ -260,8 +259,6 @@ The following tools are available in this MCP server.
           "owned_by": "openai"
       }
       ```
-
-  ````
 
 - `list_models` (`read`): List available models.
 
@@ -282,8 +279,7 @@ The following tools are available in this MCP server.
   Valid API key with 'read' scope permission
 
   Example:
-
-  ````python
+  ```python
   import dedalus_labs
 
       client = dedalus_labs.Client(api_key="your-api-key")
@@ -311,7 +307,6 @@ The following tools are available in this MCP server.
           ]
       }
       ```
-  ````
 
 ### Resource `chat.completions`:
 
@@ -340,8 +335,7 @@ The following tools are available in this MCP server.
 
   Example:
   Basic chat completion:
-
-  ````python
+  ```python
   from dedalus_labs import Dedalus
 
       client = Dedalus(api_key="your-api-key")
@@ -397,4 +391,3 @@ The following tools are available in this MCP server.
           if chunk.choices[0].delta.content:
               print(chunk.choices[0].delta.content, end="")
       ```
-  ````
