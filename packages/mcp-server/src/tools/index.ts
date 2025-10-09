@@ -8,6 +8,11 @@ import get_root from './root/get-root';
 import check_health from './health/check-health';
 import retrieve_models from './models/retrieve-models';
 import list_models from './models/list-models';
+import create_embeddings from './embeddings/create-embeddings';
+import create_audio_speech from './audio/speech/create-audio-speech';
+import create_audio_transcriptions from './audio/transcriptions/create-audio-transcriptions';
+import create_audio_translations from './audio/translations/create-audio-translations';
+import generate_images from './images/generate-images';
 import create_chat_completions from './chat/completions/create-chat-completions';
 
 export const endpoints: Endpoint[] = [];
@@ -20,6 +25,11 @@ addEndpoint(get_root);
 addEndpoint(check_health);
 addEndpoint(retrieve_models);
 addEndpoint(list_models);
+addEndpoint(create_embeddings);
+addEndpoint(create_audio_speech);
+addEndpoint(create_audio_transcriptions);
+addEndpoint(create_audio_translations);
+addEndpoint(generate_images);
 addEndpoint(create_chat_completions);
 
 export type Filter = {

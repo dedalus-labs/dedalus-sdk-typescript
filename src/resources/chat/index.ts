@@ -5,7 +5,7 @@ export {
   Completions,
   type ChatCompletionTokenLogprob,
   type Completion,
-  type CompletionRequestMessages,
+  type CompletionRequest,
   type DedalusModelChoice,
   type ModelID,
   type Models,

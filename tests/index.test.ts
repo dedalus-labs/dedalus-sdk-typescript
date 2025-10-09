@@ -445,8 +445,8 @@ describe('idempotency', () => {
       baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
       apiKey: 'My API Key',
     });
-    await client.chat.completions.create(
-      { messages: [{ content: 'bar', role: 'bar' }] },
+    await client.embeddings.create(
+      { input: 'string', model: 'string' },
       { idempotencyKey: 'my-idempotency-key' },
     );
   });

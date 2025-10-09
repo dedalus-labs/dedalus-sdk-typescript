@@ -17,9 +17,17 @@ import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import { _Private } from './resources/-private';
+import {
+  CreateEmbeddingRequest,
+  CreateEmbeddingResponse,
+  EmbeddingCreateParams,
+  Embeddings,
+} from './resources/embeddings';
 import { Health, HealthCheckResponse } from './resources/health';
-import { DedalusModel, Model, Models, ModelsResponse } from './resources/models';
+import { CreateImageRequest, Image, ImageGenerateParams, Images, ImagesResponse } from './resources/images';
+import { DedalusModel, ListModelsResponse, Model, Models } from './resources/models';
 import { Root, RootGetResponse } from './resources/root';
+import { Audio } from './resources/audio/audio';
 import { Chat } from './resources/chat/chat';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
@@ -42,17 +50,12 @@ type Environment = keyof typeof environments;
 
 export interface ClientOptions {
   /**
-   * Defaults to process.env['DEDALUS_API_KEY'].
+   * API key for Bearer token authentication.
    */
   apiKey?: string | null | undefined;
 
   /**
-   * Defaults to process.env['DEDALUS_API_KEY'].
-   */
-  apiKeyHeader?: string | null | undefined;
-
-  /**
-   * Defaults to process.env['DEDALUS_ORG_ID'].
+   * Organization ID for scoping API requests.
    */
   organization?: string | null | undefined;
 
@@ -139,7 +142,6 @@ export interface ClientOptions {
  */
 export class Dedalus {
   apiKey: string | null;
-  apiKeyHeader: string | null;
   organization: string | null;
 
   baseURL: string;
@@ -158,7 +160,6 @@ export class Dedalus {
    * API Client for interfacing with the Dedalus API.
    *
    * @param {string | null | undefined} [opts.apiKey=process.env['DEDALUS_API_KEY'] ?? null]
-   * @param {string | null | undefined} [opts.apiKeyHeader=process.env['DEDALUS_API_KEY'] ?? null]
    * @param {string | null | undefined} [opts.organization=process.env['DEDALUS_ORG_ID'] ?? null]
    * @param {Environment} [opts.environment=production] - Specifies the environment URL to use for the API.
    * @param {string} [opts.baseURL=process.env['DEDALUS_BASE_URL'] ?? https://api.dedaluslabs.ai] - Override the default base URL for the API.
@@ -172,13 +173,11 @@ export class Dedalus {
   constructor({
     baseURL = readEnv('DEDALUS_BASE_URL'),
     apiKey = readEnv('DEDALUS_API_KEY') ?? null,
-    apiKeyHeader = readEnv('DEDALUS_API_KEY') ?? null,
     organization = readEnv('DEDALUS_ORG_ID') ?? null,
     ...opts
   }: ClientOptions = {}) {
     const options: ClientOptions = {
       apiKey,
-      apiKeyHeader,
       organization,
       ...opts,
       baseURL,
@@ -210,7 +209,6 @@ export class Dedalus {
     this.idempotencyHeader = 'Idempotency-Key';
 
     this.apiKey = apiKey;
-    this.apiKeyHeader = apiKeyHeader;
     this.organization = organization;
   }
 
@@ -229,7 +227,6 @@ export class Dedalus {
       fetch: this.fetch,
       fetchOptions: this.fetchOptions,
       apiKey: this.apiKey,
-      apiKeyHeader: this.apiKeyHeader,
       organization: this.organization,
       ...options,
     });
@@ -255,34 +252,16 @@ export class Dedalus {
       return;
     }
 
-    if (this.apiKeyHeader && values.get('x-api-key')) {
-      return;
-    }
-    if (nulls.has('x-api-key')) {
-      return;
-    }
-
     throw new Error(
-      'Could not resolve authentication method. Expected either apiKey or apiKeyHeader to be set. Or for one of the "Authorization" or "x-api-key" headers to be explicitly omitted',
+      'Could not resolve authentication method. Expected the apiKey to be set. Or for the "Authorization" headers to be explicitly omitted',
     );
   }
 
   protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
-    return buildHeaders([await this.httpBearerAuth(opts), await this.apiKeyAuth(opts)]);
-  }
-
-  protected async httpBearerAuth(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
     if (this.apiKey == null) {
       return undefined;
     }
     return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
-  }
-
-  protected async apiKeyAuth(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
-    if (this.apiKeyHeader == null) {
-      return undefined;
-    }
-    return buildHeaders([{ 'x-api-key': this.apiKeyHeader }]);
   }
 
   /**
@@ -795,6 +774,9 @@ export class Dedalus {
   _private: API._Private = new API._Private(this);
   health: API.Health = new API.Health(this);
   models: API.Models = new API.Models(this);
+  embeddings: API.Embeddings = new API.Embeddings(this);
+  audio: API.Audio = new API.Audio(this);
+  images: API.Images = new API.Images(this);
   chat: API.Chat = new API.Chat(this);
 }
 
@@ -802,6 +784,9 @@ Dedalus.Root = Root;
 Dedalus._Private = _Private;
 Dedalus.Health = Health;
 Dedalus.Models = Models;
+Dedalus.Embeddings = Embeddings;
+Dedalus.Audio = Audio;
+Dedalus.Images = Images;
 Dedalus.Chat = Chat;
 
 export declare namespace Dedalus {
@@ -816,8 +801,25 @@ export declare namespace Dedalus {
   export {
     Models as Models,
     type DedalusModel as DedalusModel,
+    type ListModelsResponse as ListModelsResponse,
     type Model as Model,
-    type ModelsResponse as ModelsResponse,
+  };
+
+  export {
+    Embeddings as Embeddings,
+    type CreateEmbeddingRequest as CreateEmbeddingRequest,
+    type CreateEmbeddingResponse as CreateEmbeddingResponse,
+    type EmbeddingCreateParams as EmbeddingCreateParams,
+  };
+
+  export { Audio as Audio };
+
+  export {
+    Images as Images,
+    type CreateImageRequest as CreateImageRequest,
+    type Image as Image,
+    type ImagesResponse as ImagesResponse,
+    type ImageGenerateParams as ImageGenerateParams,
   };
 
   export { Chat as Chat };
