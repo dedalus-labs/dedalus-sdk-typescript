@@ -16,7 +16,7 @@ export class Models extends APIResource {
    * 'anthropic/claude-3-5-sonnet-20241022') user: Authenticated user obtained from
    * API key validation
    *
-   * Returns: DedalusModel: Information about the requested model
+   * Returns: Model: Information about the requested model
    *
    * Raises: HTTPException: - 401 if authentication fails - 404 if model not found or
    * not accessible with current API key - 500 if internal error occurs
@@ -42,258 +42,325 @@ export class Models extends APIResource {
    *     }
    *     ```
    */
-  retrieve(modelID: string, options?: RequestOptions): APIPromise<DedalusModel> {
+  retrieve(modelID: string, options?: RequestOptions): APIPromise<Model> {
     return this._client.get(path`/v1/models/${modelID}`, options);
   }
 
   /**
-   * List available models.
+   * List available models from OpenAI, Anthropic, and Google.
    *
-   * Returns a list of available models from all configured providers. Models are
-   * filtered based on provider availability and API key configuration. Only models
-   * from providers with valid API keys are returned.
+   * Calls provider APIs to get live model lists, then combines into unified
+   * response. Only returns models from providers with configured API keys.
    *
-   * Args: user: Authenticated user obtained from API key validation
-   *
-   * Returns: ModelsResponse: Object containing list of available models
-   *
-   * Raises: HTTPException: - 401 if authentication fails - 500 if internal error
-   * occurs during model listing
-   *
-   * Requires: Valid API key with 'read' scope permission
-   *
-   * Example: ```python import dedalus_labs
-   *
-   *     client = dedalus_labs.Client(api_key="your-api-key")
-   *     models = client.models.list()
-   *
-   *     for model in models.data:
-   *         print(f"Model: {model.id} (Owner: {model.owned_by})")
-   *     ```
-   *
-   *     Response:
-   *     ```json
-   *     {
-   *         "object": "list",
-   *         "data": [
-   *             {
-   *                 "id": "openai/gpt-4",
-   *                 "object": "model",
-   *                 "owned_by": "openai"
-   *             },
-   *             {
-   *                 "id": "anthropic/claude-3-5-sonnet-20241022",
-   *                 "object": "model",
-   *                 "owned_by": "anthropic"
-   *             }
-   *         ]
-   *     }
-   *     ```
+   * Returns: ModelsResponse: Combined list of models from all providers
    */
-  list(options?: RequestOptions): APIPromise<ModelsResponse> {
+  list(options?: RequestOptions): APIPromise<ListModelsResponse> {
     return this._client.get('/v1/models', options);
   }
 }
 
 /**
- * Model configuration for chat completions.
+ * Structured model selection entry used in request payloads.
  *
- * A user-friendly model configuration object that bundles model selection with
- * model-specific parameters. Unlike the Model class (which represents API response
- * data), this class is designed for request configuration.
- *
- * Use this when you want to:
- *
- * - Pre-configure model parameters
- * - Pass model-specific settings
- * - Use intelligent routing with attributes
- *
- * Example: model = DedalusModel( name="gpt-4", temperature=0.7, max_tokens=1000,
- * attributes={"intelligence": 0.9, "cost": 0.8} )
- *
- *     completion = client.chat.completions.create(
- *         model=model,  # Pass the configured model
- *         messages=[...]
- *     )
+ * Supports OpenAI-style semantics (string model id) while enabling optional
+ * per-model default settings for Dedalus multi-model routing.
  */
 export interface DedalusModel {
   /**
-   * Model name (e.g., 'gpt-4', 'claude-3-5-sonnet')
+   * Model identifier with provider prefix (e.g., 'openai/gpt-5',
+   * 'anthropic/claude-3-5-sonnet').
    */
-  name: string;
+  model: string;
 
   /**
-   * [Dedalus] Custom attributes for intelligent model routing (e.g., intelligence,
-   * speed, creativity, cost).
+   * Optional default generation settings (e.g., temperature, max_tokens) applied
+   * when this model is selected.
    */
-  attributes?: { [key: string]: number } | null;
+  settings?: DedalusModel.Settings | null;
+}
 
+export namespace DedalusModel {
   /**
-   * Penalize new tokens based on their frequency in the text so far.
+   * Optional default generation settings (e.g., temperature, max_tokens) applied
+   * when this model is selected.
    */
-  frequency_penalty?: number | null;
+  export interface Settings {
+    attributes?: { [key: string]: unknown };
 
-  /**
-   * Modify the likelihood of specified tokens appearing.
-   */
-  logit_bias?: { [key: string]: number } | null;
+    audio?: { [key: string]: unknown } | null;
 
-  /**
-   * Whether to return log probabilities of the output tokens.
-   */
-  logprobs?: boolean | null;
+    extra_args?: { [key: string]: unknown } | null;
 
-  /**
-   * An upper bound for the number of tokens that can be generated for a completion.
-   */
-  max_completion_tokens?: number | null;
+    extra_body?: { [key: string]: unknown } | null;
 
-  /**
-   * Maximum number of tokens to generate.
-   */
-  max_tokens?: number | null;
+    extra_headers?: { [key: string]: string } | null;
 
-  /**
-   * [Dedalus] Additional metadata for request tracking and debugging.
-   */
-  metadata?: { [key: string]: string } | null;
+    extra_query?: { [key: string]: unknown } | null;
 
-  /**
-   * Number of completions to generate for each prompt.
-   */
-  n?: number | null;
+    frequency_penalty?: number | null;
 
-  /**
-   * Whether to enable parallel function calling.
-   */
-  parallel_tool_calls?: boolean | null;
+    generation_config?: { [key: string]: unknown } | null;
 
-  /**
-   * Penalize new tokens based on whether they appear in the text so far.
-   */
-  presence_penalty?: number | null;
+    include_usage?: boolean | null;
 
-  /**
-   * Format for the model output (e.g., {'type': 'json_object'}).
-   */
-  response_format?: { [key: string]: unknown } | null;
+    input_audio_format?: string | null;
 
-  /**
-   * Seed for deterministic sampling.
-   */
-  seed?: number | null;
+    input_audio_transcription?: { [key: string]: unknown } | null;
 
-  /**
-   * Latency tier for the request (e.g., 'auto', 'default').
-   */
-  service_tier?: string | null;
+    logit_bias?: { [key: string]: number } | null;
 
-  /**
-   * Up to 4 sequences where the API will stop generating further tokens.
-   */
-  stop?: string | Array<string> | null;
+    logprobs?: boolean | null;
 
-  /**
-   * Whether to stream back partial progress.
-   */
-  stream?: boolean | null;
+    max_completion_tokens?: number | null;
 
-  /**
-   * Options for streaming responses.
-   */
-  stream_options?: { [key: string]: unknown } | null;
+    max_tokens?: number | null;
 
-  /**
-   * Sampling temperature (0 to 2). Higher values make output more random.
-   */
-  temperature?: number | null;
+    metadata?: { [key: string]: string } | null;
 
-  /**
-   * Controls which tool is called by the model.
-   */
-  tool_choice?: string | { [key: string]: unknown } | null;
+    modalities?: Array<string> | null;
 
-  /**
-   * List of tools the model may call.
-   */
-  tools?: Array<{ [key: string]: unknown }> | null;
+    n?: number | null;
 
-  /**
-   * Number of most likely tokens to return at each token position.
-   */
-  top_logprobs?: number | null;
+    output_audio_format?: string | null;
 
-  /**
-   * Nucleus sampling parameter. Alternative to temperature.
-   */
-  top_p?: number | null;
+    parallel_tool_calls?: boolean | null;
 
-  /**
-   * A unique identifier representing your end-user.
-   */
-  user?: string | null;
+    prediction?: { [key: string]: unknown } | null;
+
+    presence_penalty?: number | null;
+
+    reasoning?: Settings.Reasoning | null;
+
+    reasoning_effort?: string | null;
+
+    response_format?: { [key: string]: unknown } | null;
+
+    response_include?: Array<
+      | 'code_interpreter_call.outputs'
+      | 'computer_call_output.output.image_url'
+      | 'file_search_call.results'
+      | 'message.input_image.image_url'
+      | 'message.output_text.logprobs'
+      | 'reasoning.encrypted_content'
+    > | null;
+
+    safety_settings?: Array<{ [key: string]: unknown }> | null;
+
+    seed?: number | null;
+
+    service_tier?: string | null;
+
+    stop?: string | Array<string> | null;
+
+    store?: boolean | null;
+
+    stream?: boolean | null;
+
+    stream_options?: { [key: string]: unknown } | null;
+
+    system_instruction?: { [key: string]: unknown } | null;
+
+    temperature?: number | null;
+
+    thinking?: { [key: string]: unknown } | null;
+
+    tool_choice?: 'auto' | 'required' | 'none' | string | Settings.MCPToolChoice | null;
+
+    top_k?: number | null;
+
+    top_logprobs?: number | null;
+
+    top_p?: number | null;
+
+    truncation?: 'auto' | 'disabled' | null;
+
+    turn_detection?: { [key: string]: unknown } | null;
+
+    use_responses?: boolean;
+
+    user?: string | null;
+
+    voice?: string | null;
+  }
+
+  export namespace Settings {
+    export interface Reasoning {
+      effort?: 'minimal' | 'low' | 'medium' | 'high' | null;
+
+      generate_summary?: 'auto' | 'concise' | 'detailed' | null;
+
+      summary?: 'auto' | 'concise' | 'detailed' | null;
+
+      [k: string]: unknown;
+    }
+
+    export interface MCPToolChoice {
+      name: string;
+
+      server_label: string;
+    }
+  }
 }
 
 /**
- * Model metadata following OpenAI's exact structure.
- *
- * This is a read-only representation of available models returned by GET
- * /v1/models. Contains only essential metadata, no configuration fields.
- *
- * Attributes: id: Model identifier (e.g., 'gpt-4', 'claude-3-5-sonnet') created:
- * Unix timestamp when model was created object: Always 'model' for OpenAI
- * compatibility owned_by: Organization that owns the model
- *
- * Example: { "id": "gpt-4", "created": 1687882411, "object": "model", "owned_by":
- * "openai" }
+ * Response for /v1/models endpoint.
  */
-export interface Model {
+export interface ListModelsResponse {
   /**
-   * Model identifier
-   */
-  id: string;
-
-  /**
-   * Unix timestamp of model creation
-   */
-  created?: number;
-
-  /**
-   * Object type, always 'model'
-   */
-  object?: string;
-
-  /**
-   * Organization that owns this model
-   */
-  owned_by?: string;
-}
-
-/**
- * Response containing list of available models.
- *
- * Returns all models available to the authenticated user based on their API key
- * permissions and configured providers.
- *
- * Attributes: object: Always 'list' for compatibility with OpenAI API data: list
- * of Model objects representing available models
- *
- * Example: { "object": "list", "data": [ { "id": "openai/gpt-4", "object":
- * "model", "owned_by": "openai" }, { "id": "anthropic/claude-3-5-sonnet-20241022",
- * "object": "model", "owned_by": "anthropic" } ] }
- */
-export interface ModelsResponse {
-  /**
-   * List of models
+   * List of available models
    */
   data: Array<Model>;
 
   /**
-   * Object type
+   * Response object type
    */
-  object?: string;
+  object?: 'list';
+}
+
+/**
+ * Unified model metadata across all providers.
+ *
+ * Combines provider-specific schemas into a single, consistent format. Fields that
+ * aren't available from a provider are set to None.
+ */
+export interface Model {
+  /**
+   * Unique model identifier with provider prefix (e.g., 'openai/gpt-4')
+   */
+  id: string;
+
+  /**
+   * When the model was released (RFC 3339)
+   */
+  created_at: string;
+
+  /**
+   * Provider that hosts this model
+   */
+  provider: 'openai' | 'anthropic' | 'google' | 'xai' | 'mistral' | 'groq';
+
+  /**
+   * Normalized model capabilities across all providers.
+   */
+  capabilities?: Model.Capabilities | null;
+
+  /**
+   * Provider-declared default parameters for model generation.
+   */
+  defaults?: Model.Defaults | null;
+
+  /**
+   * Model description
+   */
+  description?: string | null;
+
+  /**
+   * Human-readable model name
+   */
+  display_name?: string | null;
+
+  /**
+   * Provider-specific generation method names (None = not declared)
+   */
+  provider_declared_generation_methods?: Array<string> | null;
+
+  /**
+   * Raw provider-specific metadata
+   */
+  provider_info?: { [key: string]: unknown } | null;
+
+  /**
+   * Model version identifier
+   */
+  version?: string | null;
+}
+
+export namespace Model {
+  /**
+   * Normalized model capabilities across all providers.
+   */
+  export interface Capabilities {
+    /**
+     * Supports audio processing
+     */
+    audio?: boolean | null;
+
+    /**
+     * Supports image generation
+     */
+    image_generation?: boolean | null;
+
+    /**
+     * Maximum input tokens
+     */
+    input_token_limit?: number | null;
+
+    /**
+     * Maximum output tokens
+     */
+    output_token_limit?: number | null;
+
+    /**
+     * Supports streaming responses
+     */
+    streaming?: boolean | null;
+
+    /**
+     * Supports structured JSON output
+     */
+    structured_output?: boolean | null;
+
+    /**
+     * Supports text generation
+     */
+    text?: boolean | null;
+
+    /**
+     * Supports extended thinking/reasoning
+     */
+    thinking?: boolean | null;
+
+    /**
+     * Supports function/tool calling
+     */
+    tools?: boolean | null;
+
+    /**
+     * Supports image understanding
+     */
+    vision?: boolean | null;
+  }
+
+  /**
+   * Provider-declared default parameters for model generation.
+   */
+  export interface Defaults {
+    /**
+     * Default maximum output tokens
+     */
+    max_output_tokens?: number | null;
+
+    /**
+     * Default temperature setting
+     */
+    temperature?: number | null;
+
+    /**
+     * Default top_k setting
+     */
+    top_k?: number | null;
+
+    /**
+     * Default top_p setting
+     */
+    top_p?: number | null;
+  }
 }
 
 export declare namespace Models {
-  export { type DedalusModel as DedalusModel, type Model as Model, type ModelsResponse as ModelsResponse };
+  export {
+    type DedalusModel as DedalusModel,
+    type ListModelsResponse as ListModelsResponse,
+    type Model as Model,
+  };
 }

@@ -10,7 +10,6 @@ You can run the MCP Server directly via `npx`:
 
 ```sh
 export DEDALUS_API_KEY="My API Key"
-export DEDALUS_API_KEY="My API Key Header"
 export DEDALUS_ORG_ID="My Organization"
 export DEDALUS_ENVIRONMENT="production"
 npx -y dedalus-labs-mcp@latest
@@ -31,7 +30,6 @@ For clients with a configuration JSON, it might look something like this:
       "args": ["-y", "dedalus-labs-mcp", "--client=claude", "--tools=all"],
       "env": {
         "DEDALUS_API_KEY": "My API Key",
-        "DEDALUS_API_KEY": "My API Key Header",
         "DEDALUS_ORG_ID": "My Organization",
         "DEDALUS_ENVIRONMENT": "production"
       }
@@ -141,8 +139,7 @@ Authorization can be provided via the `Authorization` header using the Bearer sc
 Additionally, authorization can be provided via the following headers:
 | Header | Equivalent client option | Security scheme |
 | ------------------- | ------------------------ | --------------- |
-| `x-dedalus-api-key` | `apiKey` | HTTPBearer |
-| `x-api-key` | `apiKeyHeader` | ApiKeyAuth |
+| `x-dedalus-api-key` | `apiKey` | Bearer |
 
 A configuration JSON for this server might look like this, assuming the server is hosted at `http://localhost:3000`:
 
@@ -231,7 +228,7 @@ The following tools are available in this MCP server.
   user: Authenticated user obtained from API key validation
 
   Returns:
-  DedalusModel: Information about the requested model
+  Model: Information about the requested model
 
   Raises:
   HTTPException: - 401 if authentication fails - 404 if model not found or not accessible with current API key - 500 if internal error occurs
@@ -260,76 +257,62 @@ The following tools are available in this MCP server.
       }
       ```
 
-- `list_models` (`read`): List available models.
+- `list_models` (`read`): List available models from OpenAI, Anthropic, and Google.
 
-  Returns a list of available models from all configured providers.
-  Models are filtered based on provider availability and API key configuration.
-  Only models from providers with valid API keys are returned.
-
-  Args:
-  user: Authenticated user obtained from API key validation
+  Calls provider APIs to get live model lists, then combines into unified response.
+  Only returns models from providers with configured API keys.
 
   Returns:
-  ModelsResponse: Object containing list of available models
+  ModelsResponse: Combined list of models from all providers
 
-  Raises:
-  HTTPException: - 401 if authentication fails - 500 if internal error occurs during model listing
+### Resource `embeddings`:
 
-  Requires:
-  Valid API key with 'read' scope permission
+- `create_embeddings` (`write`): Create embeddings using the configured provider.
 
-  Example:
-  ```python
-  import dedalus_labs
+### Resource `audio.speech`:
 
-      client = dedalus_labs.Client(api_key="your-api-key")
-      models = client.models.list()
+- `create_audio_speech` (`write`): Generate audio from text using text-to-speech.
 
-      for model in models.data:
-          print(f"Model: {model.id} (Owner: {model.owned_by})")
-      ```
+  OpenAI only endpoint.
 
-      Response:
-      ```json
-      {
-          "object": "list",
-          "data": [
-              {
-                  "id": "openai/gpt-4",
-                  "object": "model",
-                  "owned_by": "openai"
-              },
-              {
-                  "id": "anthropic/claude-3-5-sonnet-20241022",
-                  "object": "model",
-                  "owned_by": "anthropic"
-              }
-          ]
-      }
-      ```
+### Resource `audio.transcriptions`:
+
+- `create_audio_transcriptions` (`write`): Transcribe audio to text.
+
+  OpenAI only endpoint.
+
+### Resource `audio.translations`:
+
+- `create_audio_translations` (`write`): Translate audio to English text.
+
+  OpenAI only endpoint.
+
+### Resource `images`:
+
+- `generate_images` (`write`): Generate images from text prompts.
+
+  Supports OpenAI (DALL-E, GPT Image) and Google (Nano Banana) models.
 
 ### Resource `chat.completions`:
 
-- `create_chat_completions` (`write`): Create a chat completion using the Agent framework.
+- `create_chat_completions` (`write`): Create a chat completion.
 
-  This endpoint provides a vendor-agnostic chat completion API that works with
-  100+ LLM providers via the Agent framework. It supports both single and
-  multi-model routing, client-side and server-side tool execution, and
-  integration with MCP (Model Context Protocol) servers.
-
-  Features: - Cross-vendor compatibility (OpenAI, Anthropic, Cohere, etc.) - Multi-model routing with intelligent agentic handoffs - Client-side tool execution (tools returned as JSON) - Server-side MCP tool execution with automatic billing - Streaming and non-streaming responses - Advanced agent attributes for routing decisions - Automatic usage tracking and billing
+  This endpoint provides a vendor-agnostic chat completions API that works with
+  thousands of LLMs. It supports MCP integration, multi-model routing with
+  intelligent agentic handoffs, client-side and server-side tool execution,
+  and streaming and non-streaming responses.
 
   Args:
-  request: Chat completion request with messages, model, and configuration
-  http_request: FastAPI request object for accessing headers and state
-  background_tasks: FastAPI background tasks for async billing operations
-  user: Authenticated user with validated API key and sufficient balance
+  request: Chat completion request with messages, model, and configuration.
+  http_request: FastAPI request object for accessing headers and state.
+  background_tasks: FastAPI background tasks for async billing operations.
+  user: Authenticated user with validated API key and sufficient balance.
 
   Returns:
-  ChatCompletion: OpenAI-compatible completion response with usage data
+  ChatCompletion: OpenAI-compatible completion response with usage data.
 
   Raises:
-  HTTPException: - 401 if authentication fails or insufficient balance - 400 if request validation fails - 500 if internal processing error occurs
+  HTTPException: - 401 if authentication fails or insufficient balance. - 400 if request validation fails. - 500 if internal processing error occurs.
 
   Billing: - Token usage billed automatically based on model pricing - MCP tool calls billed separately using credits system - Streaming responses billed after completion via background task
 

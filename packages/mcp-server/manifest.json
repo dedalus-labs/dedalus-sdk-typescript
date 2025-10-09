@@ -21,7 +21,6 @@
       "args": ["${__dirname}/index.js"],
       "env": {
         "DEDALUS_API_KEY": "${user_config.DEDALUS_API_KEY}",
-        "DEDALUS_API_KEY": "${user_config.DEDALUS_API_KEY}",
         "DEDALUS_ORG_ID": "${user_config.DEDALUS_ORG_ID}"
       }
     }
@@ -29,19 +28,13 @@
   "user_config": {
     "DEDALUS_API_KEY": {
       "title": "api_key",
-      "description": "",
-      "required": false,
-      "type": "string"
-    },
-    "DEDALUS_API_KEY": {
-      "title": "api_key_header",
-      "description": "",
+      "description": "API key for Bearer token authentication.",
       "required": false,
       "type": "string"
     },
     "DEDALUS_ORG_ID": {
       "title": "organization",
-      "description": "",
+      "description": "Organization ID for scoping API requests.",
       "required": false,
       "type": "string"
     }

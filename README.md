@@ -49,8 +49,8 @@ const stream = await client.chat.completions.create({
     { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
     { role: 'user', content: 'What do you think of artificial intelligence?' },
   ],
-  stream: true,
   model: 'openai/gpt-5',
+  stream: true,
 });
 for await (const streamChunk of stream) {
   console.log(streamChunk.id);
@@ -77,6 +77,41 @@ const response: Dedalus.HealthCheckResponse = await client.health.check();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
+
+## File uploads
+
+Request parameters that correspond to file uploads can be passed in many different forms:
+
+- `File` (or an object with the same structure)
+- a `fetch` `Response` (or an object with the same structure)
+- an `fs.ReadStream`
+- the return value of our `toFile` helper
+
+```ts
+import fs from 'fs';
+import Dedalus, { toFile } from 'dedalus-labs';
+
+const client = new Dedalus();
+
+// If you have access to Node `fs` we recommend using `fs.createReadStream()`:
+await client.audio.transcriptions.create({ file: fs.createReadStream('/path/to/file'), model: 'model' });
+
+// Or if you have the web `File` API you can pass a `File` instance:
+await client.audio.transcriptions.create({ file: new File(['my bytes'], 'file'), model: 'model' });
+
+// You can also pass a `fetch` `Response`:
+await client.audio.transcriptions.create({ file: await fetch('https://somesite/file'), model: 'model' });
+
+// Finally, if none of the above are convenient, you can use our `toFile` helper:
+await client.audio.transcriptions.create({
+  file: await toFile(Buffer.from('my bytes'), 'file'),
+  model: 'model',
+});
+await client.audio.transcriptions.create({
+  file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
+  model: 'model',
+});
+```
 
 ## Handling errors
 
