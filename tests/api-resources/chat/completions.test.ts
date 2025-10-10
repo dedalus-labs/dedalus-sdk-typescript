@@ -30,6 +30,7 @@ describe('resource completions', () => {
       model: 'openai/gpt-4',
       agent_attributes: { accuracy: 0.9, complexity: 0.8, efficiency: 0.7 },
       audio: { format: 'bar', voice: 'bar' },
+      auto_execute_tools: true,
       disable_automatic_function_calling: true,
       frequency_penalty: -0.5,
       function_call: 'string',
