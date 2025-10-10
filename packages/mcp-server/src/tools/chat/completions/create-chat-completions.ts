@@ -71,6 +71,12 @@ export const tool: Tool = {
               "Parameters for audio output. Required when requesting audio responses (for example, modalities including 'audio').",
             additionalProperties: true,
           },
+          auto_execute_tools: {
+            type: 'boolean',
+            title: 'Auto Execute Tools',
+            description:
+              'When False, skip server-side tool execution and return raw OpenAI-style tool_calls in the response.',
+          },
           disable_automatic_function_calling: {
             type: 'boolean',
             title: 'Disable Automatic Function Calling',
@@ -594,6 +600,12 @@ export const tool: Tool = {
             description:
               "Parameters for audio output. Required when requesting audio responses (for example, modalities including 'audio').",
             additionalProperties: true,
+          },
+          auto_execute_tools: {
+            type: 'boolean',
+            title: 'Auto Execute Tools',
+            description:
+              'When False, skip server-side tool execution and return raw OpenAI-style tool_calls in the response.',
           },
           disable_automatic_function_calling: {
             type: 'boolean',

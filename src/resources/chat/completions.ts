@@ -431,6 +431,12 @@ export interface CompletionRequest {
   audio?: { [key: string]: unknown } | null;
 
   /**
+   * When False, skip server-side tool execution and return raw OpenAI-style
+   * tool_calls in the response.
+   */
+  auto_execute_tools?: boolean;
+
+  /**
    * Google-only flag to disable the SDK's automatic function execution. When true,
    * the model returns function calls for the client to execute manually.
    */
@@ -1061,6 +1067,12 @@ export interface CompletionCreateParamsBase {
    * example, modalities including 'audio').
    */
   audio?: { [key: string]: unknown } | null;
+
+  /**
+   * When False, skip server-side tool execution and return raw OpenAI-style
+   * tool_calls in the response.
+   */
+  auto_execute_tools?: boolean;
 
   /**
    * Google-only flag to disable the SDK's automatic function execution. When true,
