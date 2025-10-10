@@ -401,11 +401,10 @@ export namespace Completion {
  */
 export interface CompletionRequest {
   /**
-   * A list of messages comprising the conversation so far. Depending on the model
-   * you use, different message types (modalities) are supported, like text, images,
-   * and audio.
+   * Conversation history. Accepts either a list of message objects or a string,
+   * which is treated as a single user message.
    */
-  messages: Array<{ [key: string]: unknown }>;
+  messages: Array<{ [key: string]: unknown }> | string;
 
   /**
    * Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
@@ -430,6 +429,12 @@ export interface CompletionRequest {
    * example, modalities including 'audio').
    */
   audio?: { [key: string]: unknown } | null;
+
+  /**
+   * Google-only flag to disable the SDK's automatic function execution. When true,
+   * the model returns function calls for the client to execute manually.
+   */
+  disable_automatic_function_calling?: boolean | null;
 
   /**
    * Number between -2.0 and 2.0. Positive values penalize new tokens based on their
@@ -467,6 +472,18 @@ export interface CompletionRequest {
    * future use - handoff configuration format not yet finalized.
    */
   handoff_config?: { [key: string]: unknown } | null;
+
+  /**
+   * Convenience alias for Responses-style `input`. Used when `messages` is omitted
+   * to provide the user prompt directly.
+   */
+  input?: Array<{ [key: string]: unknown }> | string | null;
+
+  /**
+   * Convenience alias for Responses-style `instructions`. Takes precedence over
+   * `system` and over system-role messages when provided.
+   */
+  instructions?: string | Array<{ [key: string]: unknown }> | null;
 
   /**
    * Modify the likelihood of specified tokens appearing in the completion. Accepts a
@@ -576,7 +593,9 @@ export interface CompletionRequest {
   /**
    * An object specifying the format that the model must output. Use {'type':
    * 'json_schema', 'json_schema': {...}} for structured outputs or {'type':
-   * 'json_object'} for the legacy JSON mode.
+   * 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models
+   * honour this field; Anthropic and Google requests will return an
+   * invalid_request_error if it is supplied.
    */
   response_format?: { [key: string]: unknown } | null;
 
@@ -1014,11 +1033,10 @@ export type CompletionCreateParams = CompletionCreateParamsNonStreaming | Comple
 
 export interface CompletionCreateParamsBase {
   /**
-   * A list of messages comprising the conversation so far. Depending on the model
-   * you use, different message types (modalities) are supported, like text, images,
-   * and audio.
+   * Conversation history. Accepts either a list of message objects or a string,
+   * which is treated as a single user message.
    */
-  messages: Array<{ [key: string]: unknown }>;
+  messages: Array<{ [key: string]: unknown }> | string;
 
   /**
    * Model(s) to use for completion. Can be a single model ID, a DedalusModel object,
@@ -1043,6 +1061,12 @@ export interface CompletionCreateParamsBase {
    * example, modalities including 'audio').
    */
   audio?: { [key: string]: unknown } | null;
+
+  /**
+   * Google-only flag to disable the SDK's automatic function execution. When true,
+   * the model returns function calls for the client to execute manually.
+   */
+  disable_automatic_function_calling?: boolean | null;
 
   /**
    * Number between -2.0 and 2.0. Positive values penalize new tokens based on their
@@ -1080,6 +1104,18 @@ export interface CompletionCreateParamsBase {
    * future use - handoff configuration format not yet finalized.
    */
   handoff_config?: { [key: string]: unknown } | null;
+
+  /**
+   * Convenience alias for Responses-style `input`. Used when `messages` is omitted
+   * to provide the user prompt directly.
+   */
+  input?: Array<{ [key: string]: unknown }> | string | null;
+
+  /**
+   * Convenience alias for Responses-style `instructions`. Takes precedence over
+   * `system` and over system-role messages when provided.
+   */
+  instructions?: string | Array<{ [key: string]: unknown }> | null;
 
   /**
    * Modify the likelihood of specified tokens appearing in the completion. Accepts a
@@ -1189,7 +1225,9 @@ export interface CompletionCreateParamsBase {
   /**
    * An object specifying the format that the model must output. Use {'type':
    * 'json_schema', 'json_schema': {...}} for structured outputs or {'type':
-   * 'json_object'} for the legacy JSON mode.
+   * 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models
+   * honour this field; Anthropic and Google requests will return an
+   * invalid_request_error if it is supplied.
    */
   response_format?: { [key: string]: unknown } | null;
 

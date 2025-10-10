@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 
 export const tool: Tool = {
   name: 'create_audio_speech',
-  description: 'Generate audio from text using text-to-speech.\n\nOpenAI only endpoint.',
+  description:
+    'Generate audio from text using text-to-speech.\n\nOpenAI models only. Gemini TTS uses different architecture (audio modalities in chat).',
   inputSchema: {
     type: 'object',
     properties: {

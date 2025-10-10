@@ -9,7 +9,8 @@ export class Speech extends APIResource {
   /**
    * Generate audio from text using text-to-speech.
    *
-   * OpenAI only endpoint.
+   * OpenAI models only. Gemini TTS uses different architecture (audio modalities in
+   * chat).
    */
   create(body: SpeechCreateParams, options?: RequestOptions): APIPromise<Response> {
     return this._client.post('/v1/audio/speech', {

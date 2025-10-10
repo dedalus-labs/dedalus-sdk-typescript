@@ -10,7 +10,7 @@ export class Translations extends APIResource {
   /**
    * Translate audio to English text.
    *
-   * OpenAI only endpoint.
+   * OpenAI Whisper models only.
    */
   create(body: TranslationCreateParams, options?: RequestOptions): APIPromise<TranslationCreateResponse> {
     return this._client.post(

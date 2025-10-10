@@ -10,7 +10,7 @@ export class Transcriptions extends APIResource {
   /**
    * Transcribe audio to text.
    *
-   * OpenAI only endpoint.
+   * OpenAI Whisper models only.
    */
   create(body: TranscriptionCreateParams, options?: RequestOptions): APIPromise<TranscriptionCreateResponse> {
     return this._client.post(

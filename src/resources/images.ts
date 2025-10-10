@@ -8,7 +8,8 @@ export class Images extends APIResource {
   /**
    * Generate images from text prompts.
    *
-   * Supports OpenAI (DALL-E, GPT Image) and Google (Nano Banana) models.
+   * Pure image generation models only (DALL-E, GPT Image). For multimodal models
+   * like gemini-2.5-flash-image, use /v1/chat/completions.
    */
   generate(body: ImageGenerateParams, options?: RequestOptions): APIPromise<ImagesResponse> {
     return this._client.post('/v1/images/generations', { body, ...options });

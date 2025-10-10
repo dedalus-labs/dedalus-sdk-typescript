@@ -55,7 +55,7 @@ export interface ClientOptions {
   apiKey?: string | null | undefined;
 
   /**
-   * Organization ID for scoping API requests.
+   * Dedalus Organization ID for scoping API requests.
    */
   organization?: string | null | undefined;
 
