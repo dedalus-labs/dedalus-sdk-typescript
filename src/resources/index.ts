@@ -1,5 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+export * from './shared';
 export { Audio } from './audio/audio';
 export { Chat } from './chat/chat';
 export {
@@ -16,6 +17,6 @@ export {
   type ImagesResponse,
   type ImageGenerateParams,
 } from './images';
-export { Models, type DedalusModel, type ListModelsResponse, type Model } from './models';
+export { Models, type ListModelsResponse } from './models';
 export { Root, type RootGetResponse } from './root';
 export { _Private } from './-private';

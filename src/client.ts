@@ -25,7 +25,7 @@ import {
 } from './resources/embeddings';
 import { Health, HealthCheckResponse } from './resources/health';
 import { CreateImageRequest, Image, ImageGenerateParams, Images, ImagesResponse } from './resources/images';
-import { DedalusModel, ListModelsResponse, Model, Models } from './resources/models';
+import { ListModelsResponse, Models } from './resources/models';
 import { Root, RootGetResponse } from './resources/root';
 import { Audio } from './resources/audio/audio';
 import { Chat } from './resources/chat/chat';
@@ -798,12 +798,7 @@ export declare namespace Dedalus {
 
   export { Health as Health, type HealthCheckResponse as HealthCheckResponse };
 
-  export {
-    Models as Models,
-    type DedalusModel as DedalusModel,
-    type ListModelsResponse as ListModelsResponse,
-    type Model as Model,
-  };
+  export { Models as Models, type ListModelsResponse as ListModelsResponse };
 
   export {
     Embeddings as Embeddings,
@@ -823,4 +818,7 @@ export declare namespace Dedalus {
   };
 
   export { Chat as Chat };
+
+  export type DedalusModel = API.DedalusModel;
+  export type Model = API.Model;
 }

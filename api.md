@@ -1,3 +1,10 @@
+# Shared
+
+Types:
+
+- <code><a href="./src/resources/shared.ts">DedalusModel</a></code>
+- <code><a href="./src/resources/shared.ts">Model</a></code>
+
 # Root
 
 Types:
@@ -24,9 +31,7 @@ Methods:
 
 Types:
 
-- <code><a href="./src/resources/models.ts">DedalusModel</a></code>
 - <code><a href="./src/resources/models.ts">ListModelsResponse</a></code>
-- <code><a href="./src/resources/models.ts">Model</a></code>
 
 Methods:
 

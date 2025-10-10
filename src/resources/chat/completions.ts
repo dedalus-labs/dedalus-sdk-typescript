@@ -2,7 +2,7 @@
 
 import { APIResource } from '../../core/resource';
 import * as CompletionsAPI from './completions';
-import * as ModelsAPI from '../models';
+import * as Shared from '../shared';
 import { APIPromise } from '../../core/api-promise';
 import { Stream } from '../../core/streaming';
 import { RequestOptions } from '../../internal/request-options';
@@ -414,7 +414,7 @@ export interface CompletionRequest {
    * 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
    * choose optimal model based on task complexity.
    */
-  model: ModelID | ModelsAPI.DedalusModel | Models;
+  model: ModelID | Shared.DedalusModel | Models;
 
   /**
    * Attributes for the agent itself, influencing behavior and model selection.
@@ -823,7 +823,7 @@ export namespace CompletionRequest {
 /**
  * Dedalus model choice - either a string ID or DedalusModel configuration object.
  */
-export type DedalusModelChoice = ModelID | ModelsAPI.DedalusModel;
+export type DedalusModelChoice = ModelID | Shared.DedalusModel;
 
 /**
  * Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').
@@ -1052,7 +1052,7 @@ export interface CompletionCreateParamsBase {
    * 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
    * choose optimal model based on task complexity.
    */
-  model: ModelID | ModelsAPI.DedalusModel | Models;
+  model: ModelID | Shared.DedalusModel | Models;
 
   /**
    * Attributes for the agent itself, influencing behavior and model selection.
