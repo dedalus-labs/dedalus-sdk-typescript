@@ -25,14 +25,21 @@ export const tool: Tool = {
         type: 'object',
         properties: {
           messages: {
-            type: 'array',
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              {
+                type: 'string',
+              },
+            ],
             title: 'Messages',
             description:
-              'A list of messages comprising the conversation so far. Depending on the model you use, different message types (modalities) are supported, like text, images, and audio.',
-            items: {
-              type: 'object',
-              additionalProperties: true,
-            },
+              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message.',
           },
           model: {
             anyOf: [
@@ -63,6 +70,12 @@ export const tool: Tool = {
             description:
               "Parameters for audio output. Required when requesting audio responses (for example, modalities including 'audio').",
             additionalProperties: true,
+          },
+          disable_automatic_function_calling: {
+            type: 'boolean',
+            title: 'Disable Automatic Function Calling',
+            description:
+              "Google-only flag to disable the SDK's automatic function execution. When true, the model returns function calls for the client to execute manually.",
           },
           frequency_penalty: {
             type: 'number',
@@ -117,6 +130,40 @@ export const tool: Tool = {
             description:
               'Configuration for multi-model handoffs and agent orchestration. Reserved for future use - handoff configuration format not yet finalized.',
             additionalProperties: true,
+          },
+          input: {
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              {
+                type: 'string',
+              },
+            ],
+            title: 'Input',
+            description:
+              'Convenience alias for Responses-style `input`. Used when `messages` is omitted to provide the user prompt directly.',
+          },
+          instructions: {
+            anyOf: [
+              {
+                type: 'string',
+              },
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+            ],
+            title: 'Instructions',
+            description:
+              'Convenience alias for Responses-style `instructions`. Takes precedence over `system` and over system-role messages when provided.',
           },
           logit_bias: {
             type: 'object',
@@ -297,7 +344,7 @@ export const tool: Tool = {
             type: 'object',
             title: 'Response Format',
             description:
-              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode.",
+              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honour this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
             additionalProperties: true,
           },
           safety_identifier: {
@@ -495,14 +542,21 @@ export const tool: Tool = {
         type: 'object',
         properties: {
           messages: {
-            type: 'array',
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              {
+                type: 'string',
+              },
+            ],
             title: 'Messages',
             description:
-              'A list of messages comprising the conversation so far. Depending on the model you use, different message types (modalities) are supported, like text, images, and audio.',
-            items: {
-              type: 'object',
-              additionalProperties: true,
-            },
+              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message.',
           },
           model: {
             anyOf: [
@@ -540,6 +594,12 @@ export const tool: Tool = {
             description:
               "Parameters for audio output. Required when requesting audio responses (for example, modalities including 'audio').",
             additionalProperties: true,
+          },
+          disable_automatic_function_calling: {
+            type: 'boolean',
+            title: 'Disable Automatic Function Calling',
+            description:
+              "Google-only flag to disable the SDK's automatic function execution. When true, the model returns function calls for the client to execute manually.",
           },
           frequency_penalty: {
             type: 'number',
@@ -594,6 +654,40 @@ export const tool: Tool = {
             description:
               'Configuration for multi-model handoffs and agent orchestration. Reserved for future use - handoff configuration format not yet finalized.',
             additionalProperties: true,
+          },
+          input: {
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              {
+                type: 'string',
+              },
+            ],
+            title: 'Input',
+            description:
+              'Convenience alias for Responses-style `input`. Used when `messages` is omitted to provide the user prompt directly.',
+          },
+          instructions: {
+            anyOf: [
+              {
+                type: 'string',
+              },
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+            ],
+            title: 'Instructions',
+            description:
+              'Convenience alias for Responses-style `instructions`. Takes precedence over `system` and over system-role messages when provided.',
           },
           logit_bias: {
             type: 'object',
@@ -774,7 +868,7 @@ export const tool: Tool = {
             type: 'object',
             title: 'Response Format',
             description:
-              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode.",
+              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honour this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
             additionalProperties: true,
           },
           safety_identifier: {
@@ -996,13 +1090,13 @@ export const tool: Tool = {
                 title: 'Audio',
                 additionalProperties: true,
               },
+              disable_automatic_function_calling: {
+                type: 'boolean',
+                title: 'Disable Automatic Function Calling',
+              },
               extra_args: {
                 type: 'object',
                 title: 'Extra Args',
-                additionalProperties: true,
-              },
-              extra_body: {
-                type: 'object',
                 additionalProperties: true,
               },
               extra_headers: {
@@ -1085,6 +1179,10 @@ export const tool: Tool = {
                 type: 'number',
                 title: 'Presence Penalty',
               },
+              prompt_cache_key: {
+                type: 'string',
+                title: 'Prompt Cache Key',
+              },
               reasoning: {
                 type: 'object',
                 title: 'Reasoning',
@@ -1130,6 +1228,10 @@ export const tool: Tool = {
                   ],
                 },
               },
+              safety_identifier: {
+                type: 'string',
+                title: 'Safety Identifier',
+              },
               safety_settings: {
                 type: 'array',
                 title: 'Safety Settings',
@@ -1173,6 +1275,11 @@ export const tool: Tool = {
                 title: 'Stream Options',
                 additionalProperties: true,
               },
+              structured_output: {
+                type: 'object',
+                title: 'Structured Output',
+                additionalProperties: true,
+              },
               system_instruction: {
                 type: 'object',
                 title: 'System Instruction',
@@ -1186,6 +1293,10 @@ export const tool: Tool = {
                 type: 'object',
                 title: 'Thinking',
                 additionalProperties: true,
+              },
+              timeout: {
+                type: 'number',
+                title: 'Timeout',
               },
               tool_choice: {
                 anyOf: [
@@ -1212,6 +1323,11 @@ export const tool: Tool = {
                     required: ['name', 'server_label'],
                   },
                 ],
+              },
+              tool_config: {
+                type: 'object',
+                title: 'Tool Config',
+                additionalProperties: true,
               },
               top_k: {
                 type: 'integer',
@@ -1243,9 +1359,18 @@ export const tool: Tool = {
                 type: 'string',
                 title: 'User',
               },
+              verbosity: {
+                type: 'string',
+                title: 'Verbosity',
+              },
               voice: {
                 type: 'string',
                 title: 'Voice',
+              },
+              web_search_options: {
+                type: 'object',
+                title: 'Web Search Options',
+                additionalProperties: true,
               },
             },
           },

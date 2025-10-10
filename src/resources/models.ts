@@ -89,9 +89,9 @@ export namespace DedalusModel {
 
     audio?: { [key: string]: unknown } | null;
 
-    extra_args?: { [key: string]: unknown } | null;
+    disable_automatic_function_calling?: boolean;
 
-    extra_body?: { [key: string]: unknown } | null;
+    extra_args?: { [key: string]: unknown } | null;
 
     extra_headers?: { [key: string]: string } | null;
 
@@ -129,6 +129,8 @@ export namespace DedalusModel {
 
     presence_penalty?: number | null;
 
+    prompt_cache_key?: string | null;
+
     reasoning?: Settings.Reasoning | null;
 
     reasoning_effort?: string | null;
@@ -144,6 +146,8 @@ export namespace DedalusModel {
       | 'reasoning.encrypted_content'
     > | null;
 
+    safety_identifier?: string | null;
+
     safety_settings?: Array<{ [key: string]: unknown }> | null;
 
     seed?: number | null;
@@ -158,13 +162,19 @@ export namespace DedalusModel {
 
     stream_options?: { [key: string]: unknown } | null;
 
+    structured_output?: unknown;
+
     system_instruction?: { [key: string]: unknown } | null;
 
     temperature?: number | null;
 
     thinking?: { [key: string]: unknown } | null;
 
+    timeout?: number | null;
+
     tool_choice?: 'auto' | 'required' | 'none' | string | Settings.MCPToolChoice | null;
+
+    tool_config?: { [key: string]: unknown } | null;
 
     top_k?: number | null;
 
@@ -180,7 +190,11 @@ export namespace DedalusModel {
 
     user?: string | null;
 
+    verbosity?: string | null;
+
     voice?: string | null;
+
+    web_search_options?: { [key: string]: unknown } | null;
   }
 
   export namespace Settings {

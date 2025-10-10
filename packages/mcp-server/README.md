@@ -273,25 +273,26 @@ The following tools are available in this MCP server.
 
 - `create_audio_speech` (`write`): Generate audio from text using text-to-speech.
 
-  OpenAI only endpoint.
+  OpenAI models only. Gemini TTS uses different architecture (audio modalities in chat).
 
 ### Resource `audio.transcriptions`:
 
 - `create_audio_transcriptions` (`write`): Transcribe audio to text.
 
-  OpenAI only endpoint.
+  OpenAI Whisper models only.
 
 ### Resource `audio.translations`:
 
 - `create_audio_translations` (`write`): Translate audio to English text.
 
-  OpenAI only endpoint.
+  OpenAI Whisper models only.
 
 ### Resource `images`:
 
 - `generate_images` (`write`): Generate images from text prompts.
 
-  Supports OpenAI (DALL-E, GPT Image) and Google (Nano Banana) models.
+  Pure image generation models only (DALL-E, GPT Image).
+  For multimodal models like gemini-2.5-flash-image, use /v1/chat/completions.
 
 ### Resource `chat.completions`:
 

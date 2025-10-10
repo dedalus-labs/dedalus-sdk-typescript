@@ -34,7 +34,7 @@
     },
     "DEDALUS_ORG_ID": {
       "title": "organization",
-      "description": "Organization ID for scoping API requests.",
+      "description": "Dedalus Organization ID for scoping API requests.",
       "required": false,
       "type": "string"
     }
