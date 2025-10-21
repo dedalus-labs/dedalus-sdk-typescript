@@ -31,7 +31,7 @@ export type StreamChunk = {
 };
 
 const isVerbose = () => {
-  const v = (process.env.DEDALUS_SDK_VERBOSE || "").toLowerCase();
+  const v = (process.env['DEDALUS_SDK_VERBOSE'] || "").toLowerCase();
   return v === "1" || v === "true" || v === "yes" || v === "on" || v === "debug";
 };
 
@@ -54,6 +54,8 @@ export async function streamAsync(stream: AsyncIterable<StreamChunk>): Promise<v
 
     if (chunk.choices && chunk.choices.length) {
       const choice = chunk.choices[0];
+      if (!choice) continue;
+
       const delta = choice.delta || {};
 
       // Print tool-call deltas as debug (verbose-only)
@@ -102,6 +104,8 @@ export function streamSync(stream: Iterable<StreamChunk>): void {
 
     if (chunk.choices && chunk.choices.length) {
       const choice = chunk.choices[0];
+      if (!choice) continue;
+
       const delta = choice.delta || {};
 
       // Print tool-call deltas as debug (verbose-only)
