@@ -8,9 +8,19 @@ import { multipartFormRequestOptions } from '../../internal/uploads';
 
 export class Transcriptions extends APIResource {
   /**
-   * Transcribe audio to text.
+   * Transcribe audio into text.
    *
-   * OpenAI Whisper models only.
+   * Transcribes audio files using OpenAI's Whisper model. Supports multiple audio
+   * formats including mp3, mp4, mpeg, mpga, m4a, wav, and webm. Maximum file size is
+   * 25 MB.
+   *
+   * Args: file: Audio file to transcribe (required) model: Model ID to use (e.g.,
+   * "openai/whisper-1") language: ISO-639-1 language code (e.g., "en", "es") -
+   * improves accuracy prompt: Optional text to guide the model's style
+   * response_format: Format of the output (json, text, srt, verbose_json, vtt)
+   * temperature: Sampling temperature between 0 and 1
+   *
+   * Returns: Transcription object with the transcribed text
    */
   create(body: TranscriptionCreateParams, options?: RequestOptions): APIPromise<TranscriptionCreateResponse> {
     return this._client.post(
@@ -21,115 +31,308 @@ export class Transcriptions extends APIResource {
 }
 
 /**
- * Response from transcription endpoint.
+ * Represents a verbose json transcription response returned by model, based on the
+ * provided input.
  *
- * For response_format='json' or 'text', only 'text' is returned. For
- * response_format='verbose_json', additional fields are included.
+ * Fields:
+ *
+ * - language (required): str
+ * - duration (required): float
+ * - text (required): str
+ * - words (optional): list[TranscriptionWord]
+ * - segments (optional): list[TranscriptionSegment]
+ * - usage (optional): TranscriptTextUsageDuration
  */
-export interface TranscriptionCreateResponse {
-  /**
-   * The transcribed text
-   */
-  text: string;
-
-  /**
-   * The duration of the input audio in seconds
-   */
-  duration?: number | null;
-
-  /**
-   * The language of the input audio
-   */
-  language?: string | null;
-
-  /**
-   * Segments of the transcribed text and their corresponding details
-   */
-  segments?: Array<TranscriptionCreateResponse.Segment> | null;
-
-  /**
-   * Extracted words and their corresponding timestamps (requires
-   * timestamp_granularities=['word'])
-   */
-  words?: Array<TranscriptionCreateResponse.Word> | null;
-}
+export type TranscriptionCreateResponse =
+  | TranscriptionCreateResponse.CreateTranscriptionResponseVerboseJson
+  | TranscriptionCreateResponse.CreateTranscriptionResponseJson;
 
 export namespace TranscriptionCreateResponse {
   /**
-   * Segment-level details for transcription.
+   * Represents a verbose json transcription response returned by model, based on the
+   * provided input.
+   *
+   * Fields:
+   *
+   * - language (required): str
+   * - duration (required): float
+   * - text (required): str
+   * - words (optional): list[TranscriptionWord]
+   * - segments (optional): list[TranscriptionSegment]
+   * - usage (optional): TranscriptTextUsageDuration
    */
-  export interface Segment {
+  export interface CreateTranscriptionResponseVerboseJson {
     /**
-     * Unique identifier of the segment
+     * The duration of the input audio.
      */
-    id: number;
+    duration: number;
 
     /**
-     * Average log probability of the segment
+     * The language of the input audio.
      */
-    avg_logprob: number;
+    language: string;
 
     /**
-     * Compression ratio of the segment. If greater than 2.4, consider the compression
-     * failed
-     */
-    compression_ratio: number;
-
-    /**
-     * End time of the segment in seconds
-     */
-    end: number;
-
-    /**
-     * Probability of no speech in the segment. If higher than 1.0 and avg_logprob is
-     * below -1, consider this segment silent
-     */
-    no_speech_prob: number;
-
-    /**
-     * Seek offset of the segment
-     */
-    seek: number;
-
-    /**
-     * Start time of the segment in seconds
-     */
-    start: number;
-
-    /**
-     * Temperature parameter used for generating this segment
-     */
-    temperature: number;
-
-    /**
-     * Text content of the segment
+     * The transcribed text.
      */
     text: string;
 
     /**
-     * Array of token IDs for the segment
+     * Segments of the transcribed text and their corresponding details.
      */
-    tokens: Array<number>;
+    segments?: Array<CreateTranscriptionResponseVerboseJson.Segment>;
+
+    /**
+     * Usage statistics for models billed by audio input duration.
+     */
+    usage?: CreateTranscriptionResponseVerboseJson.Usage;
+
+    /**
+     * Extracted words and their corresponding timestamps.
+     */
+    words?: Array<CreateTranscriptionResponseVerboseJson.Word>;
+  }
+
+  export namespace CreateTranscriptionResponseVerboseJson {
+    /**
+     * Fields:
+     *
+     * - id (required): int
+     * - seek (required): int
+     * - start (required): float
+     * - end (required): float
+     * - text (required): str
+     * - tokens (required): list[int]
+     * - temperature (required): float
+     * - avg_logprob (required): float
+     * - compression_ratio (required): float
+     * - no_speech_prob (required): float
+     */
+    export interface Segment {
+      /**
+       * Unique identifier of the segment.
+       */
+      id: number;
+
+      /**
+       * Average logprob of the segment. If the value is lower than -1, consider the
+       * logprobs failed.
+       */
+      avg_logprob: number;
+
+      /**
+       * Compression ratio of the segment. If the value is greater than 2.4, consider the
+       * compression failed.
+       */
+      compression_ratio: number;
+
+      /**
+       * End time of the segment in seconds.
+       */
+      end: number;
+
+      /**
+       * Probability of no speech in the segment. If the value is higher than 1.0 and the
+       * `avg_logprob` is below -1, consider this segment silent.
+       */
+      no_speech_prob: number;
+
+      /**
+       * Seek offset of the segment.
+       */
+      seek: number;
+
+      /**
+       * Start time of the segment in seconds.
+       */
+      start: number;
+
+      /**
+       * Temperature parameter used for generating the segment.
+       */
+      temperature: number;
+
+      /**
+       * Text content of the segment.
+       */
+      text: string;
+
+      /**
+       * Array of token IDs for the text content.
+       */
+      tokens: Array<number>;
+    }
+
+    /**
+     * Usage statistics for models billed by audio input duration.
+     */
+    export interface Usage {
+      /**
+       * Duration of the input audio in seconds.
+       */
+      seconds: number;
+
+      /**
+       * The type of the usage object. Always `duration` for this variant.
+       */
+      type: 'duration';
+    }
+
+    /**
+     * Fields:
+     *
+     * - word (required): str
+     * - start (required): float
+     * - end (required): float
+     */
+    export interface Word {
+      /**
+       * End time of the word in seconds.
+       */
+      end: number;
+
+      /**
+       * Start time of the word in seconds.
+       */
+      start: number;
+
+      /**
+       * The text content of the word.
+       */
+      word: string;
+    }
   }
 
   /**
-   * Word-level timestamp for transcription.
+   * Represents a transcription response returned by model, based on the provided
+   * input.
+   *
+   * Fields:
+   *
+   * - text (required): str
+   * - logprobs (optional): list[LogprobsItem]
+   * - usage (optional): Usage
    */
-  export interface Word {
+  export interface CreateTranscriptionResponseJson {
     /**
-     * End time of the word in seconds
+     * The transcribed text.
      */
-    end: number;
+    text: string;
 
     /**
-     * Start time of the word in seconds
+     * The log probabilities of the tokens in the transcription. Only returned with the
+     * models `gpt-4o-transcribe` and `gpt-4o-mini-transcribe` if `logprobs` is added
+     * to the `include` array.
      */
-    start: number;
+    logprobs?: Array<CreateTranscriptionResponseJson.Logprob>;
 
     /**
-     * The text content of the word
+     * Token usage statistics for the request.
      */
-    word: string;
+    usage?:
+      | CreateTranscriptionResponseJson.TranscriptTextUsageTokens
+      | CreateTranscriptionResponseJson.TranscriptTextUsageDuration;
+  }
+
+  export namespace CreateTranscriptionResponseJson {
+    /**
+     * Fields:
+     *
+     * - token (optional): str
+     * - logprob (optional): float
+     * - bytes (optional): list[float]
+     */
+    export interface Logprob {
+      /**
+       * The token in the transcription.
+       */
+      token?: string;
+
+      /**
+       * The bytes of the token.
+       */
+      bytes?: Array<number>;
+
+      /**
+       * The log probability of the token.
+       */
+      logprob?: number;
+    }
+
+    /**
+     * Usage statistics for models billed by token usage.
+     *
+     * Fields:
+     *
+     * - type (required): Literal['tokens']
+     * - input_tokens (required): int
+     * - input_token_details (optional): InputTokenDetails
+     * - output_tokens (required): int
+     * - total_tokens (required): int
+     */
+    export interface TranscriptTextUsageTokens {
+      /**
+       * Number of input tokens billed for this request.
+       */
+      input_tokens: number;
+
+      /**
+       * Number of output tokens generated.
+       */
+      output_tokens: number;
+
+      /**
+       * Total number of tokens used (input + output).
+       */
+      total_tokens: number;
+
+      /**
+       * The type of the usage object. Always `tokens` for this variant.
+       */
+      type: 'tokens';
+
+      /**
+       * Details about the input tokens billed for this request.
+       */
+      input_token_details?: TranscriptTextUsageTokens.InputTokenDetails;
+    }
+
+    export namespace TranscriptTextUsageTokens {
+      /**
+       * Details about the input tokens billed for this request.
+       */
+      export interface InputTokenDetails {
+        /**
+         * Number of audio tokens billed for this request.
+         */
+        audio_tokens?: number;
+
+        /**
+         * Number of text tokens billed for this request.
+         */
+        text_tokens?: number;
+      }
+    }
+
+    /**
+     * Usage statistics for models billed by audio input duration.
+     *
+     * Fields:
+     *
+     * - type (required): Literal['duration']
+     * - seconds (required): float
+     */
+    export interface TranscriptTextUsageDuration {
+      /**
+       * Duration of the input audio in seconds.
+       */
+      seconds: number;
+
+      /**
+       * The type of the usage object. Always `duration` for this variant.
+       */
+      type: 'duration';
+    }
   }
 }
 

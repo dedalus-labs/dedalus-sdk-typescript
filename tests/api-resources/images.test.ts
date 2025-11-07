@@ -25,7 +25,7 @@ describe('resource images', () => {
     const response = await client.images.generate({
       prompt: 'A white siamese cat',
       background: 'transparent',
-      model: 'dall-e-3',
+      model: 'openai/dall-e-3',
       moderation: 'auto',
       n: 1,
       output_compression: 85,

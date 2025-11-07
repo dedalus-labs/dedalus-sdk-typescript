@@ -30,6 +30,8 @@ export namespace DedalusModel {
 
     audio?: { [key: string]: unknown } | null;
 
+    deferred?: boolean | null;
+
     disable_automatic_function_calling?: boolean;
 
     extra_args?: { [key: string]: unknown } | null;
@@ -91,6 +93,8 @@ export namespace DedalusModel {
 
     safety_settings?: Array<{ [key: string]: unknown }> | null;
 
+    search_parameters?: { [key: string]: unknown } | null;
+
     seed?: number | null;
 
     service_tier?: string | null;
@@ -113,7 +117,14 @@ export namespace DedalusModel {
 
     timeout?: number | null;
 
-    tool_choice?: 'auto' | 'required' | 'none' | string | Settings.MCPToolChoice | null;
+    tool_choice?:
+      | 'auto'
+      | 'required'
+      | 'none'
+      | string
+      | { [key: string]: unknown }
+      | Settings.MCPToolChoice
+      | null;
 
     tool_config?: { [key: string]: unknown } | null;
 
@@ -177,7 +188,7 @@ export interface Model {
   /**
    * Provider that hosts this model
    */
-  provider: 'openai' | 'anthropic' | 'google' | 'xai' | 'mistral' | 'groq';
+  provider: 'openai' | 'anthropic' | 'google' | 'xai' | 'mistral' | 'groq' | 'fireworks' | 'deepseek';
 
   /**
    * Normalized model capabilities across all providers.

@@ -8,10 +8,10 @@ import { path } from '../internal/utils/path';
 
 export class Models extends APIResource {
   /**
-   * Get information about a specific model.
+   * Retrieve a model.
    *
-   * Returns detailed information about a specific model by ID. The model must be
-   * available to your API key's configured providers.
+   * Retrieve detailed information about a specific model, including its
+   * capabilities, provider, and supported features.
    *
    * Args: model_id: The ID of the model to retrieve (e.g., 'openai/gpt-4',
    * 'anthropic/claude-3-5-sonnet-20241022') user: Authenticated user obtained from
@@ -48,12 +48,13 @@ export class Models extends APIResource {
   }
 
   /**
-   * List available models from OpenAI, Anthropic, and Google.
+   * List available models.
    *
-   * Calls provider APIs to get live model lists, then combines into unified
-   * response. Only returns models from providers with configured API keys.
+   * Retrieve the complete list of models available to your organization, including
+   * models from OpenAI, Anthropic, Google, xAI, Mistral, Fireworks, and DeepSeek.
    *
-   * Returns: ModelsResponse: Combined list of models from all providers
+   * Returns: ListModelsResponse: List of available models across all supported
+   * providers
    */
   list(options?: RequestOptions): APIPromise<ListModelsResponse> {
     return this._client.get('/v1/models', options);

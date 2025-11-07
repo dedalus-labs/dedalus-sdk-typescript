@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const tool: Tool = {
   name: 'create_audio_speech',
   description:
-    'Generate audio from text using text-to-speech.\n\nOpenAI models only. Gemini TTS uses different architecture (audio modalities in chat).',
+    'Generate speech audio from text.\n\nGenerates audio from the input text using text-to-speech models. Supports multiple\nvoices and output formats including mp3, opus, aac, flac, wav, and pcm.\n\nReturns streaming audio data that can be saved to a file or streamed directly to users.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -30,7 +30,7 @@ export const tool: Tool = {
         type: 'string',
         title: 'Model',
         description:
-          'One of the available [TTS models](https://platform.openai.com/docs/models#tts): `tts-1`, `tts-1-hd` or `gpt-4o-mini-tts`.',
+          'One of the available [TTS models](https://platform.openai.com/docs/models#tts): `openai/tts-1`, `openai/tts-1-hd` or `openai/gpt-4o-mini-tts`.',
       },
       voice: {
         type: 'string',
