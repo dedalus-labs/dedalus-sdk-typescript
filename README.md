@@ -27,12 +27,12 @@ const client = new Dedalus({
   environment: 'development', // defaults to 'production'
 });
 
-const streamChunk = await client.chat.completions.create({
+const completion = await client.chat.completions.create({
   messages: [{ role: 'user', content: 'Hello, how are you today?' }],
   model: 'openai/gpt-5',
 });
 
-console.log(streamChunk.id);
+console.log(completion.id);
 ```
 
 ## Streaming responses

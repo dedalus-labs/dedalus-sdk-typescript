@@ -8,9 +8,18 @@ import { multipartFormRequestOptions } from '../../internal/uploads';
 
 export class Translations extends APIResource {
   /**
-   * Translate audio to English text.
+   * Translate audio into English.
    *
-   * OpenAI Whisper models only.
+   * Translates audio files in any supported language to English text using OpenAI's
+   * Whisper model. Supports the same audio formats as transcription. Maximum file
+   * size is 25 MB.
+   *
+   * Args: file: Audio file to translate (required) model: Model ID to use (e.g.,
+   * "openai/whisper-1") prompt: Optional text to guide the model's style
+   * response_format: Format of the output (json, text, srt, verbose_json, vtt)
+   * temperature: Sampling temperature between 0 and 1
+   *
+   * Returns: Translation object with the English translation
    */
   create(body: TranslationCreateParams, options?: RequestOptions): APIPromise<TranslationCreateResponse> {
     return this._client.post(
@@ -21,89 +30,126 @@ export class Translations extends APIResource {
 }
 
 /**
- * Response from translation endpoint.
+ * Fields:
  *
- * For response_format='json' or 'text', only 'text' is returned. For
- * response_format='verbose_json', additional fields are included.
+ * - language (required): str
+ * - duration (required): float
+ * - text (required): str
+ * - segments (optional): list[TranscriptionSegment]
  */
-export interface TranslationCreateResponse {
-  /**
-   * The translated text (in English)
-   */
-  text: string;
-
-  /**
-   * The duration of the input audio in seconds
-   */
-  duration?: number | null;
-
-  /**
-   * The language of the output translation (always 'english')
-   */
-  language?: string | null;
-
-  /**
-   * Segments of the translated text and their corresponding details
-   */
-  segments?: Array<TranslationCreateResponse.Segment> | null;
-}
+export type TranslationCreateResponse =
+  | TranslationCreateResponse.CreateTranslationResponseVerboseJson
+  | TranslationCreateResponse.CreateTranslationResponseJson;
 
 export namespace TranslationCreateResponse {
   /**
-   * Segment-level details for transcription.
+   * Fields:
+   *
+   * - language (required): str
+   * - duration (required): float
+   * - text (required): str
+   * - segments (optional): list[TranscriptionSegment]
    */
-  export interface Segment {
+  export interface CreateTranslationResponseVerboseJson {
     /**
-     * Unique identifier of the segment
+     * The duration of the input audio.
      */
-    id: number;
+    duration: number;
 
     /**
-     * Average log probability of the segment
+     * The language of the output translation (always `english`).
      */
-    avg_logprob: number;
+    language: string;
 
     /**
-     * Compression ratio of the segment. If greater than 2.4, consider the compression
-     * failed
-     */
-    compression_ratio: number;
-
-    /**
-     * End time of the segment in seconds
-     */
-    end: number;
-
-    /**
-     * Probability of no speech in the segment. If higher than 1.0 and avg_logprob is
-     * below -1, consider this segment silent
-     */
-    no_speech_prob: number;
-
-    /**
-     * Seek offset of the segment
-     */
-    seek: number;
-
-    /**
-     * Start time of the segment in seconds
-     */
-    start: number;
-
-    /**
-     * Temperature parameter used for generating this segment
-     */
-    temperature: number;
-
-    /**
-     * Text content of the segment
+     * The translated text.
      */
     text: string;
 
     /**
-     * Array of token IDs for the segment
+     * Segments of the translated text and their corresponding details.
      */
-    tokens: Array<number>;
+    segments?: Array<CreateTranslationResponseVerboseJson.Segment>;
+  }
+
+  export namespace CreateTranslationResponseVerboseJson {
+    /**
+     * Fields:
+     *
+     * - id (required): int
+     * - seek (required): int
+     * - start (required): float
+     * - end (required): float
+     * - text (required): str
+     * - tokens (required): list[int]
+     * - temperature (required): float
+     * - avg_logprob (required): float
+     * - compression_ratio (required): float
+     * - no_speech_prob (required): float
+     */
+    export interface Segment {
+      /**
+       * Unique identifier of the segment.
+       */
+      id: number;
+
+      /**
+       * Average logprob of the segment. If the value is lower than -1, consider the
+       * logprobs failed.
+       */
+      avg_logprob: number;
+
+      /**
+       * Compression ratio of the segment. If the value is greater than 2.4, consider the
+       * compression failed.
+       */
+      compression_ratio: number;
+
+      /**
+       * End time of the segment in seconds.
+       */
+      end: number;
+
+      /**
+       * Probability of no speech in the segment. If the value is higher than 1.0 and the
+       * `avg_logprob` is below -1, consider this segment silent.
+       */
+      no_speech_prob: number;
+
+      /**
+       * Seek offset of the segment.
+       */
+      seek: number;
+
+      /**
+       * Start time of the segment in seconds.
+       */
+      start: number;
+
+      /**
+       * Temperature parameter used for generating the segment.
+       */
+      temperature: number;
+
+      /**
+       * Text content of the segment.
+       */
+      text: string;
+
+      /**
+       * Array of token IDs for the text content.
+       */
+      tokens: Array<number>;
+    }
+  }
+
+  /**
+   * Fields:
+   *
+   * - text (required): str
+   */
+  export interface CreateTranslationResponseJson {
+    text: string;
   }
 }
 

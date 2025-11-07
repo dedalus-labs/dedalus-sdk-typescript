@@ -39,7 +39,7 @@ export const tool: Tool = {
         type: 'string',
         title: 'Model',
         description:
-          'The model to use for image generation. One of `dall-e-2`, `dall-e-3`, or `gpt-image-1`. Defaults to `dall-e-2` unless a parameter specific to `gpt-image-1` is used.',
+          'The model to use for image generation. One of `openai/dall-e-2`, `openai/dall-e-3`, or `openai/gpt-image-1`. Defaults to `openai/dall-e-2` unless a parameter specific to `gpt-image-1` is used.',
       },
       moderation: {
         type: 'string',

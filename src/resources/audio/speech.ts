@@ -7,10 +7,13 @@ import { RequestOptions } from '../../internal/request-options';
 
 export class Speech extends APIResource {
   /**
-   * Generate audio from text using text-to-speech.
+   * Generate speech audio from text.
    *
-   * OpenAI models only. Gemini TTS uses different architecture (audio modalities in
-   * chat).
+   * Generates audio from the input text using text-to-speech models. Supports
+   * multiple voices and output formats including mp3, opus, aac, flac, wav, and pcm.
+   *
+   * Returns streaming audio data that can be saved to a file or streamed directly to
+   * users.
    */
   create(body: SpeechCreateParams, options?: RequestOptions): APIPromise<Response> {
     return this._client.post('/v1/audio/speech', {
@@ -30,7 +33,7 @@ export interface SpeechCreateParams {
 
   /**
    * One of the available [TTS models](https://platform.openai.com/docs/models#tts):
-   * `tts-1`, `tts-1-hd` or `gpt-4o-mini-tts`.
+   * `openai/tts-1`, `openai/tts-1-hd` or `openai/gpt-4o-mini-tts`.
    */
   model: string;
 

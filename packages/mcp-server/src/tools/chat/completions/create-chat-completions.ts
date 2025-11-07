@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const tool: Tool = {
   name: 'create_chat_completions',
   description:
-    'Create a chat completion.\n\nThis endpoint provides a vendor-agnostic chat completions API that works with\nthousands of LLMs. It supports MCP integration, multi-model routing with\nintelligent agentic handoffs, client-side and server-side tool execution,\nand streaming and non-streaming responses.\n\nArgs:\n    request: Chat completion request with messages, model, and configuration.\n    http_request: FastAPI request object for accessing headers and state.\n    background_tasks: FastAPI background tasks for async billing operations.\n    user: Authenticated user with validated API key and sufficient balance.\n\nReturns:\n    ChatCompletion: OpenAI-compatible completion response with usage data.\n\nRaises:\n    HTTPException:\n        - 401 if authentication fails or insufficient balance.\n        - 400 if request validation fails.\n        - 500 if internal processing error occurs.\n\nBilling:\n    - Token usage billed automatically based on model pricing\n    - MCP tool calls billed separately using credits system\n    - Streaming responses billed after completion via background task\n\nExample:\n    Basic chat completion:\n    ```python\n    from dedalus_labs import Dedalus\n\n    client = Dedalus(api_key="your-api-key")\n\n    completion = client.chat.completions.create(\n        model="openai/gpt-5",\n        messages=[{"role": "user", "content": "Hello, how are you?"}],\n    )\n\n    print(completion.choices[0].message.content)\n    ```\n\n    With tools and MCP servers:\n    ```python\n    completion = client.chat.completions.create(\n        model="openai/gpt-5",\n        messages=[{"role": "user", "content": "Search for recent AI news"}],\n        tools=[\n            {\n                "type": "function",\n                "function": {\n                    "name": "search_web",\n                    "description": "Search the web for information",\n                },\n            }\n        ],\n        mcp_servers=["dedalus-labs/brave-search"],\n    )\n    ```\n\n    Multi-model routing:\n    ```python\n    completion = client.chat.completions.create(\n        model=[\n            "openai/gpt-4o-mini",\n            "openai/gpt-5",\n            "anthropic/claude-sonnet-4-20250514",\n        ],\n        messages=[{"role": "user", "content": "Analyze this complex data"}],\n        agent_attributes={"complexity": 0.8, "accuracy": 0.9},\n    )\n    ```\n\n    Streaming response:\n    ```python\n    stream = client.chat.completions.create(\n        model="openai/gpt-5",\n        messages=[{"role": "user", "content": "Tell me a story"}],\n        stream=True,\n    )\n\n    for chunk in stream:\n        if chunk.choices[0].delta.content:\n            print(chunk.choices[0].delta.content, end="")\n    ```',
+    'Create a chat completion.\n\nUnified chat-completions endpoint that works across many model providers. Supports\noptional MCP integration, multi-model routing with agentic handoffs, server- or\nclient-executed tools, and both streaming and non-streaming delivery.\n\nRequest body:\n  - messages: ordered list of chat turns.\n  - model: identifier or a list of identifiers for routing.\n  - tools: optional tool declarations available to the model.\n  - mcp_servers: optional list of MCP server slugs to enable during the run.\n  - stream: boolean to request incremental output.\n  - config: optional generation parameters (e.g., temperature, max_tokens, metadata).\n\nHeaders:\n  - Authorization: bearer key for the calling account.\n  - Optional BYOK or provider headers if applicable.\n\nBehavior:\n  - If multiple models are supplied, the router may select or hand off across them.\n  - Tools may be invoked on the server or signaled for the client to run.\n  - Streaming responses emit incremental deltas; non-streaming returns a single object.\n  - Usage metrics are computed when available and returned in the response.\n\nResponses:\n  - 200 OK: JSON completion object with choices, message content, and usage.\n  - 400 Bad Request: validation error.\n  - 401 Unauthorized: authentication failed.\n  - 402 Payment Required or 429 Too Many Requests: quota, balance, or rate limit issue.\n  - 500 Internal Server Error: unexpected failure.\n\nBilling:\n  - Token usage metered by the selected model(s).\n  - Tool calls and MCP sessions may be billed separately.\n  - Streaming is settled after the stream ends via an async task.\n\nExample (non-streaming HTTP):\n  POST /v1/chat/completions\n  Content-Type: application/json\n  Authorization: Bearer <key>\n\n  {\n    "model": "provider/model-name",\n    "messages": [{"role": "user", "content": "Hello"}]\n  }\n\n  200 OK\n  {\n    "id": "cmpl_123",\n    "object": "chat.completion",\n    "choices": [\n      {"index": 0, "message": {"role": "assistant", "content": "Hi there!"}, "finish_reason": "stop"}\n    ],\n    "usage": {"prompt_tokens": 3, "completion_tokens": 4, "total_tokens": 7}\n  }\n\nExample (streaming over SSE):\n  POST /v1/chat/completions\n  Accept: text/event-stream\n\n  data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":"Hi"}}]}\n  data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":" there!"}}]}\n  data: [DONE]',
   inputSchema: {
     type: 'object',
     anyOf: [
@@ -76,6 +76,12 @@ export const tool: Tool = {
             title: 'Auto Execute Tools',
             description:
               'When False, skip server-side tool execution and return raw OpenAI-style tool_calls in the response.',
+          },
+          deferred: {
+            type: 'boolean',
+            title: 'Deferred',
+            description:
+              'xAI-specific parameter. If set to true, the request returns a request_id for async completion retrieval via GET /v1/chat/deferred-completion/{request_id}.',
           },
           disable_automatic_function_calling: {
             type: 'boolean',
@@ -205,80 +211,12 @@ export const tool: Tool = {
           mcp_servers: {
             anyOf: [
               {
-                type: 'array',
-                title: 'MCPServers',
-                description: 'List of MCP servers.',
-                items: {
-                  anyOf: [
-                    {
-                      type: 'string',
-                      title: 'MCPServerSlug',
-                      description: "MCP server slug (e.g., 'dedalus-labs/brave-search').",
-                    },
-                    {
-                      type: 'object',
-                      title: 'MCPServerSpec',
-                      description: 'Structured representation of an MCP server reference.',
-                      properties: {
-                        metadata: {
-                          type: 'object',
-                          title: 'Metadata',
-                          description: 'Optional metadata associated with the MCP server entry.',
-                          additionalProperties: true,
-                        },
-                        slug: {
-                          type: 'string',
-                          title: 'Slug',
-                          description: "Slug identifying an MCP server (e.g., 'dedalus-labs/brave-search').",
-                        },
-                        url: {
-                          type: 'string',
-                          title: 'Url',
-                          description: 'Explicit MCP server URL.',
-                        },
-                        version: {
-                          type: 'string',
-                          title: 'Version',
-                          description: 'Optional explicit version to target when using a slug.',
-                        },
-                      },
-                    },
-                  ],
-                  title: 'MCPServerChoice',
-                  description: 'MCP server choice - either a slug string or full MCPServerSpec object.',
-                },
-              },
-              {
                 type: 'string',
-                title: 'MCPServerSlug',
-                description: "MCP server slug (e.g., 'dedalus-labs/brave-search').",
               },
               {
-                type: 'object',
-                title: 'MCPServerSpec',
-                description: 'Structured representation of an MCP server reference.',
-                properties: {
-                  metadata: {
-                    type: 'object',
-                    title: 'Metadata',
-                    description: 'Optional metadata associated with the MCP server entry.',
-                    additionalProperties: true,
-                  },
-                  slug: {
-                    type: 'string',
-                    title: 'Slug',
-                    description: "Slug identifying an MCP server (e.g., 'dedalus-labs/brave-search').",
-                  },
-                  url: {
-                    type: 'string',
-                    title: 'Url',
-                    description: 'Explicit MCP server URL.',
-                  },
-                  version: {
-                    type: 'string',
-                    title: 'Version',
-                    description: 'Optional explicit version to target when using a slug.',
-                  },
+                type: 'array',
+                items: {
+                  type: 'string',
                 },
               },
             ],
@@ -367,6 +305,13 @@ export const tool: Tool = {
               type: 'object',
               additionalProperties: true,
             },
+          },
+          search_parameters: {
+            type: 'object',
+            title: 'Search Parameters',
+            description:
+              'xAI-specific parameter for configuring web search data acquisition. If not set, no data will be acquired by the model.',
+            additionalProperties: true,
           },
           seed: {
             type: 'integer',
@@ -607,6 +552,12 @@ export const tool: Tool = {
             description:
               'When False, skip server-side tool execution and return raw OpenAI-style tool_calls in the response.',
           },
+          deferred: {
+            type: 'boolean',
+            title: 'Deferred',
+            description:
+              'xAI-specific parameter. If set to true, the request returns a request_id for async completion retrieval via GET /v1/chat/deferred-completion/{request_id}.',
+          },
           disable_automatic_function_calling: {
             type: 'boolean',
             title: 'Disable Automatic Function Calling',
@@ -735,80 +686,12 @@ export const tool: Tool = {
           mcp_servers: {
             anyOf: [
               {
-                type: 'array',
-                title: 'MCPServers',
-                description: 'List of MCP servers.',
-                items: {
-                  anyOf: [
-                    {
-                      type: 'string',
-                      title: 'MCPServerSlug',
-                      description: "MCP server slug (e.g., 'dedalus-labs/brave-search').",
-                    },
-                    {
-                      type: 'object',
-                      title: 'MCPServerSpec',
-                      description: 'Structured representation of an MCP server reference.',
-                      properties: {
-                        metadata: {
-                          type: 'object',
-                          title: 'Metadata',
-                          description: 'Optional metadata associated with the MCP server entry.',
-                          additionalProperties: true,
-                        },
-                        slug: {
-                          type: 'string',
-                          title: 'Slug',
-                          description: "Slug identifying an MCP server (e.g., 'dedalus-labs/brave-search').",
-                        },
-                        url: {
-                          type: 'string',
-                          title: 'Url',
-                          description: 'Explicit MCP server URL.',
-                        },
-                        version: {
-                          type: 'string',
-                          title: 'Version',
-                          description: 'Optional explicit version to target when using a slug.',
-                        },
-                      },
-                    },
-                  ],
-                  title: 'MCPServerChoice',
-                  description: 'MCP server choice - either a slug string or full MCPServerSpec object.',
-                },
-              },
-              {
                 type: 'string',
-                title: 'MCPServerSlug',
-                description: "MCP server slug (e.g., 'dedalus-labs/brave-search').",
               },
               {
-                type: 'object',
-                title: 'MCPServerSpec',
-                description: 'Structured representation of an MCP server reference.',
-                properties: {
-                  metadata: {
-                    type: 'object',
-                    title: 'Metadata',
-                    description: 'Optional metadata associated with the MCP server entry.',
-                    additionalProperties: true,
-                  },
-                  slug: {
-                    type: 'string',
-                    title: 'Slug',
-                    description: "Slug identifying an MCP server (e.g., 'dedalus-labs/brave-search').",
-                  },
-                  url: {
-                    type: 'string',
-                    title: 'Url',
-                    description: 'Explicit MCP server URL.',
-                  },
-                  version: {
-                    type: 'string',
-                    title: 'Version',
-                    description: 'Optional explicit version to target when using a slug.',
-                  },
+                type: 'array',
+                items: {
+                  type: 'string',
                 },
               },
             ],
@@ -897,6 +780,13 @@ export const tool: Tool = {
               type: 'object',
               additionalProperties: true,
             },
+          },
+          search_parameters: {
+            type: 'object',
+            title: 'Search Parameters',
+            description:
+              'xAI-specific parameter for configuring web search data acquisition. If not set, no data will be acquired by the model.',
+            additionalProperties: true,
           },
           seed: {
             type: 'integer',
@@ -1102,6 +992,10 @@ export const tool: Tool = {
                 title: 'Audio',
                 additionalProperties: true,
               },
+              deferred: {
+                type: 'boolean',
+                title: 'Deferred',
+              },
               disable_automatic_function_calling: {
                 type: 'boolean',
                 title: 'Disable Automatic Function Calling',
@@ -1252,6 +1146,11 @@ export const tool: Tool = {
                   additionalProperties: true,
                 },
               },
+              search_parameters: {
+                type: 'object',
+                title: 'Search Parameters',
+                additionalProperties: true,
+              },
               seed: {
                 type: 'integer',
                 title: 'Seed',
@@ -1318,6 +1217,10 @@ export const tool: Tool = {
                   },
                   {
                     type: 'string',
+                  },
+                  {
+                    type: 'object',
+                    additionalProperties: true,
                   },
                   {
                     type: 'object',
