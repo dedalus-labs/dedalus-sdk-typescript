@@ -828,4 +828,7 @@ export declare namespace Dedalus {
   };
 
   export { Chat as Chat };
+
+  export type DedalusModel = API.DedalusModel;
+  export type DedalusModelChoice = API.DedalusModelChoice;
 }

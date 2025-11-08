@@ -47,332 +47,7 @@ export const tool: Tool = {
                 $ref: '#/$defs/model_id',
               },
               {
-                type: 'object',
-                title: 'DedalusModel',
-                description:
-                  'Structured model selection entry used in request payloads.\n\nSupports OpenAI-style semantics (string model id) while enabling\noptional per-model default settings for Dedalus multi-model routing.',
-                properties: {
-                  model: {
-                    type: 'string',
-                    title: 'Model',
-                    description:
-                      "Model identifier with provider prefix (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
-                  },
-                  settings: {
-                    type: 'object',
-                    title: 'ModelSettings',
-                    description:
-                      'Optional default generation settings (e.g., temperature, max_tokens) applied when this model is selected.',
-                    properties: {
-                      attributes: {
-                        type: 'object',
-                        title: 'Attributes',
-                        additionalProperties: true,
-                      },
-                      audio: {
-                        type: 'object',
-                        title: 'Audio',
-                        additionalProperties: true,
-                      },
-                      deferred: {
-                        type: 'boolean',
-                        title: 'Deferred',
-                      },
-                      disable_automatic_function_calling: {
-                        type: 'boolean',
-                        title: 'Disable Automatic Function Calling',
-                      },
-                      extra_args: {
-                        type: 'object',
-                        title: 'Extra Args',
-                        additionalProperties: true,
-                      },
-                      extra_headers: {
-                        type: 'object',
-                        additionalProperties: true,
-                      },
-                      extra_query: {
-                        type: 'object',
-                        additionalProperties: true,
-                      },
-                      frequency_penalty: {
-                        type: 'number',
-                        title: 'Frequency Penalty',
-                      },
-                      generation_config: {
-                        type: 'object',
-                        title: 'Generation Config',
-                        additionalProperties: true,
-                      },
-                      include_usage: {
-                        type: 'boolean',
-                        title: 'Include Usage',
-                      },
-                      input_audio_format: {
-                        type: 'string',
-                        title: 'Input Audio Format',
-                      },
-                      input_audio_transcription: {
-                        type: 'object',
-                        title: 'Input Audio Transcription',
-                        additionalProperties: true,
-                      },
-                      logit_bias: {
-                        type: 'object',
-                        title: 'Logit Bias',
-                        additionalProperties: true,
-                      },
-                      logprobs: {
-                        type: 'boolean',
-                        title: 'Logprobs',
-                      },
-                      max_completion_tokens: {
-                        type: 'integer',
-                        title: 'Max Completion Tokens',
-                      },
-                      max_tokens: {
-                        type: 'integer',
-                        title: 'Max Tokens',
-                      },
-                      metadata: {
-                        type: 'object',
-                        title: 'Metadata',
-                        additionalProperties: true,
-                      },
-                      modalities: {
-                        type: 'array',
-                        title: 'Modalities',
-                        items: {
-                          type: 'string',
-                        },
-                      },
-                      n: {
-                        type: 'integer',
-                        title: 'N',
-                      },
-                      output_audio_format: {
-                        type: 'string',
-                        title: 'Output Audio Format',
-                      },
-                      parallel_tool_calls: {
-                        type: 'boolean',
-                        title: 'Parallel Tool Calls',
-                      },
-                      prediction: {
-                        type: 'object',
-                        title: 'Prediction',
-                        additionalProperties: true,
-                      },
-                      presence_penalty: {
-                        type: 'number',
-                        title: 'Presence Penalty',
-                      },
-                      prompt_cache_key: {
-                        type: 'string',
-                        title: 'Prompt Cache Key',
-                      },
-                      reasoning: {
-                        type: 'object',
-                        title: 'Reasoning',
-                        properties: {
-                          effort: {
-                            type: 'string',
-                            title: 'Effort',
-                            enum: ['minimal', 'low', 'medium', 'high'],
-                          },
-                          generate_summary: {
-                            type: 'string',
-                            title: 'Generate Summary',
-                            enum: ['auto', 'concise', 'detailed'],
-                          },
-                          summary: {
-                            type: 'string',
-                            title: 'Summary',
-                            enum: ['auto', 'concise', 'detailed'],
-                          },
-                        },
-                      },
-                      reasoning_effort: {
-                        type: 'string',
-                        title: 'Reasoning Effort',
-                      },
-                      response_format: {
-                        type: 'object',
-                        title: 'Response Format',
-                        additionalProperties: true,
-                      },
-                      response_include: {
-                        type: 'array',
-                        title: 'Response Include',
-                        items: {
-                          type: 'string',
-                          enum: [
-                            'code_interpreter_call.outputs',
-                            'computer_call_output.output.image_url',
-                            'file_search_call.results',
-                            'message.input_image.image_url',
-                            'message.output_text.logprobs',
-                            'reasoning.encrypted_content',
-                          ],
-                        },
-                      },
-                      safety_identifier: {
-                        type: 'string',
-                        title: 'Safety Identifier',
-                      },
-                      safety_settings: {
-                        type: 'array',
-                        title: 'Safety Settings',
-                        items: {
-                          type: 'object',
-                          additionalProperties: true,
-                        },
-                      },
-                      search_parameters: {
-                        type: 'object',
-                        title: 'Search Parameters',
-                        additionalProperties: true,
-                      },
-                      seed: {
-                        type: 'integer',
-                        title: 'Seed',
-                      },
-                      service_tier: {
-                        type: 'string',
-                        title: 'Service Tier',
-                      },
-                      stop: {
-                        anyOf: [
-                          {
-                            type: 'string',
-                          },
-                          {
-                            type: 'array',
-                            items: {
-                              type: 'string',
-                            },
-                          },
-                        ],
-                        title: 'Stop',
-                      },
-                      store: {
-                        type: 'boolean',
-                        title: 'Store',
-                      },
-                      stream: {
-                        type: 'boolean',
-                        title: 'Stream',
-                      },
-                      stream_options: {
-                        type: 'object',
-                        title: 'Stream Options',
-                        additionalProperties: true,
-                      },
-                      structured_output: {
-                        type: 'object',
-                        title: 'Structured Output',
-                        additionalProperties: true,
-                      },
-                      system_instruction: {
-                        type: 'object',
-                        title: 'System Instruction',
-                        additionalProperties: true,
-                      },
-                      temperature: {
-                        type: 'number',
-                        title: 'Temperature',
-                      },
-                      thinking: {
-                        type: 'object',
-                        title: 'Thinking',
-                        additionalProperties: true,
-                      },
-                      timeout: {
-                        type: 'number',
-                        title: 'Timeout',
-                      },
-                      tool_choice: {
-                        anyOf: [
-                          {
-                            type: 'string',
-                            enum: ['auto', 'required', 'none'],
-                          },
-                          {
-                            type: 'string',
-                          },
-                          {
-                            type: 'object',
-                            additionalProperties: true,
-                          },
-                          {
-                            type: 'object',
-                            title: 'MCPToolChoice',
-                            properties: {
-                              name: {
-                                type: 'string',
-                                title: 'Name',
-                              },
-                              server_label: {
-                                type: 'string',
-                                title: 'Server Label',
-                              },
-                            },
-                            required: ['name', 'server_label'],
-                          },
-                        ],
-                      },
-                      tool_config: {
-                        type: 'object',
-                        title: 'Tool Config',
-                        additionalProperties: true,
-                      },
-                      top_k: {
-                        type: 'integer',
-                        title: 'Top K',
-                      },
-                      top_logprobs: {
-                        type: 'integer',
-                        title: 'Top Logprobs',
-                      },
-                      top_p: {
-                        type: 'number',
-                        title: 'Top P',
-                      },
-                      truncation: {
-                        type: 'string',
-                        title: 'Truncation',
-                        enum: ['auto', 'disabled'],
-                      },
-                      turn_detection: {
-                        type: 'object',
-                        title: 'Turn Detection',
-                        additionalProperties: true,
-                      },
-                      use_responses: {
-                        type: 'boolean',
-                        title: 'Use Responses',
-                      },
-                      user: {
-                        type: 'string',
-                        title: 'User',
-                      },
-                      verbosity: {
-                        type: 'string',
-                        title: 'Verbosity',
-                      },
-                      voice: {
-                        type: 'string',
-                        title: 'Voice',
-                      },
-                      web_search_options: {
-                        type: 'object',
-                        title: 'Web Search Options',
-                        additionalProperties: true,
-                      },
-                    },
-                  },
-                },
-                required: ['model'],
+                $ref: '#/$defs/dedalus_model',
               },
               {
                 $ref: '#/$defs/models',
@@ -840,332 +515,7 @@ export const tool: Tool = {
                 $ref: '#/$defs/model_id',
               },
               {
-                type: 'object',
-                title: 'DedalusModel',
-                description:
-                  'Structured model selection entry used in request payloads.\n\nSupports OpenAI-style semantics (string model id) while enabling\noptional per-model default settings for Dedalus multi-model routing.',
-                properties: {
-                  model: {
-                    type: 'string',
-                    title: 'Model',
-                    description:
-                      "Model identifier with provider prefix (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
-                  },
-                  settings: {
-                    type: 'object',
-                    title: 'ModelSettings',
-                    description:
-                      'Optional default generation settings (e.g., temperature, max_tokens) applied when this model is selected.',
-                    properties: {
-                      attributes: {
-                        type: 'object',
-                        title: 'Attributes',
-                        additionalProperties: true,
-                      },
-                      audio: {
-                        type: 'object',
-                        title: 'Audio',
-                        additionalProperties: true,
-                      },
-                      deferred: {
-                        type: 'boolean',
-                        title: 'Deferred',
-                      },
-                      disable_automatic_function_calling: {
-                        type: 'boolean',
-                        title: 'Disable Automatic Function Calling',
-                      },
-                      extra_args: {
-                        type: 'object',
-                        title: 'Extra Args',
-                        additionalProperties: true,
-                      },
-                      extra_headers: {
-                        type: 'object',
-                        additionalProperties: true,
-                      },
-                      extra_query: {
-                        type: 'object',
-                        additionalProperties: true,
-                      },
-                      frequency_penalty: {
-                        type: 'number',
-                        title: 'Frequency Penalty',
-                      },
-                      generation_config: {
-                        type: 'object',
-                        title: 'Generation Config',
-                        additionalProperties: true,
-                      },
-                      include_usage: {
-                        type: 'boolean',
-                        title: 'Include Usage',
-                      },
-                      input_audio_format: {
-                        type: 'string',
-                        title: 'Input Audio Format',
-                      },
-                      input_audio_transcription: {
-                        type: 'object',
-                        title: 'Input Audio Transcription',
-                        additionalProperties: true,
-                      },
-                      logit_bias: {
-                        type: 'object',
-                        title: 'Logit Bias',
-                        additionalProperties: true,
-                      },
-                      logprobs: {
-                        type: 'boolean',
-                        title: 'Logprobs',
-                      },
-                      max_completion_tokens: {
-                        type: 'integer',
-                        title: 'Max Completion Tokens',
-                      },
-                      max_tokens: {
-                        type: 'integer',
-                        title: 'Max Tokens',
-                      },
-                      metadata: {
-                        type: 'object',
-                        title: 'Metadata',
-                        additionalProperties: true,
-                      },
-                      modalities: {
-                        type: 'array',
-                        title: 'Modalities',
-                        items: {
-                          type: 'string',
-                        },
-                      },
-                      n: {
-                        type: 'integer',
-                        title: 'N',
-                      },
-                      output_audio_format: {
-                        type: 'string',
-                        title: 'Output Audio Format',
-                      },
-                      parallel_tool_calls: {
-                        type: 'boolean',
-                        title: 'Parallel Tool Calls',
-                      },
-                      prediction: {
-                        type: 'object',
-                        title: 'Prediction',
-                        additionalProperties: true,
-                      },
-                      presence_penalty: {
-                        type: 'number',
-                        title: 'Presence Penalty',
-                      },
-                      prompt_cache_key: {
-                        type: 'string',
-                        title: 'Prompt Cache Key',
-                      },
-                      reasoning: {
-                        type: 'object',
-                        title: 'Reasoning',
-                        properties: {
-                          effort: {
-                            type: 'string',
-                            title: 'Effort',
-                            enum: ['minimal', 'low', 'medium', 'high'],
-                          },
-                          generate_summary: {
-                            type: 'string',
-                            title: 'Generate Summary',
-                            enum: ['auto', 'concise', 'detailed'],
-                          },
-                          summary: {
-                            type: 'string',
-                            title: 'Summary',
-                            enum: ['auto', 'concise', 'detailed'],
-                          },
-                        },
-                      },
-                      reasoning_effort: {
-                        type: 'string',
-                        title: 'Reasoning Effort',
-                      },
-                      response_format: {
-                        type: 'object',
-                        title: 'Response Format',
-                        additionalProperties: true,
-                      },
-                      response_include: {
-                        type: 'array',
-                        title: 'Response Include',
-                        items: {
-                          type: 'string',
-                          enum: [
-                            'code_interpreter_call.outputs',
-                            'computer_call_output.output.image_url',
-                            'file_search_call.results',
-                            'message.input_image.image_url',
-                            'message.output_text.logprobs',
-                            'reasoning.encrypted_content',
-                          ],
-                        },
-                      },
-                      safety_identifier: {
-                        type: 'string',
-                        title: 'Safety Identifier',
-                      },
-                      safety_settings: {
-                        type: 'array',
-                        title: 'Safety Settings',
-                        items: {
-                          type: 'object',
-                          additionalProperties: true,
-                        },
-                      },
-                      search_parameters: {
-                        type: 'object',
-                        title: 'Search Parameters',
-                        additionalProperties: true,
-                      },
-                      seed: {
-                        type: 'integer',
-                        title: 'Seed',
-                      },
-                      service_tier: {
-                        type: 'string',
-                        title: 'Service Tier',
-                      },
-                      stop: {
-                        anyOf: [
-                          {
-                            type: 'string',
-                          },
-                          {
-                            type: 'array',
-                            items: {
-                              type: 'string',
-                            },
-                          },
-                        ],
-                        title: 'Stop',
-                      },
-                      store: {
-                        type: 'boolean',
-                        title: 'Store',
-                      },
-                      stream: {
-                        type: 'boolean',
-                        title: 'Stream',
-                      },
-                      stream_options: {
-                        type: 'object',
-                        title: 'Stream Options',
-                        additionalProperties: true,
-                      },
-                      structured_output: {
-                        type: 'object',
-                        title: 'Structured Output',
-                        additionalProperties: true,
-                      },
-                      system_instruction: {
-                        type: 'object',
-                        title: 'System Instruction',
-                        additionalProperties: true,
-                      },
-                      temperature: {
-                        type: 'number',
-                        title: 'Temperature',
-                      },
-                      thinking: {
-                        type: 'object',
-                        title: 'Thinking',
-                        additionalProperties: true,
-                      },
-                      timeout: {
-                        type: 'number',
-                        title: 'Timeout',
-                      },
-                      tool_choice: {
-                        anyOf: [
-                          {
-                            type: 'string',
-                            enum: ['auto', 'required', 'none'],
-                          },
-                          {
-                            type: 'string',
-                          },
-                          {
-                            type: 'object',
-                            additionalProperties: true,
-                          },
-                          {
-                            type: 'object',
-                            title: 'MCPToolChoice',
-                            properties: {
-                              name: {
-                                type: 'string',
-                                title: 'Name',
-                              },
-                              server_label: {
-                                type: 'string',
-                                title: 'Server Label',
-                              },
-                            },
-                            required: ['name', 'server_label'],
-                          },
-                        ],
-                      },
-                      tool_config: {
-                        type: 'object',
-                        title: 'Tool Config',
-                        additionalProperties: true,
-                      },
-                      top_k: {
-                        type: 'integer',
-                        title: 'Top K',
-                      },
-                      top_logprobs: {
-                        type: 'integer',
-                        title: 'Top Logprobs',
-                      },
-                      top_p: {
-                        type: 'number',
-                        title: 'Top P',
-                      },
-                      truncation: {
-                        type: 'string',
-                        title: 'Truncation',
-                        enum: ['auto', 'disabled'],
-                      },
-                      turn_detection: {
-                        type: 'object',
-                        title: 'Turn Detection',
-                        additionalProperties: true,
-                      },
-                      use_responses: {
-                        type: 'boolean',
-                        title: 'Use Responses',
-                      },
-                      user: {
-                        type: 'string',
-                        title: 'User',
-                      },
-                      verbosity: {
-                        type: 'string',
-                        title: 'Verbosity',
-                      },
-                      voice: {
-                        type: 'string',
-                        title: 'Voice',
-                      },
-                      web_search_options: {
-                        type: 'object',
-                        title: 'Web Search Options',
-                        additionalProperties: true,
-                      },
-                    },
-                  },
-                },
-                required: ['model'],
+                $ref: '#/$defs/dedalus_model',
               },
               {
                 $ref: '#/$defs/models',
@@ -1614,347 +964,353 @@ export const tool: Tool = {
         title: 'ModelId',
         description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
       },
+      dedalus_model: {
+        type: 'object',
+        title: 'DedalusModel',
+        description:
+          'Structured model selection entry used in request payloads.\n\nSupports OpenAI-style semantics (string model id) while enabling\noptional per-model default settings for Dedalus multi-model routing.',
+        properties: {
+          model: {
+            type: 'string',
+            title: 'Model',
+            description:
+              "Model identifier with provider prefix (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
+          },
+          settings: {
+            type: 'object',
+            title: 'ModelSettings',
+            description:
+              'Optional default generation settings (e.g., temperature, max_tokens) applied when this model is selected.',
+            properties: {
+              attributes: {
+                type: 'object',
+                title: 'Attributes',
+                additionalProperties: true,
+              },
+              audio: {
+                type: 'object',
+                title: 'Audio',
+                additionalProperties: true,
+              },
+              deferred: {
+                type: 'boolean',
+                title: 'Deferred',
+              },
+              disable_automatic_function_calling: {
+                type: 'boolean',
+                title: 'Disable Automatic Function Calling',
+              },
+              extra_args: {
+                type: 'object',
+                title: 'Extra Args',
+                additionalProperties: true,
+              },
+              extra_headers: {
+                type: 'object',
+                additionalProperties: true,
+              },
+              extra_query: {
+                type: 'object',
+                additionalProperties: true,
+              },
+              frequency_penalty: {
+                type: 'number',
+                title: 'Frequency Penalty',
+              },
+              generation_config: {
+                type: 'object',
+                title: 'Generation Config',
+                additionalProperties: true,
+              },
+              include_usage: {
+                type: 'boolean',
+                title: 'Include Usage',
+              },
+              input_audio_format: {
+                type: 'string',
+                title: 'Input Audio Format',
+              },
+              input_audio_transcription: {
+                type: 'object',
+                title: 'Input Audio Transcription',
+                additionalProperties: true,
+              },
+              logit_bias: {
+                type: 'object',
+                title: 'Logit Bias',
+                additionalProperties: true,
+              },
+              logprobs: {
+                type: 'boolean',
+                title: 'Logprobs',
+              },
+              max_completion_tokens: {
+                type: 'integer',
+                title: 'Max Completion Tokens',
+              },
+              max_tokens: {
+                type: 'integer',
+                title: 'Max Tokens',
+              },
+              metadata: {
+                type: 'object',
+                title: 'Metadata',
+                additionalProperties: true,
+              },
+              modalities: {
+                type: 'array',
+                title: 'Modalities',
+                items: {
+                  type: 'string',
+                },
+              },
+              n: {
+                type: 'integer',
+                title: 'N',
+              },
+              output_audio_format: {
+                type: 'string',
+                title: 'Output Audio Format',
+              },
+              parallel_tool_calls: {
+                type: 'boolean',
+                title: 'Parallel Tool Calls',
+              },
+              prediction: {
+                type: 'object',
+                title: 'Prediction',
+                additionalProperties: true,
+              },
+              presence_penalty: {
+                type: 'number',
+                title: 'Presence Penalty',
+              },
+              prompt_cache_key: {
+                type: 'string',
+                title: 'Prompt Cache Key',
+              },
+              reasoning: {
+                type: 'object',
+                title: 'Reasoning',
+                properties: {
+                  effort: {
+                    type: 'string',
+                    title: 'Effort',
+                    enum: ['minimal', 'low', 'medium', 'high'],
+                  },
+                  generate_summary: {
+                    type: 'string',
+                    title: 'Generate Summary',
+                    enum: ['auto', 'concise', 'detailed'],
+                  },
+                  summary: {
+                    type: 'string',
+                    title: 'Summary',
+                    enum: ['auto', 'concise', 'detailed'],
+                  },
+                },
+              },
+              reasoning_effort: {
+                type: 'string',
+                title: 'Reasoning Effort',
+              },
+              response_format: {
+                type: 'object',
+                title: 'Response Format',
+                additionalProperties: true,
+              },
+              response_include: {
+                type: 'array',
+                title: 'Response Include',
+                items: {
+                  type: 'string',
+                  enum: [
+                    'code_interpreter_call.outputs',
+                    'computer_call_output.output.image_url',
+                    'file_search_call.results',
+                    'message.input_image.image_url',
+                    'message.output_text.logprobs',
+                    'reasoning.encrypted_content',
+                  ],
+                },
+              },
+              safety_identifier: {
+                type: 'string',
+                title: 'Safety Identifier',
+              },
+              safety_settings: {
+                type: 'array',
+                title: 'Safety Settings',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              search_parameters: {
+                type: 'object',
+                title: 'Search Parameters',
+                additionalProperties: true,
+              },
+              seed: {
+                type: 'integer',
+                title: 'Seed',
+              },
+              service_tier: {
+                type: 'string',
+                title: 'Service Tier',
+              },
+              stop: {
+                anyOf: [
+                  {
+                    type: 'string',
+                  },
+                  {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                    },
+                  },
+                ],
+                title: 'Stop',
+              },
+              store: {
+                type: 'boolean',
+                title: 'Store',
+              },
+              stream: {
+                type: 'boolean',
+                title: 'Stream',
+              },
+              stream_options: {
+                type: 'object',
+                title: 'Stream Options',
+                additionalProperties: true,
+              },
+              structured_output: {
+                type: 'object',
+                title: 'Structured Output',
+                additionalProperties: true,
+              },
+              system_instruction: {
+                type: 'object',
+                title: 'System Instruction',
+                additionalProperties: true,
+              },
+              temperature: {
+                type: 'number',
+                title: 'Temperature',
+              },
+              thinking: {
+                type: 'object',
+                title: 'Thinking',
+                additionalProperties: true,
+              },
+              timeout: {
+                type: 'number',
+                title: 'Timeout',
+              },
+              tool_choice: {
+                anyOf: [
+                  {
+                    type: 'string',
+                    enum: ['auto', 'required', 'none'],
+                  },
+                  {
+                    type: 'string',
+                  },
+                  {
+                    type: 'object',
+                    additionalProperties: true,
+                  },
+                  {
+                    type: 'object',
+                    title: 'MCPToolChoice',
+                    properties: {
+                      name: {
+                        type: 'string',
+                        title: 'Name',
+                      },
+                      server_label: {
+                        type: 'string',
+                        title: 'Server Label',
+                      },
+                    },
+                    required: ['name', 'server_label'],
+                  },
+                ],
+              },
+              tool_config: {
+                type: 'object',
+                title: 'Tool Config',
+                additionalProperties: true,
+              },
+              top_k: {
+                type: 'integer',
+                title: 'Top K',
+              },
+              top_logprobs: {
+                type: 'integer',
+                title: 'Top Logprobs',
+              },
+              top_p: {
+                type: 'number',
+                title: 'Top P',
+              },
+              truncation: {
+                type: 'string',
+                title: 'Truncation',
+                enum: ['auto', 'disabled'],
+              },
+              turn_detection: {
+                type: 'object',
+                title: 'Turn Detection',
+                additionalProperties: true,
+              },
+              use_responses: {
+                type: 'boolean',
+                title: 'Use Responses',
+              },
+              user: {
+                type: 'string',
+                title: 'User',
+              },
+              verbosity: {
+                type: 'string',
+                title: 'Verbosity',
+              },
+              voice: {
+                type: 'string',
+                title: 'Voice',
+              },
+              web_search_options: {
+                type: 'object',
+                title: 'Web Search Options',
+                additionalProperties: true,
+              },
+            },
+          },
+        },
+        required: ['model'],
+      },
       models: {
         type: 'array',
         title: 'Models',
         description: 'List of models for multi-model routing.',
         items: {
-          anyOf: [
-            {
-              $ref: '#/$defs/model_id',
-            },
-            {
-              type: 'object',
-              title: 'DedalusModel',
-              description:
-                'Structured model selection entry used in request payloads.\n\nSupports OpenAI-style semantics (string model id) while enabling\noptional per-model default settings for Dedalus multi-model routing.',
-              properties: {
-                model: {
-                  type: 'string',
-                  title: 'Model',
-                  description:
-                    "Model identifier with provider prefix (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
-                },
-                settings: {
-                  type: 'object',
-                  title: 'ModelSettings',
-                  description:
-                    'Optional default generation settings (e.g., temperature, max_tokens) applied when this model is selected.',
-                  properties: {
-                    attributes: {
-                      type: 'object',
-                      title: 'Attributes',
-                      additionalProperties: true,
-                    },
-                    audio: {
-                      type: 'object',
-                      title: 'Audio',
-                      additionalProperties: true,
-                    },
-                    deferred: {
-                      type: 'boolean',
-                      title: 'Deferred',
-                    },
-                    disable_automatic_function_calling: {
-                      type: 'boolean',
-                      title: 'Disable Automatic Function Calling',
-                    },
-                    extra_args: {
-                      type: 'object',
-                      title: 'Extra Args',
-                      additionalProperties: true,
-                    },
-                    extra_headers: {
-                      type: 'object',
-                      additionalProperties: true,
-                    },
-                    extra_query: {
-                      type: 'object',
-                      additionalProperties: true,
-                    },
-                    frequency_penalty: {
-                      type: 'number',
-                      title: 'Frequency Penalty',
-                    },
-                    generation_config: {
-                      type: 'object',
-                      title: 'Generation Config',
-                      additionalProperties: true,
-                    },
-                    include_usage: {
-                      type: 'boolean',
-                      title: 'Include Usage',
-                    },
-                    input_audio_format: {
-                      type: 'string',
-                      title: 'Input Audio Format',
-                    },
-                    input_audio_transcription: {
-                      type: 'object',
-                      title: 'Input Audio Transcription',
-                      additionalProperties: true,
-                    },
-                    logit_bias: {
-                      type: 'object',
-                      title: 'Logit Bias',
-                      additionalProperties: true,
-                    },
-                    logprobs: {
-                      type: 'boolean',
-                      title: 'Logprobs',
-                    },
-                    max_completion_tokens: {
-                      type: 'integer',
-                      title: 'Max Completion Tokens',
-                    },
-                    max_tokens: {
-                      type: 'integer',
-                      title: 'Max Tokens',
-                    },
-                    metadata: {
-                      type: 'object',
-                      title: 'Metadata',
-                      additionalProperties: true,
-                    },
-                    modalities: {
-                      type: 'array',
-                      title: 'Modalities',
-                      items: {
-                        type: 'string',
-                      },
-                    },
-                    n: {
-                      type: 'integer',
-                      title: 'N',
-                    },
-                    output_audio_format: {
-                      type: 'string',
-                      title: 'Output Audio Format',
-                    },
-                    parallel_tool_calls: {
-                      type: 'boolean',
-                      title: 'Parallel Tool Calls',
-                    },
-                    prediction: {
-                      type: 'object',
-                      title: 'Prediction',
-                      additionalProperties: true,
-                    },
-                    presence_penalty: {
-                      type: 'number',
-                      title: 'Presence Penalty',
-                    },
-                    prompt_cache_key: {
-                      type: 'string',
-                      title: 'Prompt Cache Key',
-                    },
-                    reasoning: {
-                      type: 'object',
-                      title: 'Reasoning',
-                      properties: {
-                        effort: {
-                          type: 'string',
-                          title: 'Effort',
-                          enum: ['minimal', 'low', 'medium', 'high'],
-                        },
-                        generate_summary: {
-                          type: 'string',
-                          title: 'Generate Summary',
-                          enum: ['auto', 'concise', 'detailed'],
-                        },
-                        summary: {
-                          type: 'string',
-                          title: 'Summary',
-                          enum: ['auto', 'concise', 'detailed'],
-                        },
-                      },
-                    },
-                    reasoning_effort: {
-                      type: 'string',
-                      title: 'Reasoning Effort',
-                    },
-                    response_format: {
-                      type: 'object',
-                      title: 'Response Format',
-                      additionalProperties: true,
-                    },
-                    response_include: {
-                      type: 'array',
-                      title: 'Response Include',
-                      items: {
-                        type: 'string',
-                        enum: [
-                          'code_interpreter_call.outputs',
-                          'computer_call_output.output.image_url',
-                          'file_search_call.results',
-                          'message.input_image.image_url',
-                          'message.output_text.logprobs',
-                          'reasoning.encrypted_content',
-                        ],
-                      },
-                    },
-                    safety_identifier: {
-                      type: 'string',
-                      title: 'Safety Identifier',
-                    },
-                    safety_settings: {
-                      type: 'array',
-                      title: 'Safety Settings',
-                      items: {
-                        type: 'object',
-                        additionalProperties: true,
-                      },
-                    },
-                    search_parameters: {
-                      type: 'object',
-                      title: 'Search Parameters',
-                      additionalProperties: true,
-                    },
-                    seed: {
-                      type: 'integer',
-                      title: 'Seed',
-                    },
-                    service_tier: {
-                      type: 'string',
-                      title: 'Service Tier',
-                    },
-                    stop: {
-                      anyOf: [
-                        {
-                          type: 'string',
-                        },
-                        {
-                          type: 'array',
-                          items: {
-                            type: 'string',
-                          },
-                        },
-                      ],
-                      title: 'Stop',
-                    },
-                    store: {
-                      type: 'boolean',
-                      title: 'Store',
-                    },
-                    stream: {
-                      type: 'boolean',
-                      title: 'Stream',
-                    },
-                    stream_options: {
-                      type: 'object',
-                      title: 'Stream Options',
-                      additionalProperties: true,
-                    },
-                    structured_output: {
-                      type: 'object',
-                      title: 'Structured Output',
-                      additionalProperties: true,
-                    },
-                    system_instruction: {
-                      type: 'object',
-                      title: 'System Instruction',
-                      additionalProperties: true,
-                    },
-                    temperature: {
-                      type: 'number',
-                      title: 'Temperature',
-                    },
-                    thinking: {
-                      type: 'object',
-                      title: 'Thinking',
-                      additionalProperties: true,
-                    },
-                    timeout: {
-                      type: 'number',
-                      title: 'Timeout',
-                    },
-                    tool_choice: {
-                      anyOf: [
-                        {
-                          type: 'string',
-                          enum: ['auto', 'required', 'none'],
-                        },
-                        {
-                          type: 'string',
-                        },
-                        {
-                          type: 'object',
-                          additionalProperties: true,
-                        },
-                        {
-                          type: 'object',
-                          title: 'MCPToolChoice',
-                          properties: {
-                            name: {
-                              type: 'string',
-                              title: 'Name',
-                            },
-                            server_label: {
-                              type: 'string',
-                              title: 'Server Label',
-                            },
-                          },
-                          required: ['name', 'server_label'],
-                        },
-                      ],
-                    },
-                    tool_config: {
-                      type: 'object',
-                      title: 'Tool Config',
-                      additionalProperties: true,
-                    },
-                    top_k: {
-                      type: 'integer',
-                      title: 'Top K',
-                    },
-                    top_logprobs: {
-                      type: 'integer',
-                      title: 'Top Logprobs',
-                    },
-                    top_p: {
-                      type: 'number',
-                      title: 'Top P',
-                    },
-                    truncation: {
-                      type: 'string',
-                      title: 'Truncation',
-                      enum: ['auto', 'disabled'],
-                    },
-                    turn_detection: {
-                      type: 'object',
-                      title: 'Turn Detection',
-                      additionalProperties: true,
-                    },
-                    use_responses: {
-                      type: 'boolean',
-                      title: 'Use Responses',
-                    },
-                    user: {
-                      type: 'string',
-                      title: 'User',
-                    },
-                    verbosity: {
-                      type: 'string',
-                      title: 'Verbosity',
-                    },
-                    voice: {
-                      type: 'string',
-                      title: 'Voice',
-                    },
-                    web_search_options: {
-                      type: 'object',
-                      title: 'Web Search Options',
-                      additionalProperties: true,
-                    },
-                  },
-                },
-              },
-              required: ['model'],
-            },
-          ],
-          title: 'DedalusModelChoice',
-          description: 'Dedalus model choice - either a string ID or DedalusModel configuration object.',
+          $ref: '#/$defs/dedalus_model_choice',
         },
+      },
+      dedalus_model_choice: {
+        anyOf: [
+          {
+            $ref: '#/$defs/model_id',
+          },
+          {
+            $ref: '#/$defs/dedalus_model',
+          },
+        ],
+        title: 'DedalusModelChoice',
+        description: 'Dedalus model choice - either a string ID or DedalusModel configuration object.',
       },
     },
   },
