@@ -6,7 +6,6 @@ export {
   type ChatCompletionTokenLogprob,
   type Completion,
   type CompletionRequest,
-  type DedalusModelChoice,
   type ModelID,
   type Models,
   type StreamChunk,

@@ -12,6 +12,8 @@ import create_embeddings from './embeddings/create-embeddings';
 import create_audio_speech from './audio/speech/create-audio-speech';
 import create_audio_transcriptions from './audio/transcriptions/create-audio-transcriptions';
 import create_audio_translations from './audio/translations/create-audio-translations';
+import create_variation_images from './images/create-variation-images';
+import edit_images from './images/edit-images';
 import generate_images from './images/generate-images';
 import create_chat_completions from './chat/completions/create-chat-completions';
 
@@ -29,6 +31,8 @@ addEndpoint(create_embeddings);
 addEndpoint(create_audio_speech);
 addEndpoint(create_audio_transcriptions);
 addEndpoint(create_audio_translations);
+addEndpoint(create_variation_images);
+addEndpoint(edit_images);
 addEndpoint(generate_images);
 addEndpoint(create_chat_completions);
 

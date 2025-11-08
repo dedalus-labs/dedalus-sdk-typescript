@@ -50,6 +50,8 @@ const fuse = new Fuse(
     'client.audio.speech.create',
     'client.audio.transcriptions.create',
     'client.audio.translations.create',
+    'client.images.createVariation',
+    'client.images.edit',
     'client.images.generate',
     'client.chat.completions.create',
   ],

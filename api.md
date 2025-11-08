@@ -1,10 +1,3 @@
-# Shared
-
-Types:
-
-- <code><a href="./src/resources/shared.ts">DedalusModel</a></code>
-- <code><a href="./src/resources/shared.ts">Model</a></code>
-
 # Root
 
 Types:
@@ -32,6 +25,7 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/models.ts">ListModelsResponse</a></code>
+- <code><a href="./src/resources/models.ts">Model</a></code>
 
 Methods:
 
@@ -87,6 +81,8 @@ Types:
 
 Methods:
 
+- <code title="post /v1/images/variations">client.images.<a href="./src/resources/images.ts">createVariation</a>({ ...params }) -> ImagesResponse</code>
+- <code title="post /v1/images/edits">client.images.<a href="./src/resources/images.ts">edit</a>({ ...params }) -> ImagesResponse</code>
 - <code title="post /v1/images/generations">client.images.<a href="./src/resources/images.ts">generate</a>({ ...params }) -> ImagesResponse</code>
 
 # Chat
@@ -98,7 +94,6 @@ Types:
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionTokenLogprob</a></code>
 - <code><a href="./src/resources/chat/completions.ts">Completion</a></code>
 - <code><a href="./src/resources/chat/completions.ts">CompletionRequest</a></code>
-- <code><a href="./src/resources/chat/completions.ts">DedalusModelChoice</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ModelID</a></code>
 - <code><a href="./src/resources/chat/completions.ts">Models</a></code>
 - <code><a href="./src/resources/chat/completions.ts">StreamChunk</a></code>

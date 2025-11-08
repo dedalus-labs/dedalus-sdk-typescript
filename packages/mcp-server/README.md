@@ -352,6 +352,15 @@ The following tools are available in this MCP server.
 
 ### Resource `images`:
 
+- `create_variation_images` (`write`): Create variations of an image.
+
+  DALL·E 2 only. Upload an image to generate variations.
+
+- `edit_images` (`write`): Edit images using inpainting.
+
+  Supports dall-e-2 and gpt-image-1. Upload an image and optionally a mask
+  to indicate which areas to regenerate based on the prompt.
+
 - `generate_images` (`write`): Generate images from text prompts.
 
   Pure image generation models only (DALL-E, GPT Image).
