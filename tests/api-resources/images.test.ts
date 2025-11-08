@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import Dedalus from 'dedalus-labs';
+import Dedalus, { toFile } from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: 'My API Key',
@@ -8,6 +8,61 @@ const client = new Dedalus({
 });
 
 describe('resource images', () => {
+  // Prism tests are disabled
+  test.skip('createVariation: only required params', async () => {
+    const responsePromise = client.images.createVariation({
+      image: await toFile(Buffer.from('# my file contents'), 'README.md'),
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Prism tests are disabled
+  test.skip('createVariation: required and optional params', async () => {
+    const response = await client.images.createVariation({
+      image: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      model: 'model',
+      n: 0,
+      response_format: 'response_format',
+      size: 'size',
+      user: 'user',
+    });
+  });
+
+  // Prism tests are disabled
+  test.skip('edit: only required params', async () => {
+    const responsePromise = client.images.edit({
+      image: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      prompt: 'prompt',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  // Prism tests are disabled
+  test.skip('edit: required and optional params', async () => {
+    const response = await client.images.edit({
+      image: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      prompt: 'prompt',
+      mask: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      model: 'model',
+      n: 0,
+      response_format: 'response_format',
+      size: 'size',
+      user: 'user',
+    });
+  });
+
   // Prism tests are disabled
   test.skip('generate: only required params', async () => {
     const responsePromise = client.images.generate({ prompt: 'A white siamese cat' });

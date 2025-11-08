@@ -2,9 +2,36 @@
 
 import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
+import { type Uploadable } from '../core/uploads';
 import { RequestOptions } from '../internal/request-options';
+import { multipartFormRequestOptions } from '../internal/uploads';
 
 export class Images extends APIResource {
+  /**
+   * Create variations of an image.
+   *
+   * DALL·E 2 only. Upload an image to generate variations.
+   */
+  createVariation(body: ImageCreateVariationParams, options?: RequestOptions): APIPromise<ImagesResponse> {
+    return this._client.post(
+      '/v1/images/variations',
+      multipartFormRequestOptions({ body, ...options }, this._client),
+    );
+  }
+
+  /**
+   * Edit images using inpainting.
+   *
+   * Supports dall-e-2 and gpt-image-1. Upload an image and optionally a mask to
+   * indicate which areas to regenerate based on the prompt.
+   */
+  edit(body: ImageEditParams, options?: RequestOptions): APIPromise<ImagesResponse> {
+    return this._client.post(
+      '/v1/images/edits',
+      multipartFormRequestOptions({ body, ...options }, this._client),
+    );
+  }
+
   /**
    * Generate images from text prompts.
    *
@@ -174,6 +201,38 @@ export interface ImagesResponse {
   data: Array<Image>;
 }
 
+export interface ImageCreateVariationParams {
+  image: Uploadable;
+
+  model?: string | null;
+
+  n?: number | null;
+
+  response_format?: string | null;
+
+  size?: string | null;
+
+  user?: string | null;
+}
+
+export interface ImageEditParams {
+  image: Uploadable;
+
+  prompt: string;
+
+  mask?: Uploadable | null;
+
+  model?: string | null;
+
+  n?: number | null;
+
+  response_format?: string | null;
+
+  size?: string | null;
+
+  user?: string | null;
+}
+
 export interface ImageGenerateParams {
   /**
    * A text description of the desired image(s). The maximum length is 32000
@@ -299,6 +358,8 @@ export declare namespace Images {
     type CreateImageRequest as CreateImageRequest,
     type Image as Image,
     type ImagesResponse as ImagesResponse,
+    type ImageCreateVariationParams as ImageCreateVariationParams,
+    type ImageEditParams as ImageEditParams,
     type ImageGenerateParams as ImageGenerateParams,
   };
 }
