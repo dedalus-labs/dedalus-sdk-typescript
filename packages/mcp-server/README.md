@@ -10,6 +10,8 @@ You can run the MCP Server directly via `npx`:
 
 ```sh
 export DEDALUS_API_KEY="My API Key"
+export DEDALUS_ORG_ID="My Organization"
+export DEDALUS_ENVIRONMENT="production"
 npx -y dedalus-labs-mcp@latest
 ```
 
@@ -27,19 +29,45 @@ For clients with a configuration JSON, it might look something like this:
       "command": "npx",
       "args": ["-y", "dedalus-labs-mcp", "--client=claude", "--tools=all"],
       "env": {
-        "DEDALUS_API_KEY": "My API Key"
+        "DEDALUS_API_KEY": "My API Key",
+        "DEDALUS_ORG_ID": "My Organization",
+        "DEDALUS_ENVIRONMENT": "production"
       }
     }
   }
 }
 ```
 
+### Cursor
+
+If you use Cursor, you can install the MCP server by using the button below. You will need to set your environment variables
+in Cursor's `mcp.json`, which can be found in Cursor Settings > Tools & MCP > New MCP Server.
+
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=dedalus-labs-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImRlZGFsdXMtbGFicy1tY3AiXSwiZW52Ijp7IkRFREFMVVNfQVBJX0tFWSI6IlNldCB5b3VyIERFREFMVVNfQVBJX0tFWSBoZXJlLiIsIkRFREFMVVNfT1JHX0lEIjoiU2V0IHlvdXIgREVEQUxVU19PUkdfSUQgaGVyZS4ifX0)
+
+### VS Code
+
+If you use MCP, you can install the MCP server by clicking the link below. You will need to set your environment variables
+in VS Code's `mcp.json`, which can be found via Command Palette > MCP: Open User Configuration.
+
+[Open VS Code](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22dedalus-labs-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22dedalus-labs-mcp%22%5D%2C%22env%22%3A%7B%22DEDALUS_API_KEY%22%3A%22Set%20your%20DEDALUS_API_KEY%20here.%22%2C%22DEDALUS_ORG_ID%22%3A%22Set%20your%20DEDALUS_ORG_ID%20here.%22%7D%7D)
+
+### Claude Code
+
+If you use Claude Code, you can install the MCP server by running the command below in your terminal. You will need to set your
+environment variables in Claude Code's `.claude.json`, which can be found in your home directory.
+
+```
+claude mcp add --transport stdio dedalus_labs_api --env DEDALUS_API_KEY="Your DEDALUS_API_KEY here." DEDALUS_ORG_ID="Your DEDALUS_ORG_ID here." -- npx -y dedalus-labs-mcp
+```
+
 ## Exposing endpoints to your MCP Client
 
-There are two ways to expose endpoints as tools in the MCP server:
+There are three ways to expose endpoints as tools in the MCP server:
 
 1. Exposing one tool per endpoint, and filtering as necessary
 2. Exposing a set of tools to dynamically discover and invoke endpoints from the API
+3. Exposing a docs search tool and a code execution tool, allowing the client to write code to be executed against the TypeScript client
 
 ### Filtering endpoints and tools
 
@@ -73,6 +101,18 @@ See more information with `--help`.
 All of these command-line options can be repeated, combined together, and have corresponding exclusion versions (e.g. `--no-tool`).
 
 Use `--list` to see the list of available tools, or see below.
+
+### Code execution
+
+If you specify `--tools=code` to the MCP server, it will expose just two tools:
+
+- `search_docs` - Searches the API documentation and returns a list of markdown results
+- `execute` - Runs code against the TypeScript client
+
+This allows the LLM to implement more complex logic by chaining together many API calls without loading
+intermediary results into its context window.
+
+The code execution itself happens in a Deno sandbox that has network access only to the base URL for the API.
 
 ### Specifying the MCP Client
 
@@ -126,6 +166,45 @@ over time, you can manually enable or disable certain capabilities:
 --resource=cards,accounts --operation=read --tag=kyc --no-tool=create_cards
 ```
 
+## Running remotely
+
+Launching the client with `--transport=http` launches the server as a remote server using Streamable HTTP transport. The `--port` setting can choose the port it will run on, and the `--socket` setting allows it to run on a Unix socket.
+
+Authorization can be provided via the `Authorization` header using the Bearer scheme.
+
+Additionally, authorization can be provided via the following headers:
+| Header | Equivalent client option | Security scheme |
+| ------------------- | ------------------------ | --------------- |
+| `x-dedalus-api-key` | `apiKey` | Bearer |
+
+A configuration JSON for this server might look like this, assuming the server is hosted at `http://localhost:3000`:
+
+```json
+{
+  "mcpServers": {
+    "dedalus_labs_api": {
+      "url": "http://localhost:3000",
+      "headers": {
+        "Authorization": "Bearer <auth value>"
+      }
+    }
+  }
+}
+```
+
+The command-line arguments for filtering tools and specifying clients can also be used as query parameters in the URL.
+For example, to exclude specific tools while including others, use the URL:
+
+```
+http://localhost:3000?resource=cards&resource=accounts&no_tool=create_cards
+```
+
+Or, to configure for the Cursor client, with a custom max tool name length, use the URL:
+
+```
+http://localhost:3000?client=cursor&capability=tool-name-length%3D40
+```
+
 ## Importing the tools and server individually
 
 ```js
@@ -175,13 +254,13 @@ The following tools are available in this MCP server.
 
 ### Resource `models`:
 
-- `retrieve_models` (`read`): Get information about a specific model.
+- `retrieve_models` (`read`): Retrieve a model.
 
-  Returns detailed information about a specific model by ID.
-  The model must be available to your API key's configured providers.
+  Retrieve detailed information about a specific model, including its capabilities,
+  provider, and supported features.
 
   Args:
-  model_id: The ID of the model to retrieve (e.g., 'gpt-4', 'claude-3-5-sonnet-20241022')
+  model_id: The ID of the model to retrieve (e.g., 'openai/gpt-4', 'anthropic/claude-3-5-sonnet-20241022')
   user: Authenticated user obtained from API key validation
 
   Returns:
@@ -194,12 +273,11 @@ The following tools are available in this MCP server.
   Valid API key with 'read' scope permission
 
   Example:
-
-  ````python
+  ```python
   import dedalus_labs
 
       client = dedalus_labs.Client(api_key="your-api-key")
-      model = client.models.retrieve("gpt-4")
+      model = client.models.retrieve("openai/gpt-4")
 
       print(f"Model: {model.id}")
       print(f"Owner: {model.owned_by}")
@@ -208,143 +286,153 @@ The following tools are available in this MCP server.
       Response:
       ```json
       {
-          "id": "gpt-4",
+          "id": "openai/gpt-4",
           "object": "model",
           "created": 1687882411,
           "owned_by": "openai"
       }
       ```
 
-  ````
-
 - `list_models` (`read`): List available models.
 
-  Returns a list of available models from all configured providers.
-  Models are filtered based on provider availability and API key configuration.
-  Only models from providers with valid API keys are returned.
-
-  Args:
-  user: Authenticated user obtained from API key validation
+  Retrieve the complete list of models available to your organization, including
+  models from OpenAI, Anthropic, Google, xAI, Mistral, Fireworks, and DeepSeek.
 
   Returns:
-  ModelsResponse: Object containing list of available models
+  ListModelsResponse: List of available models across all supported providers
 
-  Raises:
-  HTTPException: - 401 if authentication fails - 500 if internal error occurs during model listing
+### Resource `embeddings`:
 
-  Requires:
-  Valid API key with 'read' scope permission
+- `create_embeddings` (`write`): Create embeddings using the configured provider.
 
-  Example:
+### Resource `audio.speech`:
 
-  ````python
-  import dedalus_labs
+- `create_audio_speech` (`write`): Generate speech audio from text.
 
-      client = dedalus_labs.Client(api_key="your-api-key")
-      models = client.models.list()
+  Generates audio from the input text using text-to-speech models. Supports multiple
+  voices and output formats including mp3, opus, aac, flac, wav, and pcm.
 
-      for model in models.data:
-          print(f"Model: {model.id} (Owner: {model.owned_by})")
-      ```
+  Returns streaming audio data that can be saved to a file or streamed directly to users.
 
-      Response:
-      ```json
-      {
-          "object": "list",
-          "data": [
-              {
-                  "id": "gpt-4",
-                  "object": "model",
-                  "owned_by": "openai"
-              },
-              {
-                  "id": "claude-3-5-sonnet-20241022",
-                  "object": "model",
-                  "owned_by": "anthropic"
-              }
-          ]
-      }
-      ```
-  ````
+### Resource `audio.transcriptions`:
 
-### Resource `chat`:
+- `create_audio_transcriptions` (`write`): Transcribe audio into text.
 
-- `create_chat` (`write`): Create a chat completion using the Agent framework.
-
-  This endpoint provides a vendor-agnostic chat completion API that works with
-  100+ LLM providers via the Agent framework. It supports both single and
-  multi-model routing, client-side and server-side tool execution, and
-  integration with MCP (Model Context Protocol) servers.
-
-  Features: - Cross-vendor compatibility (OpenAI, Anthropic, Cohere, etc.) - Multi-model routing with intelligent agentic handoffs - Client-side tool execution (tools returned as JSON) - Server-side MCP tool execution with automatic billing - Streaming and non-streaming responses - Advanced agent attributes for routing decisions - Automatic usage tracking and billing
+  Transcribes audio files using OpenAI's Whisper model. Supports multiple audio formats
+  including mp3, mp4, mpeg, mpga, m4a, wav, and webm. Maximum file size is 25 MB.
 
   Args:
-  request: Chat completion request with messages, model, and configuration
-  http_request: FastAPI request object for accessing headers and state
-  background_tasks: FastAPI background tasks for async billing operations
-  user: Authenticated user with validated API key and sufficient balance
+  file: Audio file to transcribe (required)
+  model: Model ID to use (e.g., "openai/whisper-1")
+  language: ISO-639-1 language code (e.g., "en", "es") - improves accuracy
+  prompt: Optional text to guide the model's style
+  response_format: Format of the output (json, text, srt, verbose_json, vtt)
+  temperature: Sampling temperature between 0 and 1
 
   Returns:
-  ChatCompletion: OpenAI-compatible completion response with usage data
+  Transcription object with the transcribed text
 
-  Raises:
-  HTTPException: - 401 if authentication fails or insufficient balance - 400 if request validation fails - 500 if internal processing error occurs
+### Resource `audio.translations`:
 
-  Billing: - Token usage billed automatically based on model pricing - MCP tool calls billed separately using credits system - Streaming responses billed after completion via background task
+- `create_audio_translations` (`write`): Translate audio into English.
 
-  Example:
-  Basic chat completion:
+  Translates audio files in any supported language to English text using OpenAI's
+  Whisper model. Supports the same audio formats as transcription. Maximum file size
+  is 25 MB.
 
-  ````python
-  import dedalus_labs
+  Args:
+  file: Audio file to translate (required)
+  model: Model ID to use (e.g., "openai/whisper-1")
+  prompt: Optional text to guide the model's style
+  response_format: Format of the output (json, text, srt, verbose_json, vtt)
+  temperature: Sampling temperature between 0 and 1
 
-      client = dedalus_labs.Client(api_key="your-api-key")
+  Returns:
+  Translation object with the English translation
 
-      completion = client.chat.create(
-          model="gpt-4",
-          input=[{"role": "user", "content": "Hello, how are you?"}],
-      )
+### Resource `images`:
 
-      print(completion.choices[0].message.content)
-      ```
+- `create_variation_images` (`write`): Create variations of an image.
 
-      With tools and MCP servers:
-      ```python
-      completion = client.chat.create(
-          model="gpt-4",
-          input=[{"role": "user", "content": "Search for recent AI news"}],
-          tools=[
-              {
-                  "type": "function",
-                  "function": {
-                      "name": "search_web",
-                      "description": "Search the web for information",
-                  },
-              }
-          ],
-          mcp_servers=["dedalus-labs/brave-search"],
-      )
-      ```
+  DALL·E 2 only. Upload an image to generate variations.
 
-      Multi-model routing:
-      ```python
-      completion = client.chat.create(
-          model=["gpt-4o-mini", "gpt-4", "claude-3-5-sonnet"],
-          input=[{"role": "user", "content": "Analyze this complex data"}],
-          agent_attributes={"complexity": 0.8, "accuracy": 0.9},
-      )
-      ```
+- `edit_images` (`write`): Edit images using inpainting.
 
-      Streaming response:
-      ```python
-      stream = client.chat.create(
-          model="gpt-4",
-          input=[{"role": "user", "content": "Tell me a story"}],
-          stream=True,
-      )
+  Supports dall-e-2 and gpt-image-1. Upload an image and optionally a mask
+  to indicate which areas to regenerate based on the prompt.
 
-      for chunk in stream:
-          if chunk.choices[0].delta.content:
-              print(chunk.choices[0].delta.content, end="")
-      ```
-  ````
+- `generate_images` (`write`): Generate images from text prompts.
+
+  Pure image generation models only (DALL-E, GPT Image).
+  For multimodal models like gemini-2.5-flash-image, use /v1/chat/completions.
+
+### Resource `chat.completions`:
+
+- `create_chat_completions` (`write`): Create a chat completion.
+
+  Unified chat-completions endpoint that works across many model providers. Supports
+  optional MCP integration, multi-model routing with agentic handoffs, server- or
+  client-executed tools, and both streaming and non-streaming delivery.
+
+  Request body:
+
+  - messages: ordered list of chat turns.
+  - model: identifier or a list of identifiers for routing.
+  - tools: optional tool declarations available to the model.
+  - mcp_servers: optional list of MCP server slugs to enable during the run.
+  - stream: boolean to request incremental output.
+  - config: optional generation parameters (e.g., temperature, max_tokens, metadata).
+
+  Headers:
+
+  - Authorization: bearer key for the calling account.
+  - Optional BYOK or provider headers if applicable.
+
+  Behavior:
+
+  - If multiple models are supplied, the router may select or hand off across them.
+  - Tools may be invoked on the server or signaled for the client to run.
+  - Streaming responses emit incremental deltas; non-streaming returns a single object.
+  - Usage metrics are computed when available and returned in the response.
+
+  Responses:
+
+  - 200 OK: JSON completion object with choices, message content, and usage.
+  - 400 Bad Request: validation error.
+  - 401 Unauthorized: authentication failed.
+  - 402 Payment Required or 429 Too Many Requests: quota, balance, or rate limit issue.
+  - 500 Internal Server Error: unexpected failure.
+
+  Billing:
+
+  - Token usage metered by the selected model(s).
+  - Tool calls and MCP sessions may be billed separately.
+  - Streaming is settled after the stream ends via an async task.
+
+  Example (non-streaming HTTP):
+  POST /v1/chat/completions
+  Content-Type: application/json
+  Authorization: Bearer <key>
+
+  {
+  "model": "provider/model-name",
+  "messages": [{"role": "user", "content": "Hello"}]
+  }
+
+  200 OK
+  {
+  "id": "cmpl_123",
+  "object": "chat.completion",
+  "choices": [
+  {"index": 0, "message": {"role": "assistant", "content": "Hi there!"}, "finish_reason": "stop"}
+  ],
+  "usage": {"prompt_tokens": 3, "completion_tokens": 4, "total_tokens": 7}
+  }
+
+  Example (streaming over SSE):
+  POST /v1/chat/completions
+  Accept: text/event-stream
+
+  data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":"Hi"}}]}
+  data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":" there!"}}]}
+  data: [DONE]

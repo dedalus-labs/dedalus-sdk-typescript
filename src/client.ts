@@ -16,18 +16,27 @@ import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
+import { _Private } from './resources/-private';
 import {
-  Chat,
-  ChatCreateParams,
-  ChatCreateParamsNonStreaming,
-  ChatCreateParamsStreaming,
-  Completion,
-  CompletionRequest,
-  StreamChunk,
-} from './resources/chat';
+  CreateEmbeddingRequest,
+  CreateEmbeddingResponse,
+  EmbeddingCreateParams,
+  Embeddings,
+} from './resources/embeddings';
 import { Health, HealthCheckResponse } from './resources/health';
-import { Model, Models, ModelsResponse } from './resources/models';
+import {
+  CreateImageRequest,
+  Image,
+  ImageCreateVariationParams,
+  ImageEditParams,
+  ImageGenerateParams,
+  Images,
+  ImagesResponse,
+} from './resources/images';
+import { ListModelsResponse, Model, Models } from './resources/models';
 import { Root, RootGetResponse } from './resources/root';
+import { Audio } from './resources/audio/audio';
+import { Chat } from './resources/chat/chat';
 import { type Fetch } from './internal/builtin-types';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
@@ -41,11 +50,31 @@ import {
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
 
+const environments = {
+  production: 'https://api.dedaluslabs.ai',
+  development: 'http://localhost:8080',
+};
+type Environment = keyof typeof environments;
+
 export interface ClientOptions {
   /**
-   * Defaults to process.env['DEDALUS_API_KEY'].
+   * API key for Bearer token authentication.
    */
-  apiKey?: string | undefined;
+  apiKey?: string | null | undefined;
+
+  /**
+   * Dedalus Organization ID for scoping API requests.
+   */
+  organization?: string | null | undefined;
+
+  /**
+   * Specifies the environment to use for the API.
+   *
+   * Each environment maps to a different base URL:
+   * - `production` corresponds to `https://api.dedaluslabs.ai`
+   * - `development` corresponds to `http://localhost:8080`
+   */
+  environment?: Environment | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
@@ -120,7 +149,8 @@ export interface ClientOptions {
  * API Client for interfacing with the Dedalus API.
  */
 export class Dedalus {
-  apiKey: string;
+  apiKey: string | null;
+  organization: string | null;
 
   baseURL: string;
   maxRetries: number;
@@ -137,7 +167,9 @@ export class Dedalus {
   /**
    * API Client for interfacing with the Dedalus API.
    *
-   * @param {string | undefined} [opts.apiKey=process.env['DEDALUS_API_KEY'] ?? undefined]
+   * @param {string | null | undefined} [opts.apiKey=process.env['DEDALUS_API_KEY'] ?? null]
+   * @param {string | null | undefined} [opts.organization=process.env['DEDALUS_ORG_ID'] ?? null]
+   * @param {Environment} [opts.environment=production] - Specifies the environment URL to use for the API.
    * @param {string} [opts.baseURL=process.env['DEDALUS_BASE_URL'] ?? https://api.dedaluslabs.ai] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
@@ -148,22 +180,25 @@ export class Dedalus {
    */
   constructor({
     baseURL = readEnv('DEDALUS_BASE_URL'),
-    apiKey = readEnv('DEDALUS_API_KEY'),
+    apiKey = readEnv('DEDALUS_API_KEY') ?? null,
+    organization = readEnv('DEDALUS_ORG_ID') ?? null,
     ...opts
   }: ClientOptions = {}) {
-    if (apiKey === undefined) {
+    const options: ClientOptions = {
+      apiKey,
+      organization,
+      ...opts,
+      baseURL,
+      environment: opts.environment ?? 'production',
+    };
+
+    if (baseURL && opts.environment) {
       throw new Errors.DedalusError(
-        "The DEDALUS_API_KEY environment variable is missing or empty; either provide it, or instantiate the Dedalus client with an apiKey option, like new Dedalus({ apiKey: 'My API Key' }).",
+        'Ambiguous URL; The `baseURL` option (or DEDALUS_BASE_URL env var) and the `environment` option are given. If you want to use the environment you must pass baseURL: null',
       );
     }
 
-    const options: ClientOptions = {
-      apiKey,
-      ...opts,
-      baseURL: baseURL || `https://api.dedaluslabs.ai`,
-    };
-
-    this.baseURL = options.baseURL!;
+    this.baseURL = options.baseURL || environments[options.environment || 'production'];
     this.timeout = options.timeout ?? Dedalus.DEFAULT_TIMEOUT /* 1 minute */;
     this.logger = options.logger ?? console;
     const defaultLogLevel = 'warn';
@@ -179,8 +214,10 @@ export class Dedalus {
     this.#encoder = Opts.FallbackEncoder;
 
     this._options = options;
+    this.idempotencyHeader = 'Idempotency-Key';
 
     this.apiKey = apiKey;
+    this.organization = organization;
   }
 
   /**
@@ -189,7 +226,8 @@ export class Dedalus {
   withOptions(options: Partial<ClientOptions>): this {
     const client = new (this.constructor as any as new (props: ClientOptions) => typeof this)({
       ...this._options,
-      baseURL: this.baseURL,
+      environment: options.environment ? options.environment : undefined,
+      baseURL: options.environment ? undefined : this.baseURL,
       maxRetries: this.maxRetries,
       timeout: this.timeout,
       logger: this.logger,
@@ -197,6 +235,7 @@ export class Dedalus {
       fetch: this.fetch,
       fetchOptions: this.fetchOptions,
       apiKey: this.apiKey,
+      organization: this.organization,
       ...options,
     });
     return client;
@@ -206,7 +245,7 @@ export class Dedalus {
    * Check whether the base URL is set to its default.
    */
   #baseURLOverridden(): boolean {
-    return this.baseURL !== 'https://api.dedaluslabs.ai';
+    return this.baseURL !== environments[this._options.environment || 'production'];
   }
 
   protected defaultQuery(): Record<string, string | undefined> | undefined {
@@ -214,10 +253,22 @@ export class Dedalus {
   }
 
   protected validateHeaders({ values, nulls }: NullableHeaders) {
-    return;
+    if (this.apiKey && values.get('authorization')) {
+      return;
+    }
+    if (nulls.has('authorization')) {
+      return;
+    }
+
+    throw new Error(
+      'Could not resolve authentication method. Expected the apiKey to be set. Or for the "Authorization" headers to be explicitly omitted',
+    );
   }
 
   protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+    if (this.apiKey == null) {
+      return undefined;
+    }
     return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
   }
 
@@ -379,7 +430,7 @@ export class Dedalus {
     const response = await this.fetchWithTimeout(url, req, timeout, controller).catch(castToError);
     const headersTime = Date.now();
 
-    if (response instanceof Error) {
+    if (response instanceof globalThis.Error) {
       const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
       if (options.signal?.aborted) {
         throw new Errors.APIUserAbortError();
@@ -657,6 +708,8 @@ export class Dedalus {
         'X-Stainless-Retry-Count': String(retryCount),
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
+        'User-Agent': 'Dedalus-SDK',
+        'X-SDK-Version': '1.0.0',
       },
       await this.authHeaders(options),
       this._options.defaultHeaders,
@@ -686,7 +739,7 @@ export class Dedalus {
         // Preserve legacy string encoding behavior for now
         headers.values.has('content-type')) ||
       // `Blob` is superset of `File`
-      body instanceof Blob ||
+      ((globalThis as any).Blob && body instanceof (globalThis as any).Blob) ||
       // `FormData` -> `multipart/form-data`
       body instanceof FormData ||
       // `URLSearchParams` -> `application/x-www-form-urlencoded`
@@ -726,30 +779,56 @@ export class Dedalus {
   static toFile = Uploads.toFile;
 
   root: API.Root = new API.Root(this);
+  _private: API._Private = new API._Private(this);
   health: API.Health = new API.Health(this);
   models: API.Models = new API.Models(this);
+  embeddings: API.Embeddings = new API.Embeddings(this);
+  audio: API.Audio = new API.Audio(this);
+  images: API.Images = new API.Images(this);
   chat: API.Chat = new API.Chat(this);
 }
+
 Dedalus.Root = Root;
+Dedalus._Private = _Private;
 Dedalus.Health = Health;
 Dedalus.Models = Models;
+Dedalus.Embeddings = Embeddings;
+Dedalus.Audio = Audio;
+Dedalus.Images = Images;
 Dedalus.Chat = Chat;
+
 export declare namespace Dedalus {
   export type RequestOptions = Opts.RequestOptions;
 
   export { Root as Root, type RootGetResponse as RootGetResponse };
 
+  export { _Private as _Private };
+
   export { Health as Health, type HealthCheckResponse as HealthCheckResponse };
 
-  export { Models as Models, type Model as Model, type ModelsResponse as ModelsResponse };
+  export { Models as Models, type ListModelsResponse as ListModelsResponse, type Model as Model };
 
   export {
-    Chat as Chat,
-    type Completion as Completion,
-    type CompletionRequest as CompletionRequest,
-    type StreamChunk as StreamChunk,
-    type ChatCreateParams as ChatCreateParams,
-    type ChatCreateParamsNonStreaming as ChatCreateParamsNonStreaming,
-    type ChatCreateParamsStreaming as ChatCreateParamsStreaming,
+    Embeddings as Embeddings,
+    type CreateEmbeddingRequest as CreateEmbeddingRequest,
+    type CreateEmbeddingResponse as CreateEmbeddingResponse,
+    type EmbeddingCreateParams as EmbeddingCreateParams,
   };
+
+  export { Audio as Audio };
+
+  export {
+    Images as Images,
+    type CreateImageRequest as CreateImageRequest,
+    type Image as Image,
+    type ImagesResponse as ImagesResponse,
+    type ImageCreateVariationParams as ImageCreateVariationParams,
+    type ImageEditParams as ImageEditParams,
+    type ImageGenerateParams as ImageGenerateParams,
+  };
+
+  export { Chat as Chat };
+
+  export type DedalusModel = API.DedalusModel;
+  export type DedalusModelChoice = API.DedalusModelChoice;
 }

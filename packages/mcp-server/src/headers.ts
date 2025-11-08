@@ -1,8 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type ClientOptions } from 'dedalus-labs/client';
-
 import { IncomingMessage } from 'node:http';
+import { ClientOptions } from 'dedalus-labs';
 
 export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> => {
   if (req.headers.authorization) {
@@ -17,7 +16,7 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
   }
 
   const apiKey =
-    req.headers['x-dedalus-api-key'] instanceof Array ?
+    Array.isArray(req.headers['x-dedalus-api-key']) ?
       req.headers['x-dedalus-api-key'][0]
     : req.headers['x-dedalus-api-key'];
   return { apiKey };

@@ -1,0 +1,50 @@
+{
+  "dxt_version": "0.2",
+  "name": "dedalus-labs-mcp",
+  "version": "0.1.0-alpha.4",
+  "description": "The official MCP Server for the Dedalus API",
+  "author": {
+    "name": "Dedalus",
+    "email": "founders@dedaluslabs.ai"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dedalus-labs/dedalus-sdk-typescript.git"
+  },
+  "homepage": "https://github.com/dedalus-labs/dedalus-sdk-typescript/tree/main/packages/mcp-server#readme",
+  "documentation": "https://docs.dedaluslabs.ai",
+  "server": {
+    "type": "node",
+    "entry_point": "index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/index.js"],
+      "env": {
+        "DEDALUS_API_KEY": "${user_config.DEDALUS_API_KEY}",
+        "DEDALUS_ORG_ID": "${user_config.DEDALUS_ORG_ID}"
+      }
+    }
+  },
+  "user_config": {
+    "DEDALUS_API_KEY": {
+      "title": "api_key",
+      "description": "API key for Bearer token authentication.",
+      "required": false,
+      "type": "string"
+    },
+    "DEDALUS_ORG_ID": {
+      "title": "organization",
+      "description": "Dedalus Organization ID for scoping API requests.",
+      "required": false,
+      "type": "string"
+    }
+  },
+  "tools": [],
+  "tools_generated": true,
+  "compatibility": {
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  },
+  "keywords": ["api"]
+}

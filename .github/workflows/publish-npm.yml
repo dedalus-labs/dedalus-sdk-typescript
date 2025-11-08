@@ -16,6 +16,9 @@ jobs:
   publish:
     name: publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    environment: production
 
     steps:
       - uses: actions/checkout@v4
@@ -39,3 +42,10 @@ jobs:
           yarn tsn scripts/publish-packages.ts "{ \"paths_released\": \"$PATHS_RELEASED\" }"
         env:
           NPM_TOKEN: ${{ secrets.DEDALUS_NPM_TOKEN || secrets.NPM_TOKEN }}
+
+      - name: Upload MCP Server DXT GitHub release asset
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} \
+            packages/mcp-server/dedalus_labs_api.mcpb
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

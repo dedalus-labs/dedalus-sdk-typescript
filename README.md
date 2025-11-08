@@ -4,7 +4,7 @@
 
 This library provides convenient access to the Dedalus REST API from server-side TypeScript or JavaScript.
 
-The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [docs.dedaluslabs.ai](https://docs.dedaluslabs.ai). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainless.com/).
 
@@ -24,15 +24,41 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
+  environment: 'development', // defaults to 'production'
 });
 
-const completion = await client.chat.create({
-  input: [{ role: 'user', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' }],
-  model: 'gpt-4o-mini',
+const completion = await client.chat.completions.create({
+  messages: [{ role: 'user', content: 'Hello, how are you today?' }],
+  model: 'openai/gpt-5',
 });
 
 console.log(completion.id);
 ```
+
+## Streaming responses
+
+We provide support for streaming responses using Server Sent Events (SSE).
+
+```ts
+import Dedalus from 'dedalus-labs';
+
+const client = new Dedalus();
+
+const stream = await client.chat.completions.create({
+  messages: [
+    { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+    { role: 'user', content: 'What do you think of artificial intelligence?' },
+  ],
+  model: 'openai/gpt-5',
+  stream: true,
+});
+for await (const streamChunk of stream) {
+  console.log(streamChunk.id);
+}
+```
+
+If you need to cancel a stream, you can `break` from the loop
+or call `stream.controller.abort()`.
 
 ### Request & Response types
 
@@ -44,12 +70,48 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
+  environment: 'development', // defaults to 'production'
 });
 
 const response: Dedalus.HealthCheckResponse = await client.health.check();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
+
+## File uploads
+
+Request parameters that correspond to file uploads can be passed in many different forms:
+
+- `File` (or an object with the same structure)
+- a `fetch` `Response` (or an object with the same structure)
+- an `fs.ReadStream`
+- the return value of our `toFile` helper
+
+```ts
+import fs from 'fs';
+import Dedalus, { toFile } from 'dedalus-labs';
+
+const client = new Dedalus();
+
+// If you have access to Node `fs` we recommend using `fs.createReadStream()`:
+await client.audio.transcriptions.create({ file: fs.createReadStream('/path/to/file'), model: 'model' });
+
+// Or if you have the web `File` API you can pass a `File` instance:
+await client.audio.transcriptions.create({ file: new File(['my bytes'], 'file'), model: 'model' });
+
+// You can also pass a `fetch` `Response`:
+await client.audio.transcriptions.create({ file: await fetch('https://somesite/file'), model: 'model' });
+
+// Finally, if none of the above are convenient, you can use our `toFile` helper:
+await client.audio.transcriptions.create({
+  file: await toFile(Buffer.from('my bytes'), 'file'),
+  model: 'model',
+});
+await client.audio.transcriptions.create({
+  file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
+  model: 'model',
+});
+```
 
 ## Handling errors
 
@@ -124,6 +186,25 @@ await client.health.check({
 On timeout, an `APIConnectionTimeoutError` is thrown.
 
 Note that requests which time out will be [retried twice by default](#retries).
+
+## Default Headers
+
+We automatically send the following headers with all requests.
+
+| Header          | Value         |
+| --------------- | ------------- |
+| `User-Agent`    | `Dedalus-SDK` |
+| `X-SDK-Version` | `1.0.0`       |
+
+If you need to, you can override these headers by setting default headers on a per-request basis.
+
+```ts
+import Dedalus from 'dedalus-labs';
+
+const client = new Dedalus();
+
+const response = await client.health.check({ headers: { 'User-Agent': 'My-Custom-Value' } });
+```
 
 ## Advanced Usage
 
@@ -225,7 +306,7 @@ parameter. This library doesn't validate at runtime that the request matches the
 send will be sent as-is.
 
 ```ts
-client.chat.create({
+client.chat.completions.create({
   // ...
   // @ts-expect-error baz is not yet public
   baz: 'undocumented option',
