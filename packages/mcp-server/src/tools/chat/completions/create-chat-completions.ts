@@ -24,23 +24,6 @@ export const tool: Tool = {
       {
         type: 'object',
         properties: {
-          messages: {
-            anyOf: [
-              {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: true,
-                },
-              },
-              {
-                type: 'string',
-              },
-            ],
-            title: 'Messages',
-            description:
-              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message.',
-          },
           model: {
             anyOf: [
               {
@@ -223,6 +206,23 @@ export const tool: Tool = {
             title: 'Mcp Servers',
             description:
               "MCP (Model Context Protocol) server addresses to make available for server-side tool execution. Entries can be URLs (e.g., 'https://mcp.example.com'), slugs (e.g., 'dedalus-labs/brave-search'), or structured objects specifying slug/version/url. MCP tools are executed server-side and billed separately.",
+          },
+          messages: {
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              {
+                type: 'string',
+              },
+            ],
+            title: 'Messages',
+            description:
+              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message. Optional if `input` or `instructions` is provided.',
           },
           metadata: {
             type: 'object',
@@ -487,28 +487,11 @@ export const tool: Tool = {
             additionalProperties: true,
           },
         },
-        required: ['messages', 'model'],
+        required: ['model'],
       },
       {
         type: 'object',
         properties: {
-          messages: {
-            anyOf: [
-              {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: true,
-                },
-              },
-              {
-                type: 'string',
-              },
-            ],
-            title: 'Messages',
-            description:
-              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message.',
-          },
           model: {
             anyOf: [
               {
@@ -698,6 +681,23 @@ export const tool: Tool = {
             title: 'Mcp Servers',
             description:
               "MCP (Model Context Protocol) server addresses to make available for server-side tool execution. Entries can be URLs (e.g., 'https://mcp.example.com'), slugs (e.g., 'dedalus-labs/brave-search'), or structured objects specifying slug/version/url. MCP tools are executed server-side and billed separately.",
+          },
+          messages: {
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              {
+                type: 'string',
+              },
+            ],
+            title: 'Messages',
+            description:
+              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message. Optional if `input` or `instructions` is provided.',
           },
           metadata: {
             type: 'object',
@@ -955,7 +955,7 @@ export const tool: Tool = {
             additionalProperties: true,
           },
         },
-        required: ['messages', 'model', 'stream'],
+        required: ['model', 'stream'],
       },
     ],
     $defs: {
@@ -1125,12 +1125,14 @@ export const tool: Tool = {
                 items: {
                   type: 'string',
                   enum: [
-                    'code_interpreter_call.outputs',
-                    'computer_call_output.output.image_url',
                     'file_search_call.results',
+                    'web_search_call.results',
+                    'web_search_call.action.sources',
                     'message.input_image.image_url',
-                    'message.output_text.logprobs',
+                    'computer_call_output.output.image_url',
+                    'code_interpreter_call.outputs',
                     'reasoning.encrypted_content',
+                    'message.output_text.logprobs',
                   ],
                 },
               },

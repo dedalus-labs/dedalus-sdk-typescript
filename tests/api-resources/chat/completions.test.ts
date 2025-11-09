@@ -10,10 +10,7 @@ const client = new Dedalus({
 describe('resource completions', () => {
   // Prism tests are disabled
   test.skip('create: only required params', async () => {
-    const responsePromise = client.chat.completions.create({
-      messages: [{ content: 'bar', role: 'bar' }],
-      model: 'openai/gpt-4',
-    });
+    const responsePromise = client.chat.completions.create({ model: 'openai/gpt-4' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -26,7 +23,6 @@ describe('resource completions', () => {
   // Prism tests are disabled
   test.skip('create: required and optional params', async () => {
     const response = await client.chat.completions.create({
-      messages: [{ content: 'bar', role: 'bar' }],
       model: 'openai/gpt-4',
       agent_attributes: { accuracy: 0.9, complexity: 0.8, efficiency: 0.7 },
       audio: { format: 'bar', voice: 'bar' },
@@ -47,6 +43,7 @@ describe('resource completions', () => {
       max_tokens: 100,
       max_turns: 5,
       mcp_servers: ['dedalus-labs/brave-search', 'dedalus-labs/github-api'],
+      messages: [{ content: 'bar', role: 'bar' }],
       metadata: { session: 'abc', user_id: '123' },
       modalities: ['text'],
       model_attributes: {
