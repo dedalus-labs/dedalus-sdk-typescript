@@ -1349,7 +1349,7 @@ export const tool: Tool = {
       },
       response_format_json_object: {
         type: 'object',
-        title: 'ResponseFormatJSONObject',
+        title: 'ResponseFormatJsonObject',
         description:
           "JSON object response format. An older method of generating JSON responses.\n\nUsing `json_schema` is recommended for models that support it. Note that the\nmodel will not generate JSON without a system or user message instructing it\nto do so.\n\nFields:\n  - type (required): Literal['json_object']",
         properties: {
@@ -1364,13 +1364,13 @@ export const tool: Tool = {
       },
       response_format_json_schema: {
         type: 'object',
-        title: 'ResponseFormatJSONSchema',
+        title: 'ResponseFormatJsonSchema',
         description:
           "JSON Schema response format. Used to generate structured JSON responses.\n\nLearn more about [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).\n\nFields:\n  - type (required): Literal['json_schema']\n  - json_schema (required): JSONSchema",
         properties: {
           json_schema: {
             type: 'object',
-            title: 'ResponseFormatJSONSchemaConfig',
+            title: 'JSONSchema',
             description: 'Structured Outputs configuration options, including a JSON Schema.',
             properties: {
               name: {
@@ -1387,7 +1387,7 @@ export const tool: Tool = {
               },
               schema: {
                 type: 'object',
-                title: 'ResponseFormatJSONSchemaSchema',
+                title: 'ResponseFormatJsonSchemaSchema',
                 description:
                   'The schema for the response format, described as a JSON Schema object.\nLearn how to build JSON schemas [here](https://json-schema.org/).',
                 additionalProperties: true,
