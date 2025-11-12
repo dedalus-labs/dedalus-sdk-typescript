@@ -796,7 +796,11 @@ export interface CompletionRequest {
    * honour this field; Anthropic and Google requests will return an
    * invalid_request_error if it is supplied.
    */
-  response_format?: { [key: string]: unknown } | null;
+  response_format?:
+    | Shared.ResponseFormatText
+    | Shared.ResponseFormatJSONObject
+    | Shared.ResponseFormatJSONSchema
+    | null;
 
   /**
    * Stable identifier used to help detect users who might violate OpenAI usage
@@ -1442,7 +1446,11 @@ export interface CompletionCreateParamsBase {
    * honour this field; Anthropic and Google requests will return an
    * invalid_request_error if it is supplied.
    */
-  response_format?: { [key: string]: unknown } | null;
+  response_format?:
+    | Shared.ResponseFormatText
+    | Shared.ResponseFormatJSONObject
+    | Shared.ResponseFormatJSONSchema
+    | null;
 
   /**
    * Stable identifier used to help detect users who might violate OpenAI usage

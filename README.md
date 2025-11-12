@@ -28,7 +28,7 @@ const client = new Dedalus({
 });
 
 const completion = await client.chat.completions.create({
-  model: 'openai/gpt-5',
+  model: 'openai/gpt-4o-mini',
   messages: [{ role: 'user', content: 'Hello, how are you today?' }],
 });
 
@@ -45,7 +45,7 @@ import Dedalus from 'dedalus-labs';
 const client = new Dedalus();
 
 const stream = await client.chat.completions.create({
-  model: 'openai/gpt-5',
+  model: 'openai/gpt-4o-mini',
   stream: true,
   messages: [
     { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },

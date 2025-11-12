@@ -38,8 +38,8 @@ export class Translations extends APIResource {
  * - segments (optional): list[TranscriptionSegment]
  */
 export type TranslationCreateResponse =
-  | TranslationCreateResponse.CreateTranslationResponseVerboseJson
-  | TranslationCreateResponse.CreateTranslationResponseJson;
+  | TranslationCreateResponse.CreateTranslationResponseVerboseJSON
+  | TranslationCreateResponse.CreateTranslationResponseJSON;
 
 export namespace TranslationCreateResponse {
   /**
@@ -50,7 +50,7 @@ export namespace TranslationCreateResponse {
    * - text (required): str
    * - segments (optional): list[TranscriptionSegment]
    */
-  export interface CreateTranslationResponseVerboseJson {
+  export interface CreateTranslationResponseVerboseJSON {
     /**
      * The duration of the input audio.
      */
@@ -69,10 +69,10 @@ export namespace TranslationCreateResponse {
     /**
      * Segments of the translated text and their corresponding details.
      */
-    segments?: Array<CreateTranslationResponseVerboseJson.Segment>;
+    segments?: Array<CreateTranslationResponseVerboseJSON.Segment>;
   }
 
-  export namespace CreateTranslationResponseVerboseJson {
+  export namespace CreateTranslationResponseVerboseJSON {
     /**
      * Fields:
      *
@@ -148,7 +148,7 @@ export namespace TranslationCreateResponse {
    *
    * - text (required): str
    */
-  export interface CreateTranslationResponseJson {
+  export interface CreateTranslationResponseJSON {
     text: string;
   }
 }

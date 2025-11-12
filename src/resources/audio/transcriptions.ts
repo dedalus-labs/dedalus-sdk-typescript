@@ -44,8 +44,8 @@ export class Transcriptions extends APIResource {
  * - usage (optional): TranscriptTextUsageDuration
  */
 export type TranscriptionCreateResponse =
-  | TranscriptionCreateResponse.CreateTranscriptionResponseVerboseJson
-  | TranscriptionCreateResponse.CreateTranscriptionResponseJson;
+  | TranscriptionCreateResponse.CreateTranscriptionResponseVerboseJSON
+  | TranscriptionCreateResponse.CreateTranscriptionResponseJSON;
 
 export namespace TranscriptionCreateResponse {
   /**
@@ -61,7 +61,7 @@ export namespace TranscriptionCreateResponse {
    * - segments (optional): list[TranscriptionSegment]
    * - usage (optional): TranscriptTextUsageDuration
    */
-  export interface CreateTranscriptionResponseVerboseJson {
+  export interface CreateTranscriptionResponseVerboseJSON {
     /**
      * The duration of the input audio.
      */
@@ -80,20 +80,20 @@ export namespace TranscriptionCreateResponse {
     /**
      * Segments of the transcribed text and their corresponding details.
      */
-    segments?: Array<CreateTranscriptionResponseVerboseJson.Segment>;
+    segments?: Array<CreateTranscriptionResponseVerboseJSON.Segment>;
 
     /**
      * Usage statistics for models billed by audio input duration.
      */
-    usage?: CreateTranscriptionResponseVerboseJson.Usage;
+    usage?: CreateTranscriptionResponseVerboseJSON.Usage;
 
     /**
      * Extracted words and their corresponding timestamps.
      */
-    words?: Array<CreateTranscriptionResponseVerboseJson.Word>;
+    words?: Array<CreateTranscriptionResponseVerboseJSON.Word>;
   }
 
-  export namespace CreateTranscriptionResponseVerboseJson {
+  export namespace CreateTranscriptionResponseVerboseJSON {
     /**
      * Fields:
      *
@@ -213,7 +213,7 @@ export namespace TranscriptionCreateResponse {
    * - logprobs (optional): list[LogprobsItem]
    * - usage (optional): Usage
    */
-  export interface CreateTranscriptionResponseJson {
+  export interface CreateTranscriptionResponseJSON {
     /**
      * The transcribed text.
      */
@@ -224,17 +224,17 @@ export namespace TranscriptionCreateResponse {
      * models `gpt-4o-transcribe` and `gpt-4o-mini-transcribe` if `logprobs` is added
      * to the `include` array.
      */
-    logprobs?: Array<CreateTranscriptionResponseJson.Logprob>;
+    logprobs?: Array<CreateTranscriptionResponseJSON.Logprob>;
 
     /**
      * Token usage statistics for the request.
      */
     usage?:
-      | CreateTranscriptionResponseJson.TranscriptTextUsageTokens
-      | CreateTranscriptionResponseJson.TranscriptTextUsageDuration;
+      | CreateTranscriptionResponseJSON.TranscriptTextUsageTokens
+      | CreateTranscriptionResponseJSON.TranscriptTextUsageDuration;
   }
 
-  export namespace CreateTranscriptionResponseJson {
+  export namespace CreateTranscriptionResponseJSON {
     /**
      * Fields:
      *
