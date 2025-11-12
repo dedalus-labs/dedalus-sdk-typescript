@@ -285,11 +285,20 @@ export const tool: Tool = {
             enum: ['low', 'medium', 'high'],
           },
           response_format: {
-            type: 'object',
+            anyOf: [
+              {
+                $ref: '#/$defs/response_format_text',
+              },
+              {
+                $ref: '#/$defs/response_format_json_object',
+              },
+              {
+                $ref: '#/$defs/response_format_json_schema',
+              },
+            ],
             title: 'Response Format',
             description:
               "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honour this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
-            additionalProperties: true,
           },
           safety_identifier: {
             type: 'string',
@@ -760,11 +769,20 @@ export const tool: Tool = {
             enum: ['low', 'medium', 'high'],
           },
           response_format: {
-            type: 'object',
+            anyOf: [
+              {
+                $ref: '#/$defs/response_format_text',
+              },
+              {
+                $ref: '#/$defs/response_format_json_object',
+              },
+              {
+                $ref: '#/$defs/response_format_json_schema',
+              },
+            ],
             title: 'Response Format',
             description:
               "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honour this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
-            additionalProperties: true,
           },
           safety_identifier: {
             type: 'string',
@@ -1313,6 +1331,84 @@ export const tool: Tool = {
         ],
         title: 'DedalusModelChoice',
         description: 'Dedalus model choice - either a string ID or DedalusModel configuration object.',
+      },
+      response_format_text: {
+        type: 'object',
+        title: 'ResponseFormatText',
+        description:
+          "Default response format. Used to generate text responses.\n\nFields:\n  - type (required): Literal['text']",
+        properties: {
+          type: {
+            type: 'string',
+            title: 'Type',
+            description: 'The type of response format being defined. Always `text`.',
+            enum: ['text'],
+          },
+        },
+        required: ['type'],
+      },
+      response_format_json_object: {
+        type: 'object',
+        title: 'ResponseFormatJSONObject',
+        description:
+          "JSON object response format. An older method of generating JSON responses.\n\nUsing `json_schema` is recommended for models that support it. Note that the\nmodel will not generate JSON without a system or user message instructing it\nto do so.\n\nFields:\n  - type (required): Literal['json_object']",
+        properties: {
+          type: {
+            type: 'string',
+            title: 'Type',
+            description: 'The type of response format being defined. Always `json_object`.',
+            enum: ['json_object'],
+          },
+        },
+        required: ['type'],
+      },
+      response_format_json_schema: {
+        type: 'object',
+        title: 'ResponseFormatJSONSchema',
+        description:
+          "JSON Schema response format. Used to generate structured JSON responses.\n\nLearn more about [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).\n\nFields:\n  - type (required): Literal['json_schema']\n  - json_schema (required): JSONSchema",
+        properties: {
+          json_schema: {
+            type: 'object',
+            title: 'ResponseFormatJSONSchemaConfig',
+            description: 'Structured Outputs configuration options, including a JSON Schema.',
+            properties: {
+              name: {
+                type: 'string',
+                title: 'Name',
+                description:
+                  'The name of the response format. Must be a-z, A-Z, 0-9, or contain\nunderscores and dashes, with a maximum length of 64.',
+              },
+              description: {
+                type: 'string',
+                title: 'Description',
+                description:
+                  'A description of what the response format is for, used by the model to\ndetermine how to respond in the format.',
+              },
+              schema: {
+                type: 'object',
+                title: 'ResponseFormatJSONSchemaSchema',
+                description:
+                  'The schema for the response format, described as a JSON Schema object.\nLearn how to build JSON schemas [here](https://json-schema.org/).',
+                additionalProperties: true,
+              },
+              strict: {
+                type: 'boolean',
+                title: 'Strict',
+                description:
+                  'Whether to enable strict schema adherence when generating the output.\nIf set to true, the model will always follow the exact schema defined\nin the `schema` field. Only a subset of JSON Schema is supported when\n`strict` is `true`. To learn more, read the [Structured Outputs\nguide](https://platform.openai.com/docs/guides/structured-outputs).',
+              },
+            },
+            required: ['name'],
+          },
+          type: {
+            type: 'string',
+            title: 'Type',
+            description: 'The type of response format being defined. Always `json_schema`.',
+            enum: ['json_schema'],
+          },
+        },
+        required: ['json_schema', 'type'],
       },
     },
   },

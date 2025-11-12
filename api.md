@@ -4,6 +4,9 @@ Types:
 
 - <code><a href="./src/resources/shared.ts">DedalusModel</a></code>
 - <code><a href="./src/resources/shared.ts">DedalusModelChoice</a></code>
+- <code><a href="./src/resources/shared.ts">ResponseFormatJSONObject</a></code>
+- <code><a href="./src/resources/shared.ts">ResponseFormatJSONSchema</a></code>
+- <code><a href="./src/resources/shared.ts">ResponseFormatText</a></code>
 
 # Root
 
