@@ -43,7 +43,7 @@ elif ! prism_is_running ; then
   echo -e "To run the server, pass in the path or url of your OpenAPI"
   echo -e "spec to the prism command:"
   echo
-  echo -e "  \$ ${YELLOW}npm exec --package=@stainless-api/prism-cli@5.15.0 -- prism mock path/to/your.openapi.yml${NC}"
+  echo -e "  \$ ${YELLOW}npm exec --package=@stainless-api/prism-cli@5.15.0 -- npx -y @stoplight/prism-cli mock https://raw.githubusercontent.com/dedalus-labs/dedalus-openapi/main/openapi.json${NC}"
   echo
 
   exit 1

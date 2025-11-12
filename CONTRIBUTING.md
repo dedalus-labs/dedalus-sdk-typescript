@@ -68,7 +68,7 @@ $ pnpm link -—global dedalus-labs
 Most tests require you to [set up a mock server](https://github.com/stoplightio/prism) against the OpenAPI spec to run the tests.
 
 ```sh
-$ npx prism mock path/to/your/openapi.yml
+$ npx -y @stoplight/prism-cli mock https://raw.githubusercontent.com/dedalus-labs/dedalus-openapi/main/openapi.json
 ```
 
 ```sh
