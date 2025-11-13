@@ -20,3 +20,4 @@ export {
   PermissionDeniedError,
   UnprocessableEntityError,
 } from './core/error';
+export { DedalusRunner, SchemaProcessingError } from './lib/tools';
