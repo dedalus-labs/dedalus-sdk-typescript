@@ -20,4 +20,6 @@ export {
   PermissionDeniedError,
   UnprocessableEntityError,
 } from './core/error';
-export { DedalusRunner, SchemaProcessingError } from './lib/tools';
+
+export { DedalusRunner } from './lib/runner';
+export { streamAsync, streamSync } from './lib/utils/stream';
