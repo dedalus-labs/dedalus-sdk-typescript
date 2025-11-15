@@ -4,6 +4,6 @@
 //          github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
-import type { CompletionCreateParamsBase } from "dedalus-labs/resources/chat/completions";
+import type { CompletionCreateParamsBase } from '../../../resources/chat/completions';
 
 export type Message = Extract<CompletionCreateParamsBase['messages'], Array<any>>[number];

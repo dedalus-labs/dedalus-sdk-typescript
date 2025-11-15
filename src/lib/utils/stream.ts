@@ -31,8 +31,8 @@ export type StreamChunk = {
 };
 
 const isVerbose = () => {
-  const v = (process.env['DEDALUS_SDK_VERBOSE'] || "").toLowerCase();
-  return v === "1" || v === "true" || v === "yes" || v === "on" || v === "debug";
+  const v = (process.env['DEDALUS_SDK_VERBOSE'] || '').toLowerCase();
+  return v === '1' || v === 'true' || v === 'yes' || v === 'on' || v === 'debug';
 };
 
 /** Stream text content from an async streaming response. */
@@ -43,10 +43,9 @@ export async function streamAsync(stream: AsyncIterable<StreamChunk>): Promise<v
     // Print server-side metadata events if present (verbose-only)
     if (verbose) {
       const extra = (chunk as any).__pydantic_extra__;
-      if (extra && typeof extra === "object") {
+      if (extra && typeof extra === 'object') {
         const meta = (extra as any).dedalus_event;
-        if (meta && typeof meta === "object") {
-          // eslint-disable-next-line no-console
+        if (meta && typeof meta === 'object') {
           console.log(`\n[EVENT] ${JSON.stringify(meta)}`);
         }
       }
@@ -63,25 +62,23 @@ export async function streamAsync(stream: AsyncIterable<StreamChunk>): Promise<v
         for (const tc of delta.tool_calls) {
           const name = tc.function?.name;
           const tcid = tc.id;
-          // eslint-disable-next-line no-console
+
           console.log(`\n[TOOL_CALL] name=${name} id=${tcid}`);
         }
       }
 
       // Always print content
       if (delta.content) {
-        // eslint-disable-next-line no-process-env, no-console
         process.stdout.write(delta.content);
       }
 
       // Print finish reason (verbose-only)
       if (verbose && choice.finish_reason) {
-        // eslint-disable-next-line no-console
         console.log(`\n[FINISH] reason=${choice.finish_reason}`);
       }
     }
   }
-  // eslint-disable-next-line no-console
+
   console.log(); // Final newline
 }
 
@@ -93,10 +90,9 @@ export function streamSync(stream: Iterable<StreamChunk>): void {
     // Print server-side metadata events if present (verbose-only)
     if (verbose) {
       const extra = (chunk as any).__pydantic_extra__;
-      if (extra && typeof extra === "object") {
+      if (extra && typeof extra === 'object') {
         const meta = (extra as any).dedalus_event;
-        if (meta && typeof meta === "object") {
-          // eslint-disable-next-line no-console
+        if (meta && typeof meta === 'object') {
           console.log(`\n[EVENT] ${JSON.stringify(meta)}`);
         }
       }
@@ -113,24 +109,22 @@ export function streamSync(stream: Iterable<StreamChunk>): void {
         for (const tc of delta.tool_calls) {
           const name = tc.function?.name;
           const tcid = tc.id;
-          // eslint-disable-next-line no-console
+
           console.log(`\n[TOOL_CALL] name=${name} id=${tcid}`);
         }
       }
 
       // Always print content
       if (delta.content) {
-        // eslint-disable-next-line no-process-env, no-console
         process.stdout.write(delta.content);
       }
 
       // Print finish reason (verbose-only)
       if (verbose && choice.finish_reason) {
-        // eslint-disable-next-line no-console
         console.log(`\n[FINISH] reason=${choice.finish_reason}`);
       }
     }
   }
-  // eslint-disable-next-line no-console
+
   console.log(); // Final newline
 }

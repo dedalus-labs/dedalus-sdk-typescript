@@ -5,4 +5,4 @@
 // ==============================================================================
 
 /** Converts value to JSON string, passing through strings unchanged. */
-export const jsonify = (v: any) => typeof v === "string" ? v : JSON.stringify(v);
+export const jsonify = (v: any) => (typeof v === 'string' ? v : JSON.stringify(v));

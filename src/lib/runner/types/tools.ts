@@ -4,8 +4,10 @@
 //           github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
-import type { Completion } from "dedalus-labs/resources/chat/completions";
-import type { JsonValue } from "../../utils/json";
+import type { Completion } from '../../../resources/chat/completions';
+import type { JsonValue } from '../../utils/json';
+
+export type { JsonValue };
 
 /** Callable function that returns JSON-serializable data, synchronously or asynchronously. */
 export type Tool = (...args: any[]) => JsonValue | Promise<JsonValue>;
