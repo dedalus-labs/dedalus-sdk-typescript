@@ -10,3 +10,6 @@ dist-deno
 .eslintcache
 dist-bundle
 *.mcpb
+**/.claude/
+**/.agent/
+.mcp.json
