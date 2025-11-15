@@ -1,30 +1,23 @@
 // ==============================================================================
 //                  © 2025 Dedalus Labs, Inc. and affiliates
 //                            Licensed under MIT
-//           github.com/dedalus-labs/dedalus-sdk-python/LICENSE
+//           github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
-export type JsonPrimitive = string | number | boolean | null;
-export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
-export type JsonArray = JsonValue[];
+import type { Completion } from "dedalus-labs/resources/chat/completions";
+import type { JsonValue } from "../../utils/json";
 
-export interface JsonObject {
-  [key: string]: JsonValue;
-}
-
-/** Mirrors: Tool = Callable[..., JsonValue]  (allowing async in TS) */
+/** Callable function that returns JSON-serializable data, synchronously or asynchronously. */
 export type Tool = (...args: any[]) => JsonValue | Promise<JsonValue>;
 
-/** Mirrors: ToolCall = Dict[str, Union[str, Dict[str, str]]] */
-export type ToolCall = Record<string, string | Record<string, string>>;
+/** Tool call type from Dedalus SDK. */
+export type ToolCall = Completion.Choice.Message.ChatCompletionMessageToolCall;
 
-/** Mirrors: ToolResult = Dict[str, Union[str, int, JsonValue]] */
+/** Result of executing a tool during a conversation turn. */
 export type ToolResult = Record<string, string | number | JsonValue>;
 
-/** Protocol-style interface for tool handlers */
+/** Interface for objects that manage tool registration and execution. */
 export interface ToolHandler {
-  /** Return JSON Schemas (or equivalent) describing available tools */
   schemas(): Array<Record<string, any>>;
-  /** Execute a named tool with JSON-ish args */
   exec(name: string, args: Record<string, JsonValue>): Promise<JsonValue>;
 }

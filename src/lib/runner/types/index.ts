@@ -1,16 +1,8 @@
 // ==============================================================================
 //                  © 2025 Dedalus Labs, Inc. and affiliates
 //                            Licensed under MIT
-//           github.com/dedalus-labs/dedalus-sdk-python/LICENSE
+//           github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
-export { Message } from "./messages";
-export {
-  JsonValue,
-  JsonObject,
-  JsonArray,
-  Tool,
-  ToolCall,
-  ToolResult,
-  ToolHandler,
-} from "./tools";
+export type { Message } from "./messages";
+export type { Tool, ToolCall, ToolResult, ToolHandler } from "./tools";
