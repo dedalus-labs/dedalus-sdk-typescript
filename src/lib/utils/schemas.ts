@@ -1,7 +1,7 @@
 // ==============================================================================
 //                  © 2025 Dedalus Labs, Inc. and affiliates
 //                            Licensed under MIT
-//           github.com/dedalus-labs/dedalus-sdk-python/LICENSE
+//           github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
 /**

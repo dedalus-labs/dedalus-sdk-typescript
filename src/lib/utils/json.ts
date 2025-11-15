@@ -4,7 +4,10 @@
 //           github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
-export { jsonify } from "./format";
-export type { JsonValue, JsonObject, JsonArray, JsonPrimitive } from "./json";
-export { toSchema } from "./schemas";
-export { streamAsync, streamSync } from "./stream";
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
+export type JsonArray = JsonValue[];
+
+export interface JsonObject {
+  [key: string]: JsonValue;
+}
