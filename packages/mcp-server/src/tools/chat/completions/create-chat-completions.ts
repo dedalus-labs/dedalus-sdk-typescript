@@ -27,13 +27,20 @@ export const tool: Tool = {
           model: {
             anyOf: [
               {
-                $ref: '#/$defs/model_id',
+                type: 'string',
+                title: 'ModelId',
+                description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
               },
               {
                 $ref: '#/$defs/dedalus_model',
               },
               {
-                $ref: '#/$defs/models',
+                type: 'array',
+                title: 'Models',
+                description: 'List of models for multi-model routing.',
+                items: {
+                  $ref: '#/$defs/dedalus_model_choice',
+                },
               },
             ],
             title: 'Model',
@@ -298,7 +305,7 @@ export const tool: Tool = {
             ],
             title: 'Response Format',
             description:
-              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honour this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
+              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honor this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
           },
           safety_identifier: {
             type: 'string',
@@ -504,13 +511,20 @@ export const tool: Tool = {
           model: {
             anyOf: [
               {
-                $ref: '#/$defs/model_id',
+                type: 'string',
+                title: 'ModelId',
+                description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
               },
               {
                 $ref: '#/$defs/dedalus_model',
               },
               {
-                $ref: '#/$defs/models',
+                type: 'array',
+                title: 'Models',
+                description: 'List of models for multi-model routing.',
+                items: {
+                  $ref: '#/$defs/dedalus_model_choice',
+                },
               },
             ],
             title: 'Model',
@@ -782,7 +796,7 @@ export const tool: Tool = {
             ],
             title: 'Response Format',
             description:
-              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honour this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
+              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honor this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
           },
           safety_identifier: {
             type: 'string',
@@ -977,11 +991,6 @@ export const tool: Tool = {
       },
     ],
     $defs: {
-      model_id: {
-        type: 'string',
-        title: 'ModelId',
-        description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
-      },
       dedalus_model: {
         type: 'object',
         title: 'DedalusModel',
@@ -1312,18 +1321,12 @@ export const tool: Tool = {
         },
         required: ['model'],
       },
-      models: {
-        type: 'array',
-        title: 'Models',
-        description: 'List of models for multi-model routing.',
-        items: {
-          $ref: '#/$defs/dedalus_model_choice',
-        },
-      },
       dedalus_model_choice: {
         anyOf: [
           {
-            $ref: '#/$defs/model_id',
+            type: 'string',
+            title: 'ModelId',
+            description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
           },
           {
             $ref: '#/$defs/dedalus_model',

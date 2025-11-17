@@ -7,7 +7,7 @@ import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import Dedalus from 'dedalus-labs';
 
 export const metadata: Metadata = {
-  resource: 'root',
+  resource: '$client',
   operation: 'read',
   tags: [],
   httpMethod: 'get',
@@ -16,9 +16,9 @@ export const metadata: Metadata = {
 };
 
 export const tool: Tool = {
-  name: 'get_root',
+  name: 'get_client',
   description:
-    "When using this tool, always use the `jq_filter` parameter to reduce the response size and improve performance.\n\nOnly omit if you're sure you don't need the data.\n\nRoot\n\n# Response Schema\n```json\n{\n  $ref: '#/$defs/root_get_response',\n  $defs: {\n    root_get_response: {\n      type: 'object',\n      title: 'RootResponse',\n      description: 'Response model for the root endpoint of the Dedalus API.',\n      properties: {\n        message: {\n          type: 'string',\n          title: 'Message'\n        }\n      },\n      required: [        'message'\n      ]\n    }\n  }\n}\n```",
+    "When using this tool, always use the `jq_filter` parameter to reduce the response size and improve performance.\n\nOnly omit if you're sure you don't need the data.\n\nRoot\n\n# Response Schema\n```json\n{\n  $ref: '#/$defs/get_response',\n  $defs: {\n    get_response: {\n      type: 'object',\n      title: 'RootResponse',\n      description: 'Response model for the root endpoint of the Dedalus API.',\n      properties: {\n        message: {\n          type: 'string',\n          title: 'Message'\n        }\n      },\n      required: [        'message'\n      ]\n    }\n  }\n}\n```",
   inputSchema: {
     type: 'object',
     properties: {
@@ -39,7 +39,7 @@ export const tool: Tool = {
 export const handler = async (client: Dedalus, args: Record<string, unknown> | undefined) => {
   const { jq_filter } = args as any;
   try {
-    return asTextContentResult(await maybeFilter(jq_filter, await client.root.get()));
+    return asTextContentResult(await maybeFilter(jq_filter, await client.get()));
   } catch (error) {
     if (isJqError(error)) {
       return asErrorResult(error.message);

@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as CompletionsAPI from './chat/completions';
-
 /**
  * Structured model selection entry used in request payloads.
  *
@@ -175,7 +173,7 @@ export namespace DedalusModel {
 /**
  * Dedalus model choice - either a string ID or DedalusModel configuration object.
  */
-export type DedalusModelChoice = CompletionsAPI.ModelID | DedalusModel;
+export type DedalusModelChoice = string | DedalusModel;
 
 /**
  * JSON object response format. An older method of generating JSON responses.
