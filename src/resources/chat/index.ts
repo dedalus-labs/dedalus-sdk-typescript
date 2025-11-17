@@ -6,8 +6,6 @@ export {
   type ChatCompletionTokenLogprob,
   type Completion,
   type CompletionRequest,
-  type ModelID,
-  type Models,
   type StreamChunk,
   type TopLogprob,
   type CompletionCreateParams,

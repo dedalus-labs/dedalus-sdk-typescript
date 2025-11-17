@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as CompletionsAPI from './chat/completions';
-
 /**
  * Structured model selection entry used in request payloads.
  *
@@ -83,12 +81,14 @@ export namespace DedalusModel {
     response_format?: { [key: string]: unknown } | null;
 
     response_include?: Array<
-      | 'code_interpreter_call.outputs'
-      | 'computer_call_output.output.image_url'
       | 'file_search_call.results'
+      | 'web_search_call.results'
+      | 'web_search_call.action.sources'
       | 'message.input_image.image_url'
-      | 'message.output_text.logprobs'
+      | 'computer_call_output.output.image_url'
+      | 'code_interpreter_call.outputs'
       | 'reasoning.encrypted_content'
+      | 'message.output_text.logprobs'
     > | null;
 
     safety_identifier?: string | null;
@@ -173,4 +173,93 @@ export namespace DedalusModel {
 /**
  * Dedalus model choice - either a string ID or DedalusModel configuration object.
  */
-export type DedalusModelChoice = CompletionsAPI.ModelID | DedalusModel;
+export type DedalusModelChoice = string | DedalusModel;
+
+/**
+ * JSON object response format. An older method of generating JSON responses.
+ *
+ * Using `json_schema` is recommended for models that support it. Note that the
+ * model will not generate JSON without a system or user message instructing it to
+ * do so.
+ *
+ * Fields:
+ *
+ * - type (required): Literal['json_object']
+ */
+export interface ResponseFormatJSONObject {
+  /**
+   * The type of response format being defined. Always `json_object`.
+   */
+  type: 'json_object';
+}
+
+/**
+ * JSON Schema response format. Used to generate structured JSON responses.
+ *
+ * Learn more about
+ * [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
+ *
+ * Fields:
+ *
+ * - type (required): Literal['json_schema']
+ * - json_schema (required): JSONSchema
+ */
+export interface ResponseFormatJSONSchema {
+  /**
+   * Structured Outputs configuration options, including a JSON Schema.
+   */
+  json_schema: ResponseFormatJSONSchema.JSONSchema;
+
+  /**
+   * The type of response format being defined. Always `json_schema`.
+   */
+  type: 'json_schema';
+}
+
+export namespace ResponseFormatJSONSchema {
+  /**
+   * Structured Outputs configuration options, including a JSON Schema.
+   */
+  export interface JSONSchema {
+    /**
+     * The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores
+     * and dashes, with a maximum length of 64.
+     */
+    name: string;
+
+    /**
+     * A description of what the response format is for, used by the model to determine
+     * how to respond in the format.
+     */
+    description?: string;
+
+    /**
+     * The schema for the response format, described as a JSON Schema object. Learn how
+     * to build JSON schemas [here](https://json-schema.org/).
+     */
+    schema?: { [key: string]: unknown };
+
+    /**
+     * Whether to enable strict schema adherence when generating the output. If set to
+     * true, the model will always follow the exact schema defined in the `schema`
+     * field. Only a subset of JSON Schema is supported when `strict` is `true`. To
+     * learn more, read the
+     * [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs).
+     */
+    strict?: boolean | null;
+  }
+}
+
+/**
+ * Default response format. Used to generate text responses.
+ *
+ * Fields:
+ *
+ * - type (required): Literal['text']
+ */
+export interface ResponseFormatText {
+  /**
+   * The type of response format being defined. Always `text`.
+   */
+  type: 'text';
+}

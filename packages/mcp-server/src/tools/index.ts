@@ -4,7 +4,7 @@ import { Metadata, Endpoint, HandlerFunction } from './types';
 
 export { Metadata, Endpoint, HandlerFunction };
 
-import get_root from './root/get-root';
+import get_client from './top-level/get-client';
 import check_health from './health/check-health';
 import retrieve_models from './models/retrieve-models';
 import list_models from './models/list-models';
@@ -23,7 +23,7 @@ function addEndpoint(endpoint: Endpoint) {
   endpoints.push(endpoint);
 }
 
-addEndpoint(get_root);
+addEndpoint(get_client);
 addEndpoint(check_health);
 addEndpoint(retrieve_models);
 addEndpoint(list_models);

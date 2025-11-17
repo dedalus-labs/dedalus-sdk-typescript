@@ -11,7 +11,9 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
       case 'Bearer':
         return { apiKey: req.headers.authorization.slice('Bearer '.length) };
       default:
-        throw new Error(`Unsupported authorization scheme`);
+        throw new Error(
+          'Unsupported authorization scheme. Expected the "Authorization" header to be a supported scheme (Bearer).',
+        );
     }
   }
 
@@ -19,5 +21,7 @@ export const parseAuthHeaders = (req: IncomingMessage): Partial<ClientOptions> =
     Array.isArray(req.headers['x-dedalus-api-key']) ?
       req.headers['x-dedalus-api-key'][0]
     : req.headers['x-dedalus-api-key'];
-  return { apiKey };
+  const xAPIKey =
+    Array.isArray(req.headers['x-api-key']) ? req.headers['x-api-key'][0] : req.headers['x-api-key'];
+  return { apiKey, xAPIKey };
 };

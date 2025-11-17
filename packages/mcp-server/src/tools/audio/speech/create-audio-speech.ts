@@ -85,7 +85,7 @@ export const tool: Tool = {
 
 export const handler = async (client: Dedalus, args: Record<string, unknown> | undefined) => {
   const body = args as any;
-  return asBinaryContentResult(await client.audio.speech.create(body));
+  return asBinaryContentResult(await client.audio.speech.create(body).asResponse());
 };
 
 export default { metadata, tool, handler };

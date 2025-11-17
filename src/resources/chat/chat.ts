@@ -10,8 +10,6 @@ import {
   CompletionCreateParamsStreaming,
   CompletionRequest,
   Completions,
-  ModelID,
-  Models,
   StreamChunk,
   TopLogprob,
 } from './completions';
@@ -28,8 +26,6 @@ export declare namespace Chat {
     type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
-    type ModelID as ModelID,
-    type Models as Models,
     type StreamChunk as StreamChunk,
     type TopLogprob as TopLogprob,
     type CompletionCreateParams as CompletionCreateParams,

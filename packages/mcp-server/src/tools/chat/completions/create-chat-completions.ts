@@ -24,33 +24,23 @@ export const tool: Tool = {
       {
         type: 'object',
         properties: {
-          messages: {
-            anyOf: [
-              {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: true,
-                },
-              },
-              {
-                type: 'string',
-              },
-            ],
-            title: 'Messages',
-            description:
-              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message.',
-          },
           model: {
             anyOf: [
               {
-                $ref: '#/$defs/model_id',
+                type: 'string',
+                title: 'ModelId',
+                description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
               },
               {
                 $ref: '#/$defs/dedalus_model',
               },
               {
-                $ref: '#/$defs/models',
+                type: 'array',
+                title: 'Models',
+                description: 'List of models for multi-model routing.',
+                items: {
+                  $ref: '#/$defs/dedalus_model_choice',
+                },
               },
             ],
             title: 'Model',
@@ -224,6 +214,23 @@ export const tool: Tool = {
             description:
               "MCP (Model Context Protocol) server addresses to make available for server-side tool execution. Entries can be URLs (e.g., 'https://mcp.example.com'), slugs (e.g., 'dedalus-labs/brave-search'), or structured objects specifying slug/version/url. MCP tools are executed server-side and billed separately.",
           },
+          messages: {
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              {
+                type: 'string',
+              },
+            ],
+            title: 'Messages',
+            description:
+              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message. Optional if `input` or `instructions` is provided.',
+          },
           metadata: {
             type: 'object',
             title: 'Metadata',
@@ -285,11 +292,20 @@ export const tool: Tool = {
             enum: ['low', 'medium', 'high'],
           },
           response_format: {
-            type: 'object',
+            anyOf: [
+              {
+                $ref: '#/$defs/response_format_text',
+              },
+              {
+                $ref: '#/$defs/response_format_json_object',
+              },
+              {
+                $ref: '#/$defs/response_format_json_schema',
+              },
+            ],
             title: 'Response Format',
             description:
-              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honour this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
-            additionalProperties: true,
+              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honor this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
           },
           safety_identifier: {
             type: 'string',
@@ -487,38 +503,28 @@ export const tool: Tool = {
             additionalProperties: true,
           },
         },
-        required: ['messages', 'model'],
+        required: ['model'],
       },
       {
         type: 'object',
         properties: {
-          messages: {
-            anyOf: [
-              {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: true,
-                },
-              },
-              {
-                type: 'string',
-              },
-            ],
-            title: 'Messages',
-            description:
-              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message.',
-          },
           model: {
             anyOf: [
               {
-                $ref: '#/$defs/model_id',
+                type: 'string',
+                title: 'ModelId',
+                description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
               },
               {
                 $ref: '#/$defs/dedalus_model',
               },
               {
-                $ref: '#/$defs/models',
+                type: 'array',
+                title: 'Models',
+                description: 'List of models for multi-model routing.',
+                items: {
+                  $ref: '#/$defs/dedalus_model_choice',
+                },
               },
             ],
             title: 'Model',
@@ -699,6 +705,23 @@ export const tool: Tool = {
             description:
               "MCP (Model Context Protocol) server addresses to make available for server-side tool execution. Entries can be URLs (e.g., 'https://mcp.example.com'), slugs (e.g., 'dedalus-labs/brave-search'), or structured objects specifying slug/version/url. MCP tools are executed server-side and billed separately.",
           },
+          messages: {
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: true,
+                },
+              },
+              {
+                type: 'string',
+              },
+            ],
+            title: 'Messages',
+            description:
+              'Conversation history. Accepts either a list of message objects or a string, which is treated as a single user message. Optional if `input` or `instructions` is provided.',
+          },
           metadata: {
             type: 'object',
             title: 'Metadata',
@@ -760,11 +783,20 @@ export const tool: Tool = {
             enum: ['low', 'medium', 'high'],
           },
           response_format: {
-            type: 'object',
+            anyOf: [
+              {
+                $ref: '#/$defs/response_format_text',
+              },
+              {
+                $ref: '#/$defs/response_format_json_object',
+              },
+              {
+                $ref: '#/$defs/response_format_json_schema',
+              },
+            ],
             title: 'Response Format',
             description:
-              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honour this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
-            additionalProperties: true,
+              "An object specifying the format that the model must output. Use {'type': 'json_schema', 'json_schema': {...}} for structured outputs or {'type': 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models honor this field; Anthropic and Google requests will return an invalid_request_error if it is supplied.",
           },
           safety_identifier: {
             type: 'string',
@@ -955,15 +987,10 @@ export const tool: Tool = {
             additionalProperties: true,
           },
         },
-        required: ['messages', 'model', 'stream'],
+        required: ['model', 'stream'],
       },
     ],
     $defs: {
-      model_id: {
-        type: 'string',
-        title: 'ModelId',
-        description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
-      },
       dedalus_model: {
         type: 'object',
         title: 'DedalusModel',
@@ -1125,12 +1152,14 @@ export const tool: Tool = {
                 items: {
                   type: 'string',
                   enum: [
-                    'code_interpreter_call.outputs',
-                    'computer_call_output.output.image_url',
                     'file_search_call.results',
+                    'web_search_call.results',
+                    'web_search_call.action.sources',
                     'message.input_image.image_url',
-                    'message.output_text.logprobs',
+                    'computer_call_output.output.image_url',
+                    'code_interpreter_call.outputs',
                     'reasoning.encrypted_content',
+                    'message.output_text.logprobs',
                   ],
                 },
               },
@@ -1292,18 +1321,12 @@ export const tool: Tool = {
         },
         required: ['model'],
       },
-      models: {
-        type: 'array',
-        title: 'Models',
-        description: 'List of models for multi-model routing.',
-        items: {
-          $ref: '#/$defs/dedalus_model_choice',
-        },
-      },
       dedalus_model_choice: {
         anyOf: [
           {
-            $ref: '#/$defs/model_id',
+            type: 'string',
+            title: 'ModelId',
+            description: "Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').",
           },
           {
             $ref: '#/$defs/dedalus_model',
@@ -1311,6 +1334,84 @@ export const tool: Tool = {
         ],
         title: 'DedalusModelChoice',
         description: 'Dedalus model choice - either a string ID or DedalusModel configuration object.',
+      },
+      response_format_text: {
+        type: 'object',
+        title: 'ResponseFormatText',
+        description:
+          "Default response format. Used to generate text responses.\n\nFields:\n  - type (required): Literal['text']",
+        properties: {
+          type: {
+            type: 'string',
+            title: 'Type',
+            description: 'The type of response format being defined. Always `text`.',
+            enum: ['text'],
+          },
+        },
+        required: ['type'],
+      },
+      response_format_json_object: {
+        type: 'object',
+        title: 'ResponseFormatJsonObject',
+        description:
+          "JSON object response format. An older method of generating JSON responses.\n\nUsing `json_schema` is recommended for models that support it. Note that the\nmodel will not generate JSON without a system or user message instructing it\nto do so.\n\nFields:\n  - type (required): Literal['json_object']",
+        properties: {
+          type: {
+            type: 'string',
+            title: 'Type',
+            description: 'The type of response format being defined. Always `json_object`.',
+            enum: ['json_object'],
+          },
+        },
+        required: ['type'],
+      },
+      response_format_json_schema: {
+        type: 'object',
+        title: 'ResponseFormatJsonSchema',
+        description:
+          "JSON Schema response format. Used to generate structured JSON responses.\n\nLearn more about [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).\n\nFields:\n  - type (required): Literal['json_schema']\n  - json_schema (required): JSONSchema",
+        properties: {
+          json_schema: {
+            type: 'object',
+            title: 'JSONSchema',
+            description: 'Structured Outputs configuration options, including a JSON Schema.',
+            properties: {
+              name: {
+                type: 'string',
+                title: 'Name',
+                description:
+                  'The name of the response format. Must be a-z, A-Z, 0-9, or contain\nunderscores and dashes, with a maximum length of 64.',
+              },
+              description: {
+                type: 'string',
+                title: 'Description',
+                description:
+                  'A description of what the response format is for, used by the model to\ndetermine how to respond in the format.',
+              },
+              schema: {
+                type: 'object',
+                title: 'ResponseFormatJsonSchemaSchema',
+                description:
+                  'The schema for the response format, described as a JSON Schema object.\nLearn how to build JSON schemas [here](https://json-schema.org/).',
+                additionalProperties: true,
+              },
+              strict: {
+                type: 'boolean',
+                title: 'Strict',
+                description:
+                  'Whether to enable strict schema adherence when generating the output.\nIf set to true, the model will always follow the exact schema defined\nin the `schema` field. Only a subset of JSON Schema is supported when\n`strict` is `true`. To learn more, read the [Structured Outputs\nguide](https://platform.openai.com/docs/guides/structured-outputs).',
+              },
+            },
+            required: ['name'],
+          },
+          type: {
+            type: 'string',
+            title: 'Type',
+            description: 'The type of response format being defined. Always `json_schema`.',
+            enum: ['json_schema'],
+          },
+        },
+        required: ['json_schema', 'type'],
       },
     },
   },
