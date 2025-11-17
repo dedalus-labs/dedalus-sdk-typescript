@@ -21,7 +21,11 @@
       "args": ["${__dirname}/index.js"],
       "env": {
         "DEDALUS_API_KEY": "${user_config.DEDALUS_API_KEY}",
-        "DEDALUS_ORG_ID": "${user_config.DEDALUS_ORG_ID}"
+        "DEDALUS_X_API_KEY": "${user_config.DEDALUS_X_API_KEY}",
+        "DEDALUS_ORG_ID": "${user_config.DEDALUS_ORG_ID}",
+        "DEDALUS_PROVIDER": "${user_config.DEDALUS_PROVIDER}",
+        "DEDALUS_PROVIDER_KEY": "${user_config.DEDALUS_PROVIDER_KEY}",
+        "DEDALUS_PROVIDER_MODEL": "${user_config.DEDALUS_PROVIDER_MODEL}"
       }
     }
   },
@@ -32,9 +36,33 @@
       "required": false,
       "type": "string"
     },
+    "DEDALUS_X_API_KEY": {
+      "title": "x_api_key",
+      "description": "API key for X-API-Key header authentication.",
+      "required": false,
+      "type": "string"
+    },
     "DEDALUS_ORG_ID": {
       "title": "organization",
-      "description": "Dedalus Organization ID for scoping API requests.",
+      "description": "Organization ID for request scoping.",
+      "required": false,
+      "type": "string"
+    },
+    "DEDALUS_PROVIDER": {
+      "title": "provider",
+      "description": "Provider name for BYOK mode.",
+      "required": false,
+      "type": "string"
+    },
+    "DEDALUS_PROVIDER_KEY": {
+      "title": "provider_key",
+      "description": "Provider API key for BYOK mode.",
+      "required": false,
+      "type": "string"
+    },
+    "DEDALUS_PROVIDER_MODEL": {
+      "title": "provider_model",
+      "description": "Model identifier for BYOK provider.",
       "required": false,
       "type": "string"
     }

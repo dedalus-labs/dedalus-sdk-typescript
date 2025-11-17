@@ -7,10 +7,10 @@ const client = new Dedalus({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource root', () => {
+describe('top level methods', () => {
   // Prism tests are disabled
   test.skip('get', async () => {
-    const responsePromise = client.root.get();
+    const responsePromise = client.get();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;

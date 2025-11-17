@@ -598,7 +598,7 @@ export interface CompletionRequest {
    * 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
    * choose optimal model based on task complexity.
    */
-  model: ModelID | Shared.DedalusModel | Models;
+  model: string | Shared.DedalusModel | Array<Shared.DedalusModelChoice>;
 
   /**
    * Attributes for the agent itself, influencing behavior and model selection.
@@ -793,7 +793,7 @@ export interface CompletionRequest {
    * An object specifying the format that the model must output. Use {'type':
    * 'json_schema', 'json_schema': {...}} for structured outputs or {'type':
    * 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models
-   * honour this field; Anthropic and Google requests will return an
+   * honor this field; Anthropic and Google requests will return an
    * invalid_request_error if it is supplied.
    */
   response_format?:
@@ -968,16 +968,6 @@ export namespace CompletionRequest {
     type: 'enabled';
   }
 }
-
-/**
- * Model identifier string (e.g., 'openai/gpt-5', 'anthropic/claude-3-5-sonnet').
- */
-export type ModelID = string;
-
-/**
- * List of models for multi-model routing.
- */
-export type Models = Array<Shared.DedalusModelChoice>;
 
 /**
  * Server-Sent Event streaming format for chat completions
@@ -1248,7 +1238,7 @@ export interface CompletionCreateParamsBase {
    * 'anthropic/claude-3-5-sonnet'] or list of DedalusModel objects - agent will
    * choose optimal model based on task complexity.
    */
-  model: ModelID | Shared.DedalusModel | Models;
+  model: string | Shared.DedalusModel | Array<Shared.DedalusModelChoice>;
 
   /**
    * Attributes for the agent itself, influencing behavior and model selection.
@@ -1443,7 +1433,7 @@ export interface CompletionCreateParamsBase {
    * An object specifying the format that the model must output. Use {'type':
    * 'json_schema', 'json_schema': {...}} for structured outputs or {'type':
    * 'json_object'} for the legacy JSON mode. Currently only OpenAI-prefixed models
-   * honour this field; Anthropic and Google requests will return an
+   * honor this field; Anthropic and Google requests will return an
    * invalid_request_error if it is supplied.
    */
   response_format?:
@@ -1646,8 +1636,6 @@ export declare namespace Completions {
     type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
     type Completion as Completion,
     type CompletionRequest as CompletionRequest,
-    type ModelID as ModelID,
-    type Models as Models,
     type StreamChunk as StreamChunk,
     type TopLogprob as TopLogprob,
     type CompletionCreateParams as CompletionCreateParams,

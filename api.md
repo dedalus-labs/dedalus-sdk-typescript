@@ -1,3 +1,13 @@
+# Dedalus
+
+Types:
+
+- <code><a href="./src/resources/top-level.ts">GetResponse</a></code>
+
+Methods:
+
+- <code title="get /">client.<a href="./src/index.ts">get</a>() -> GetResponse</code>
+
 # Shared
 
 Types:
@@ -7,16 +17,6 @@ Types:
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONObject</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONSchema</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatText</a></code>
-
-# Root
-
-Types:
-
-- <code><a href="./src/resources/root.ts">RootGetResponse</a></code>
-
-Methods:
-
-- <code title="get /">client.root.<a href="./src/resources/root.ts">get</a>() -> RootGetResponse</code>
 
 # \_Private
 
@@ -104,8 +104,6 @@ Types:
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionTokenLogprob</a></code>
 - <code><a href="./src/resources/chat/completions.ts">Completion</a></code>
 - <code><a href="./src/resources/chat/completions.ts">CompletionRequest</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ModelID</a></code>
-- <code><a href="./src/resources/chat/completions.ts">Models</a></code>
 - <code><a href="./src/resources/chat/completions.ts">StreamChunk</a></code>
 - <code><a href="./src/resources/chat/completions.ts">TopLogprob</a></code>
 
