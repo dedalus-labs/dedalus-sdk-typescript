@@ -372,6 +372,8 @@ export class DedalusRunner {
       const collectedContent: string[] = [];
 
       for await (const chunk of stream as any) {
+        yield chunk;
+
         if (chunk.choices) {
           const choice = chunk.choices[0];
           const delta = choice?.delta;
@@ -381,7 +383,6 @@ export class DedalusRunner {
             }
             if (delta.content) {
               collectedContent.push(delta.content);
-              yield { type: 'content_delta', delta: delta.content };
             }
           }
         }
