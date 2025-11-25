@@ -20,5 +20,5 @@ export {
   type ImageGenerateParams,
 } from './images';
 export { Models, type ListModelsResponse, type Model } from './models';
-export { Root, type RootGetResponse } from './root';
 export { _Private } from './-private';
+export { type GetResponse } from './top-level';

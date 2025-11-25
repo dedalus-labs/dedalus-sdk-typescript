@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as CompletionsAPI from './chat/completions';
-
 /**
  * Structured model selection entry used in request payloads.
  *
@@ -83,12 +81,14 @@ export namespace DedalusModel {
     response_format?: { [key: string]: unknown } | null;
 
     response_include?: Array<
-      | 'code_interpreter_call.outputs'
-      | 'computer_call_output.output.image_url'
       | 'file_search_call.results'
+      | 'web_search_call.results'
+      | 'web_search_call.action.sources'
       | 'message.input_image.image_url'
-      | 'message.output_text.logprobs'
+      | 'computer_call_output.output.image_url'
+      | 'code_interpreter_call.outputs'
       | 'reasoning.encrypted_content'
+      | 'message.output_text.logprobs'
     > | null;
 
     safety_identifier?: string | null;
@@ -173,4 +173,53 @@ export namespace DedalusModel {
 /**
  * Dedalus model choice - either a string ID or DedalusModel configuration object.
  */
-export type DedalusModelChoice = CompletionsAPI.ModelID | DedalusModel;
+export type DedalusModelChoice = string | DedalusModel;
+
+/**
+ * JSON object response format. An older method of generating JSON responses. Using
+ * `json_schema` is recommended for models that support it. Note that the model
+ * will not generate JSON without a system or user message instructing it to do so.
+ */
+export interface ResponseFormatJSONObject {
+  type?: 'json_object';
+}
+
+/**
+ * JSON Schema response format. Used to generate structured JSON responses. Learn
+ * more about
+ * [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
+ */
+export interface ResponseFormatJSONSchema {
+  /**
+   * Structured Outputs configuration options, including a JSON Schema.
+   */
+  json_schema: ResponseFormatJSONSchema.JSONSchema;
+
+  type?: 'json_schema';
+}
+
+export namespace ResponseFormatJSONSchema {
+  /**
+   * Structured Outputs configuration options, including a JSON Schema.
+   */
+  export interface JSONSchema {
+    name: string;
+
+    description?: string | null;
+
+    /**
+     * The schema for the response format, described as a JSON Schema object. Learn how
+     * to build JSON schemas [here](https://json-schema.org/).
+     */
+    schema?: { [key: string]: unknown } | null;
+
+    strict?: { [key: string]: unknown } | null;
+  }
+}
+
+/**
+ * Default response format. Used to generate text responses.
+ */
+export interface ResponseFormatText {
+  type?: 'text';
+}

@@ -28,8 +28,8 @@ const client = new Dedalus({
 });
 
 const completion = await client.chat.completions.create({
+  model: 'openai/gpt-5-nano',
   messages: [{ role: 'user', content: 'Hello, how are you today?' }],
-  model: 'openai/gpt-5',
 });
 
 console.log(completion.id);
@@ -45,12 +45,12 @@ import Dedalus from 'dedalus-labs';
 const client = new Dedalus();
 
 const stream = await client.chat.completions.create({
+  model: 'openai/gpt-5-nano',
+  stream: true,
   messages: [
     { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
     { role: 'user', content: 'What do you think of artificial intelligence?' },
   ],
-  model: 'openai/gpt-5',
-  stream: true,
 });
 for await (const streamChunk of stream) {
   console.log(streamChunk.id);

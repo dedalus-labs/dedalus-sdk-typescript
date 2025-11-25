@@ -1,12 +1,44 @@
 # Changelog
 
-## 0.1.0-alpha.5 (2025-11-08)
+## 0.1.0-alpha.6 (2025-11-25)
+
+Full Changelog: [v0.1.0-alpha.5...v0.1.0-alpha.6](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.5...v0.1.0-alpha.6)
+
+### Features
+
+* **api:** config update for dedalus-ai/dev ([0df93e2](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/0df93e22387cdec588897e8efb646c34abf5065b))
+* **api:** messages param nullable ([254f9ef](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/254f9ef5397df901ddc8ac2b21e9ee3431f0c132))
+* **api:** response format ([765345e](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/765345eb89f6ca4528cf9a9554f1356afba7bec4))
+* **api:** schema compiler landed ([58cea7d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/58cea7d1d5b6c26ca8ef9601461a3cf2d86cc79a))
+* **api:** standardize name casing with stainless initialism ([a295370](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/a2953702f8c371cb7d8eaf60b92167c8a8926d97))
+* **runner:** add type defns ([d87bda2](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/d87bda271da4ace957a1b2cd34d58ffa62bcd8ec))
+* **utils:** new util funcs ([51b9d14](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/51b9d14de98848a6ebe9470520bcf3d6f7f3061d))
+
+
+### Bug Fixes
+
+* **mcp:** return tool execution error on jq failure ([734dc43](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/734dc432f4ca1bd445c9fb7c9283f5c7b09cc01b))
+* **mcp:** use raw responses for binary content ([caebbe8](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/caebbe8310be50666c96f45521e3b86f3fc145c8))
+
+
+### Chores
+
+* **api:** gitignore coding agents ([7c58e25](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/7c58e25eb03bc7f03b1a9ad2dcf74e3d67881098))
+* **internal:** configure MCP Server hosting ([f93d33c](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/f93d33cfafd2c21892906235d0e5f90a941df9cf))
+* **mcp:** clarify http auth error ([10bc93d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/10bc93d8396bf29303226f2ad2b3b98b0d234b5a))
+* **mcp:** upgrade jq-web ([83b2b3a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/83b2b3a58ae2e8d819bfbbe8b718e80cbf27ad19))
+
+
+### Refactors
+
+* **runner:** standardize dir layout ([c7cf1d5](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/c7cf1d50d2aa3ddcf717748b4c6f1990af098aa9))
+
+## 0.1.0-alpha.5 (2025-10-10)
 
 Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.4...v0.1.0-alpha.5)
 
 ### Features
 
-* **api:** add endpoints ([f76b925](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/f76b9258e7e232eee002ab387f54b69ae71040fd))
 * **api:** add endpoints ([48fe852](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/48fe85202cdbc3697daa0e7c14b8b4c523202736))
 * **api:** adjust parameters ([8a91533](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/8a91533602d6aa391a1ef506992ae00215a82f6d))
 * **api:** api update ([a6576c3](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/a6576c3169abb6a5b42ee130f69818a1004e2675))
@@ -27,7 +59,6 @@ Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-lab
 * **api:** decouple Model and DedalusModel ([5a1ddd1](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/5a1ddd1f87670b0beec85f9010f27376f5d0c01a))
 * **api:** dedalus model update ([99bd4df](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/99bd4dfb02aa2004d59e387b7e391706ded9cbb9))
 * **api:** id-&gt;name in DedalusModel ([c05611a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/c05611a838aa7c4f0d363da20ca725e25d56cca5))
-* **api:** image support ([9e0db2d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/9e0db2d03fcbe0b03bb5975dd1f34fdb17e6d405))
 * **api:** logic adj ([868d32b](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/868d32b51aee4ed66be548366aab65d2c97901c6))
 * **api:** manual updates ([758631f](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/758631f62a13459d24e76401f70f6fba385a78e1))
 * **api:** manual updates ([fc8a369](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/fc8a3695ff4a5fdb8c0e9c569c2c10e8dffed041))
@@ -43,7 +74,6 @@ Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-lab
 * **mcp:** add option to infer mcp client ([2ee9508](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/2ee95089fdcc9605d0b9aae00ec66aa94bcb9c63))
 * **mcp:** allow setting logging level ([ed246b9](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/ed246b9b3d3008a3e0952ed922fa4ec97f9591c9))
 * **mcp:** enable experimental docs search tool ([27a07ae](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/27a07aea9ebcb46ab5b504b8e660ef4dc1028199))
-* **mcp:** enable optional code execution tool on http mcp servers ([6f186fa](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/6f186fa13482c0482c0654161f35d348571981e7))
 * **mcp:** expose client options in `streamableHTTPApp` ([a033b07](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/a033b07452ca178eca485e4f47639603f6fbc07e))
 * **mcp:** parse query string as mcp client options in mcp server ([ed28a00](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/ed28a000ee0f10b6a104decbdb45b68c16a1594b))
 * **model:** add DedalusModel ([e0391a0](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/e0391a04b6ae0fb590d64cb4cf871ac84163253c))
@@ -51,11 +81,9 @@ Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-lab
 
 ### Bug Fixes
 
-* **api:** add shared DedalusModel type ([8f5e610](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/8f5e610e62af700cdfc2f3055fe5cadb2f6f9eed))
 * **ci:** set permissions for DXT publish action ([ea94670](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/ea94670575f5ea2298f307f63b3dd76d0237e33f))
 * coerce nullable values to undefined ([3d400a7](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/3d400a7dd40b057624cd1ffc7d2de5aab4a0476c))
 * **mcp:** avoid importing unsupported libraries on non-node environments ([e21c04e](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/e21c04e1441788cb346eaa61cd0b8c030eaea534))
-* **mcpb:** pin @anthropic-ai/mcpb version ([779f76d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/779f76d17c1566ad68fb6fcb4227e72da35fafe6))
 * **mcp:** fix cli argument parsing logic ([d116c44](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/d116c44132e8ea3f25ea9bcd593c509d9d66bf0f))
 * **mcp:** fix query options parsing ([6ec3b6f](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/6ec3b6fab4548ebbcc0f027b202fe0a8e14b5438))
 * **mcp:** fix uploading dxt release assets ([c51827d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/c51827dda5a8a0791da987b41033a76e7a16dc2c))
@@ -77,8 +105,6 @@ Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-lab
 * **deps:** update dependency @types/node to v20.17.58 ([4f267c5](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/4f267c51a9019e729691f590272429d0aeb4fe7a))
 * do not install brew dependencies in ./scripts/bootstrap by default ([faf80c4](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/faf80c4b83e320d3b0c3bdb0ea3e8cc73fc2d018))
 * extract some types in mcp docs ([afd8a03](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/afd8a03407f6402973382390fdc2302ffc41993c))
-* **internal:** codegen related update ([663de79](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/663de790cb73b9fc0d4d56baf1d20017bff3f4aa))
-* **internal:** codegen related update ([425c937](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/425c937a0b1f84b17047ace8492e0283e36b333c))
 * **internal:** codegen related update ([47b5877](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/47b58778296443789b45f1bec87f87d652548d29))
 * **internal:** codegen related update ([6244dd7](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/6244dd7c27a1207dc746431b59d4a5b998f2c621))
 * **internal:** codegen related update ([9d7074a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/9d7074aed3203385a3dd871df6dec7245ceb1d9d))
@@ -87,7 +113,6 @@ Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-lab
 * **internal:** fix incremental formatting in some cases ([7a91709](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/7a917093e5c22cf3d357d8c52fdda1a7e3bbbb6b))
 * **internal:** formatting change ([96094f4](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/96094f48b5ea80257499e8553cc2395e9eaeadd6))
 * **internal:** gitignore .mcpb files ([56749a1](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/56749a1b4530e45625b3bf59f4cd6bc1b8c3567a))
-* **internal:** grammar fix (it's -&gt; its) ([d2ee048](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/d2ee04877ba338604528c5f453f3c3a7d7275901))
 * **internal:** ignore .eslintcache ([b762b7f](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/b762b7fcf8dad60c348aca0e3fd550feff0b2077))
 * **internal:** make mcp-server publishing public by defaut ([c7401ae](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/c7401ae3d6b920dd36099652ce9a8bfa2d28f26d))
 * **internal:** refactor array check ([168b3ab](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/168b3ab37ba60c748b46477939453e1925db1701))
@@ -97,10 +122,7 @@ Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-lab
 * **internal:** update global Error reference ([33ba316](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/33ba316073761720832452b4b5e4c95df56fe623))
 * **internal:** use npm pack for build uploads ([6e1f05a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/6e1f05a076ada16fa6dda26f0b835a9d3051b412))
 * **jsdoc:** fix [@link](https://github.com/link) annotations to refer only to parts of the package‘s public interface ([77e618c](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/77e618c90bfc216fedcf3c53574d88c1a920ae05))
-* mcp code tool explicit error message when missing a run function ([455da8a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/455da8a144aba6c4e8adc00fe402ea4508620da7))
 * **mcp:** add cors to oauth metadata route ([220072a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/220072af73f4b4f3881303e8eada3840bf1b33e3))
-* **mcp:** add friendlier MCP code tool errors on incorrect method invocations ([35d66ed](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/35d66edae245d7e079aeaf526ac2bc5e2c0472c0))
-* **mcp:** add line numbers to code tool errors ([0264767](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/0264767edaa51a92f9a1895cb2bc75ab0bd08592))
 * **mcp:** allow pointing `docs_search` tool at other URLs ([efd6160](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/efd61600aa9826cc6d26ac833fa522a8463bc811))
 * **mcp:** document remote server in README.md ([fa265eb](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/fa265eb2c7baa1c2c23a9b7054a103b01f47a47e))
 * **mcp:** minor cleanup of types and package.json ([1222f8e](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/1222f8e115ceb3ac6ebd0aa1dc2cd2b4b8049dff))
@@ -112,13 +134,6 @@ Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-lab
 * update @stainless-api/prism-cli to v5.15.0 ([7a9d8ce](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/7a9d8ce11bc8c56894c8bcef1f5d313619d5325e))
 * update CI script ([532493a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/532493a9bc252db84e0fc5c094ce22ec53a2e54d))
 * update lockfile ([7fc67b2](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/7fc67b26263d8cea1c61c8c5dc1602eb47f083c7))
-* use structured error when code execution tool errors ([e6cd3bc](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/e6cd3bc99883bdbd818bedc50425cd373f2bbdb0))
-
-
-### Documentation
-
-* **mcp:** add a README button for one-click add to Cursor ([6d89547](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/6d89547d55126b704aab8b76d39cd3d44d061255))
-* **mcp:** add a README link to add server to VS Code or Claude Code ([d71586b](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/d71586b5ca5957dadffcd169b6d0f2c8f9268ad1))
 
 ## 0.1.0-alpha.4 (2025-08-07)
 

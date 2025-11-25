@@ -15,6 +15,8 @@ import { VERSION } from './version';
 import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
+import * as TopLevelAPI from './resources/top-level';
+import { GetResponse } from './resources/top-level';
 import { APIPromise } from './core/api-promise';
 import { _Private } from './resources/-private';
 import {
@@ -34,7 +36,6 @@ import {
   ImagesResponse,
 } from './resources/images';
 import { ListModelsResponse, Model, Models } from './resources/models';
-import { Root, RootGetResponse } from './resources/root';
 import { Audio } from './resources/audio/audio';
 import { Chat } from './resources/chat/chat';
 import { type Fetch } from './internal/builtin-types';
@@ -63,9 +64,29 @@ export interface ClientOptions {
   apiKey?: string | null | undefined;
 
   /**
-   * Dedalus Organization ID for scoping API requests.
+   * API key for X-API-Key header authentication.
+   */
+  xAPIKey?: string | null | undefined;
+
+  /**
+   * Organization ID for request scoping.
    */
   organization?: string | null | undefined;
+
+  /**
+   * Provider name for BYOK mode.
+   */
+  provider?: string | null | undefined;
+
+  /**
+   * Provider API key for BYOK mode.
+   */
+  providerKey?: string | null | undefined;
+
+  /**
+   * Model identifier for BYOK provider.
+   */
+  providerModel?: string | null | undefined;
 
   /**
    * Specifies the environment to use for the API.
@@ -150,7 +171,11 @@ export interface ClientOptions {
  */
 export class Dedalus {
   apiKey: string | null;
+  xAPIKey: string | null;
   organization: string | null;
+  provider: string | null;
+  providerKey: string | null;
+  providerModel: string | null;
 
   baseURL: string;
   maxRetries: number;
@@ -168,7 +193,11 @@ export class Dedalus {
    * API Client for interfacing with the Dedalus API.
    *
    * @param {string | null | undefined} [opts.apiKey=process.env['DEDALUS_API_KEY'] ?? null]
+   * @param {string | null | undefined} [opts.xAPIKey=process.env['DEDALUS_X_API_KEY'] ?? null]
    * @param {string | null | undefined} [opts.organization=process.env['DEDALUS_ORG_ID'] ?? null]
+   * @param {string | null | undefined} [opts.provider=process.env['DEDALUS_PROVIDER'] ?? null]
+   * @param {string | null | undefined} [opts.providerKey=process.env['DEDALUS_PROVIDER_KEY'] ?? null]
+   * @param {string | null | undefined} [opts.providerModel=process.env['DEDALUS_PROVIDER_MODEL'] ?? null]
    * @param {Environment} [opts.environment=production] - Specifies the environment URL to use for the API.
    * @param {string} [opts.baseURL=process.env['DEDALUS_BASE_URL'] ?? https://api.dedaluslabs.ai] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
@@ -181,12 +210,20 @@ export class Dedalus {
   constructor({
     baseURL = readEnv('DEDALUS_BASE_URL'),
     apiKey = readEnv('DEDALUS_API_KEY') ?? null,
+    xAPIKey = readEnv('DEDALUS_X_API_KEY') ?? null,
     organization = readEnv('DEDALUS_ORG_ID') ?? null,
+    provider = readEnv('DEDALUS_PROVIDER') ?? null,
+    providerKey = readEnv('DEDALUS_PROVIDER_KEY') ?? null,
+    providerModel = readEnv('DEDALUS_PROVIDER_MODEL') ?? null,
     ...opts
   }: ClientOptions = {}) {
     const options: ClientOptions = {
       apiKey,
+      xAPIKey,
       organization,
+      provider,
+      providerKey,
+      providerModel,
       ...opts,
       baseURL,
       environment: opts.environment ?? 'production',
@@ -217,7 +254,11 @@ export class Dedalus {
     this.idempotencyHeader = 'Idempotency-Key';
 
     this.apiKey = apiKey;
+    this.xAPIKey = xAPIKey;
     this.organization = organization;
+    this.provider = provider;
+    this.providerKey = providerKey;
+    this.providerModel = providerModel;
   }
 
   /**
@@ -235,7 +276,11 @@ export class Dedalus {
       fetch: this.fetch,
       fetchOptions: this.fetchOptions,
       apiKey: this.apiKey,
+      xAPIKey: this.xAPIKey,
       organization: this.organization,
+      provider: this.provider,
+      providerKey: this.providerKey,
+      providerModel: this.providerModel,
       ...options,
     });
     return client;
@@ -246,6 +291,13 @@ export class Dedalus {
    */
   #baseURLOverridden(): boolean {
     return this.baseURL !== environments[this._options.environment || 'production'];
+  }
+
+  /**
+   * Root
+   */
+  get(options?: RequestOptions): APIPromise<TopLevelAPI.GetResponse> {
+    return this.get('/', options);
   }
 
   protected defaultQuery(): Record<string, string | undefined> | undefined {
@@ -260,16 +312,34 @@ export class Dedalus {
       return;
     }
 
+    if (this.xAPIKey && values.get('x-api-key')) {
+      return;
+    }
+    if (nulls.has('x-api-key')) {
+      return;
+    }
+
     throw new Error(
-      'Could not resolve authentication method. Expected the apiKey to be set. Or for the "Authorization" headers to be explicitly omitted',
+      'Could not resolve authentication method. Expected either apiKey or xAPIKey to be set. Or for one of the "Authorization" or "x-api-key" headers to be explicitly omitted',
     );
   }
 
   protected async authHeaders(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+    return buildHeaders([await this.bearerAuth(opts), await this.apiKeyAuth(opts)]);
+  }
+
+  protected async bearerAuth(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
     if (this.apiKey == null) {
       return undefined;
     }
     return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
+  }
+
+  protected async apiKeyAuth(opts: FinalRequestOptions): Promise<NullableHeaders | undefined> {
+    if (this.xAPIKey == null) {
+      return undefined;
+    }
+    return buildHeaders([{ 'x-api-key': this.xAPIKey }]);
   }
 
   /**
@@ -708,8 +778,9 @@ export class Dedalus {
         'X-Stainless-Retry-Count': String(retryCount),
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
-        'User-Agent': 'Dedalus-SDK',
         'X-SDK-Version': '1.0.0',
+        'X-Provider': this.provider,
+        'X-Provider-Key': this.providerKey,
       },
       await this.authHeaders(options),
       this._options.defaultHeaders,
@@ -778,7 +849,6 @@ export class Dedalus {
 
   static toFile = Uploads.toFile;
 
-  root: API.Root = new API.Root(this);
   _private: API._Private = new API._Private(this);
   health: API.Health = new API.Health(this);
   models: API.Models = new API.Models(this);
@@ -788,7 +858,6 @@ export class Dedalus {
   chat: API.Chat = new API.Chat(this);
 }
 
-Dedalus.Root = Root;
 Dedalus._Private = _Private;
 Dedalus.Health = Health;
 Dedalus.Models = Models;
@@ -800,7 +869,7 @@ Dedalus.Chat = Chat;
 export declare namespace Dedalus {
   export type RequestOptions = Opts.RequestOptions;
 
-  export { Root as Root, type RootGetResponse as RootGetResponse };
+  export { type GetResponse as GetResponse };
 
   export { _Private as _Private };
 
@@ -831,4 +900,7 @@ export declare namespace Dedalus {
 
   export type DedalusModel = API.DedalusModel;
   export type DedalusModelChoice = API.DedalusModelChoice;
+  export type ResponseFormatJSONObject = API.ResponseFormatJSONObject;
+  export type ResponseFormatJSONSchema = API.ResponseFormatJSONSchema;
+  export type ResponseFormatText = API.ResponseFormatText;
 }
