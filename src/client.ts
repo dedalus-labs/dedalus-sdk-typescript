@@ -778,7 +778,6 @@ export class Dedalus {
         'X-Stainless-Retry-Count': String(retryCount),
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
-        'User-Agent': 'Dedalus-SDK',
         'X-SDK-Version': '1.0.0',
         'X-Provider': this.provider,
         'X-Provider-Key': this.providerKey,
