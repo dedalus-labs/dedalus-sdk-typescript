@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.0-alpha.6 (2025-11-25)
+
+Full Changelog: [v0.1.0-alpha.5...v0.1.0-alpha.6](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.5...v0.1.0-alpha.6)
+
+### Features
+
+* **api:** config update for dedalus-ai/dev ([0df93e2](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/0df93e22387cdec588897e8efb646c34abf5065b))
+* **api:** messages param nullable ([254f9ef](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/254f9ef5397df901ddc8ac2b21e9ee3431f0c132))
+* **api:** response format ([765345e](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/765345eb89f6ca4528cf9a9554f1356afba7bec4))
+* **api:** schema compiler landed ([58cea7d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/58cea7d1d5b6c26ca8ef9601461a3cf2d86cc79a))
+* **api:** standardize name casing with stainless initialism ([a295370](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/a2953702f8c371cb7d8eaf60b92167c8a8926d97))
+* **runner:** add type defns ([d87bda2](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/d87bda271da4ace957a1b2cd34d58ffa62bcd8ec))
+* **utils:** new util funcs ([51b9d14](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/51b9d14de98848a6ebe9470520bcf3d6f7f3061d))
+
+
+### Bug Fixes
+
+* **mcp:** return tool execution error on jq failure ([734dc43](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/734dc432f4ca1bd445c9fb7c9283f5c7b09cc01b))
+* **mcp:** use raw responses for binary content ([caebbe8](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/caebbe8310be50666c96f45521e3b86f3fc145c8))
+
+
+### Chores
+
+* **api:** gitignore coding agents ([7c58e25](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/7c58e25eb03bc7f03b1a9ad2dcf74e3d67881098))
+* **internal:** configure MCP Server hosting ([f93d33c](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/f93d33cfafd2c21892906235d0e5f90a941df9cf))
+* **mcp:** clarify http auth error ([10bc93d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/10bc93d8396bf29303226f2ad2b3b98b0d234b5a))
+* **mcp:** upgrade jq-web ([83b2b3a](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/83b2b3a58ae2e8d819bfbbe8b718e80cbf27ad19))
+
+
+### Refactors
+
+* **runner:** standardize dir layout ([c7cf1d5](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/c7cf1d50d2aa3ddcf717748b4c6f1990af098aa9))
+
 ## 0.1.0-alpha.5 (2025-10-10)
 
 Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.4...v0.1.0-alpha.5)
