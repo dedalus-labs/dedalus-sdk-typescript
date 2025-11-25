@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.7 (2025-11-25)
+
+Full Changelog: [v0.1.0-alpha.6...v0.1.0-alpha.7](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.6...v0.1.0-alpha.7)
+
+### Features
+
+* **mcp:** add detail field to docs search tool ([f626d60](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/f626d608160a127706832de7cffa19d96e686101))
+
 ## 0.1.0-alpha.6 (2025-11-25)
 
 Full Changelog: [v0.1.0-alpha.5...v0.1.0-alpha.6](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.5...v0.1.0-alpha.6)
