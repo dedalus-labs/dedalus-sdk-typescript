@@ -379,18 +379,8 @@ The following tools are available in this MCP server.
 
 - `create_chat_completions` (`write`): Create a chat completion.
 
-  Unified chat-completions endpoint that works across many model providers. Supports
-  optional MCP integration, multi-model routing with agentic handoffs, server- or
-  client-executed tools, and both streaming and non-streaming delivery.
-
-  Request body:
-
-  - messages: ordered list of chat turns.
-  - model: identifier or a list of identifiers for routing.
-  - tools: optional tool declarations available to the model.
-  - mcp_servers: optional list of MCP server slugs to enable during the run.
-  - stream: boolean to request incremental output.
-  - config: optional generation parameters (e.g., temperature, max_tokens, metadata).
+  Generates a model response for the given conversation and configuration.
+  Supports OpenAI-compatible parameters and provider-specific extensions.
 
   Headers:
 
@@ -399,7 +389,7 @@ The following tools are available in this MCP server.
 
   Behavior:
 
-  - If multiple models are supplied, the router may select or hand off across them.
+  - If multiple models are supplied, the first one is used, and the agent may hand off to another model.
   - Tools may be invoked on the server or signaled for the client to run.
   - Streaming responses emit incremental deltas; non-streaming returns a single object.
   - Usage metrics are computed when available and returned in the response.
