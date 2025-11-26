@@ -80,17 +80,6 @@ export namespace DedalusModel {
 
     response_format?: { [key: string]: unknown } | null;
 
-    response_include?: Array<
-      | 'file_search_call.results'
-      | 'web_search_call.results'
-      | 'web_search_call.action.sources'
-      | 'message.input_image.image_url'
-      | 'computer_call_output.output.image_url'
-      | 'code_interpreter_call.outputs'
-      | 'reasoning.encrypted_content'
-      | 'message.output_text.logprobs'
-    > | null;
-
     safety_identifier?: string | null;
 
     safety_settings?: Array<{ [key: string]: unknown }> | null;
@@ -132,8 +121,6 @@ export namespace DedalusModel {
     truncation?: 'auto' | 'disabled' | null;
 
     turn_detection?: { [key: string]: unknown } | null;
-
-    use_responses?: boolean;
 
     user?: string | null;
 

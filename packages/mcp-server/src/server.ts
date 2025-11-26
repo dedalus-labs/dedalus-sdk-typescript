@@ -34,7 +34,7 @@ export const newMcpServer = () =>
   new McpServer(
     {
       name: 'dedalus_labs_api',
-      version: '0.1.0-alpha.8',
+      version: '0.1.0-alpha.9',
     },
     { capabilities: { tools: {}, logging: {} } },
   );
@@ -88,7 +88,6 @@ export function initMcpServer(params: {
   };
 
   let client = new Dedalus({
-    ...{ environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any },
     logger,
     ...params.clientOptions,
     defaultHeaders: {

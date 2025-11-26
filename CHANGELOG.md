@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.9 (2025-11-26)
+
+Full Changelog: [v0.1.0-alpha.8...v0.1.0-alpha.9](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.8...v0.1.0-alpha.9)
+
+### Chores
+
+* **api:** migrate pkg manager to uv ([12a8f74](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/12a8f74e586a131a1cbd7a0dddfbb5da2a50e0a0))
+
 ## 0.1.0-alpha.8 (2025-11-26)
 
 Full Changelog: [v0.1.0-alpha.7...v0.1.0-alpha.8](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.7...v0.1.0-alpha.8)
