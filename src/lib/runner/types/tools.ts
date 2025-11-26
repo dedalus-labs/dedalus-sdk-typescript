@@ -4,7 +4,11 @@
 //           github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
-import type { Completion } from '../../../resources/chat/completions';
+import type {
+  ChatCompletionToolParam,
+  ChatCompletionMessageToolCall,
+  ChatCompletionMessageCustomToolCall,
+} from '../../../resources/chat/completions';
 import type { JsonValue } from '../../utils/json';
 
 export type { JsonValue };
@@ -13,13 +17,13 @@ export type { JsonValue };
 export type Tool = (...args: any[]) => JsonValue | Promise<JsonValue>;
 
 /** Tool call type from Dedalus SDK. */
-export type ToolCall = Completion.Choice.Message.ChatCompletionMessageToolCall;
+export type ToolCall = ChatCompletionMessageToolCall | ChatCompletionMessageCustomToolCall;
 
 /** Result of executing a tool during a conversation turn. */
 export type ToolResult = Record<string, string | number | JsonValue>;
 
 /** Interface for objects that manage tool registration and execution. */
 export interface ToolHandler {
-  schemas(): Array<Record<string, any>>;
+  schemas(): Array<ChatCompletionToolParam>;
   exec(name: string, args: Record<string, JsonValue>): Promise<JsonValue>;
 }

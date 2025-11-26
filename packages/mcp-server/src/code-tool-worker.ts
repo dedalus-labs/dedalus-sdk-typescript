@@ -42,8 +42,6 @@ function getRunFunctionNode(
 
 const fuse = new Fuse(
   [
-    'client.get',
-    'client.health.check',
     'client.models.list',
     'client.models.retrieve',
     'client.embeddings.create',

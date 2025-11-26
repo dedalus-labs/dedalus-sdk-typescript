@@ -15,17 +15,13 @@ import { VERSION } from './version';
 import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
-import * as TopLevelAPI from './resources/top-level';
-import { GetResponse } from './resources/top-level';
 import { APIPromise } from './core/api-promise';
-import { _Private } from './resources/-private';
 import {
   CreateEmbeddingRequest,
   CreateEmbeddingResponse,
   EmbeddingCreateParams,
   Embeddings,
 } from './resources/embeddings';
-import { Health, HealthCheckResponse } from './resources/health';
 import {
   CreateImageRequest,
   Image,
@@ -50,6 +46,7 @@ import {
   parseLogLevel,
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
+import { transformRequestBody } from './lib/case-conversion';
 
 const environments = {
   production: 'https://api.dedaluslabs.ai',
@@ -293,13 +290,6 @@ export class Dedalus {
     return this.baseURL !== environments[this._options.environment || 'production'];
   }
 
-  /**
-   * Root
-   */
-  get(options?: RequestOptions): APIPromise<TopLevelAPI.GetResponse> {
-    return this.get('/', options);
-  }
-
   protected defaultQuery(): Record<string, string | undefined> | undefined {
     return this._options.defaultQuery;
   }
@@ -403,9 +393,18 @@ export class Dedalus {
   }
 
   /**
-   * Used as a callback for mutating the given `FinalRequestOptions` object.
+   * Convert camelCase parameters to snake_case for API compatibility.
+   * We preserve the structured output schemas, which are already in the correct format.
    */
-  protected async prepareOptions(options: FinalRequestOptions): Promise<void> {}
+  protected async prepareOptions(options: FinalRequestOptions): Promise<void> {
+    if (options.body) {
+      options.body = transformRequestBody(options.body);
+    }
+
+    if (options.query) {
+      options.query = transformRequestBody(options.query);
+    }
+  }
 
   /**
    * Used as a callback for mutating the given `RequestInit` object.
@@ -849,8 +848,6 @@ export class Dedalus {
 
   static toFile = Uploads.toFile;
 
-  _private: API._Private = new API._Private(this);
-  health: API.Health = new API.Health(this);
   models: API.Models = new API.Models(this);
   embeddings: API.Embeddings = new API.Embeddings(this);
   audio: API.Audio = new API.Audio(this);
@@ -858,8 +855,6 @@ export class Dedalus {
   chat: API.Chat = new API.Chat(this);
 }
 
-Dedalus._Private = _Private;
-Dedalus.Health = Health;
 Dedalus.Models = Models;
 Dedalus.Embeddings = Embeddings;
 Dedalus.Audio = Audio;
@@ -868,12 +863,6 @@ Dedalus.Chat = Chat;
 
 export declare namespace Dedalus {
   export type RequestOptions = Opts.RequestOptions;
-
-  export { type GetResponse as GetResponse };
-
-  export { _Private as _Private };
-
-  export { Health as Health, type HealthCheckResponse as HealthCheckResponse };
 
   export { Models as Models, type ListModelsResponse as ListModelsResponse, type Model as Model };
 

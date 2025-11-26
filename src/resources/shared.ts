@@ -1,5 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+import * as CompletionsAPI from './chat/completions';
+
 /**
  * Structured model selection entry used in request payloads.
  *
@@ -31,8 +33,6 @@ export namespace DedalusModel {
     audio?: { [key: string]: unknown } | null;
 
     deferred?: boolean | null;
-
-    disable_automatic_function_calling?: boolean;
 
     extra_args?: { [key: string]: unknown } | null;
 
@@ -74,7 +74,7 @@ export namespace DedalusModel {
 
     prompt_cache_key?: string | null;
 
-    reasoning?: Settings.Reasoning | null;
+    reasoning?: CompletionsAPI.Reasoning | null;
 
     reasoning_effort?: string | null;
 
@@ -119,14 +119,7 @@ export namespace DedalusModel {
 
     timeout?: number | null;
 
-    tool_choice?:
-      | 'auto'
-      | 'required'
-      | 'none'
-      | string
-      | { [key: string]: unknown }
-      | Settings.MCPToolChoice
-      | null;
+    tool_choice?: CompletionsAPI.ToolChoice | null;
 
     tool_config?: { [key: string]: unknown } | null;
 
@@ -150,24 +143,6 @@ export namespace DedalusModel {
 
     web_search_options?: { [key: string]: unknown } | null;
   }
-
-  export namespace Settings {
-    export interface Reasoning {
-      effort?: 'minimal' | 'low' | 'medium' | 'high' | null;
-
-      generate_summary?: 'auto' | 'concise' | 'detailed' | null;
-
-      summary?: 'auto' | 'concise' | 'detailed' | null;
-
-      [k: string]: unknown;
-    }
-
-    export interface MCPToolChoice {
-      name: string;
-
-      server_label: string;
-    }
-  }
 }
 
 /**
@@ -176,18 +151,85 @@ export namespace DedalusModel {
 export type DedalusModelChoice = string | DedalusModel;
 
 /**
+ * Schema for FunctionObject.
+ *
+ * Fields:
+ *
+ * - description (optional): str
+ * - name (required): str
+ * - parameters (optional): FunctionParameters
+ * - strict (optional): bool | None
+ */
+export interface FunctionDefinition {
+  /**
+   * The name of the function to be called. Must be a-z, A-Z, 0-9, or contain
+   * underscores and dashes, with a maximum length of 64.
+   */
+  name: string;
+
+  /**
+   * A description of what the function does, used by the model to choose when and
+   * how to call the function.
+   */
+  description?: string;
+
+  /**
+   * The parameters the functions accepts, described as a JSON Schema object. See the
+   * [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
+   * and the
+   * [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for
+   * documentation about the format.
+   *
+   * Omitting `parameters` defines a function with an empty parameter list.
+   */
+  parameters?: FunctionParameters;
+
+  /**
+   * Whether to enable strict schema adherence when generating the function call. If
+   * set to true, the model will follow the exact schema defined in the `parameters`
+   * field. Only a subset of JSON Schema is supported when `strict` is `true`. Learn
+   * more about Structured Outputs in the
+   * [function calling guide](https://platform.openai.com/docs/guides/function-calling).
+   */
+  strict?: boolean | null;
+}
+
+/**
+ * The parameters the functions accepts, described as a JSON Schema object. See the
+ * [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
+ * and the
+ * [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for
+ * documentation about the format.
+ *
+ * Omitting `parameters` defines a function with an empty parameter list.
+ */
+export type FunctionParameters = { [key: string]: unknown };
+
+/**
  * JSON object response format. An older method of generating JSON responses. Using
  * `json_schema` is recommended for models that support it. Note that the model
  * will not generate JSON without a system or user message instructing it to do so.
+ *
+ * Fields:
+ *
+ * - type (required): Literal["json_object"]
  */
 export interface ResponseFormatJSONObject {
-  type?: 'json_object';
+  /**
+   * The type of response format being defined. Always `json_object`.
+   */
+  type: 'json_object';
 }
 
 /**
  * JSON Schema response format. Used to generate structured JSON responses. Learn
  * more about
  * [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
+ *
+ * Fields:
+ *
+ * - type (required): Literal["json_schema"]
+ * - json_schema (required): JSONSchema
  */
 export interface ResponseFormatJSONSchema {
   /**
@@ -195,7 +237,10 @@ export interface ResponseFormatJSONSchema {
    */
   json_schema: ResponseFormatJSONSchema.JSONSchema;
 
-  type?: 'json_schema';
+  /**
+   * The type of response format being defined. Always `json_schema`.
+   */
+  type: 'json_schema';
 }
 
 export namespace ResponseFormatJSONSchema {
@@ -203,23 +248,45 @@ export namespace ResponseFormatJSONSchema {
    * Structured Outputs configuration options, including a JSON Schema.
    */
   export interface JSONSchema {
+    /**
+     * The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores
+     * and dashes, with a maximum length of 64.
+     */
     name: string;
 
-    description?: string | null;
+    /**
+     * A description of what the response format is for, used by the model to determine
+     * how to respond in the format.
+     */
+    description?: string;
 
     /**
      * The schema for the response format, described as a JSON Schema object. Learn how
      * to build JSON schemas [here](https://json-schema.org/).
      */
-    schema?: { [key: string]: unknown } | null;
+    schema?: { [key: string]: unknown };
 
-    strict?: { [key: string]: unknown } | null;
+    /**
+     * Whether to enable strict schema adherence when generating the output. If set to
+     * true, the model will always follow the exact schema defined in the `schema`
+     * field. Only a subset of JSON Schema is supported when `strict` is `true`. To
+     * learn more, read the
+     * [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs).
+     */
+    strict?: boolean | null;
   }
 }
 
 /**
  * Default response format. Used to generate text responses.
+ *
+ * Fields:
+ *
+ * - type (required): Literal["text"]
  */
 export interface ResponseFormatText {
-  type?: 'text';
+  /**
+   * The type of response format being defined. Always `text`.
+   */
+  type: 'text';
 }

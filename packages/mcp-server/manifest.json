@@ -50,7 +50,7 @@
     },
     "DEDALUS_PROVIDER": {
       "title": "provider",
-      "description": "Provider name for BYOK mode.",
+      "description": "Provider name for BYOK mode (e.g., 'openai', 'anthropic').",
       "required": false,
       "type": "string"
     },
