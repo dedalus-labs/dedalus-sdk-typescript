@@ -3,6 +3,8 @@ import type {
   Completion,
   CompletionCreateParams,
   CompletionCreateParamsBase,
+  Choice,
+  ChatCompletionMessage,
 } from '../resources/chat/completions';
 
 /**
@@ -127,14 +129,14 @@ export interface ParsedChatCompletion<ParsedT> extends Omit<Completion, 'choices
 /**
  * Parsed choice with typed parsed content.
  */
-export interface ParsedChoice<ParsedT> extends Omit<Completion.Choice, 'message'> {
+export interface ParsedChoice<ParsedT> extends Omit<Choice, 'message'> {
   message: ParsedMessage<ParsedT>;
 }
 
 /**
  * Parsed message with typed parsed field and parsed tool calls.
  */
-export interface ParsedMessage<ParsedT> extends Omit<Completion.Choice.Message, 'tool_calls'> {
+export interface ParsedMessage<ParsedT> extends Omit<ChatCompletionMessage, 'tool_calls'> {
   /**
    * The parsed structured output, if response_format was auto-parseable.
    * Null if parsing failed or content was filtered.

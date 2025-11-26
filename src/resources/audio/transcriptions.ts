@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../core/resource';
+import * as CompletionsAPI from '../chat/completions';
 import { APIPromise } from '../../core/api-promise';
 import { type Uploadable } from '../../core/uploads';
 import { RequestOptions } from '../../internal/request-options';
@@ -294,24 +295,7 @@ export namespace TranscriptionCreateResponse {
       /**
        * Details about the input tokens billed for this request.
        */
-      input_token_details?: TranscriptTextUsageTokens.InputTokenDetails;
-    }
-
-    export namespace TranscriptTextUsageTokens {
-      /**
-       * Details about the input tokens billed for this request.
-       */
-      export interface InputTokenDetails {
-        /**
-         * Number of audio tokens billed for this request.
-         */
-        audio_tokens?: number;
-
-        /**
-         * Number of text tokens billed for this request.
-         */
-        text_tokens?: number;
-      }
+      input_token_details?: CompletionsAPI.InputTokenDetails;
     }
 
     /**
