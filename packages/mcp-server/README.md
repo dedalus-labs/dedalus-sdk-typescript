@@ -15,7 +15,6 @@ export DEDALUS_ORG_ID="My Organization"
 export DEDALUS_PROVIDER="My Provider"
 export DEDALUS_PROVIDER_KEY="My Provider Key"
 export DEDALUS_PROVIDER_MODEL="My Provider Model"
-export DEDALUS_ENVIRONMENT="production"
 npx -y dedalus-labs-mcp@latest
 ```
 
@@ -38,8 +37,7 @@ For clients with a configuration JSON, it might look something like this:
         "DEDALUS_ORG_ID": "My Organization",
         "DEDALUS_PROVIDER": "My Provider",
         "DEDALUS_PROVIDER_KEY": "My Provider Key",
-        "DEDALUS_PROVIDER_MODEL": "My Provider Model",
-        "DEDALUS_ENVIRONMENT": "production"
+        "DEDALUS_PROVIDER_MODEL": "My Provider Model"
       }
     }
   }
@@ -217,213 +215,9 @@ http://localhost:3000?client=cursor&capability=tool-name-length%3D40
 ## Importing the tools and server individually
 
 ```js
-// Import the server, generated endpoints, or the init function
-import { server, endpoints, init } from "dedalus-labs-mcp/server";
 
-// import a specific tool
-import retrieveModels from "dedalus-labs-mcp/tools/models/retrieve-models";
-
-// initialize the server and all endpoints
-init({ server, endpoints });
-
-// manually start server
-const transport = new StdioServerTransport();
-await server.connect(transport);
-
-// or initialize your own server with specific tools
-const myServer = new McpServer(...);
-
-// define your own endpoint
-const myCustomEndpoint = {
-  tool: {
-    name: 'my_custom_tool',
-    description: 'My custom tool',
-    inputSchema: zodToJsonSchema(z.object({ a_property: z.string() })),
-  },
-  handler: async (client: client, args: any) => {
-    return { myResponse: 'Hello world!' };
-  })
-};
-
-// initialize the server with your custom endpoints
-init({ server: myServer, endpoints: [retrieveModels, myCustomEndpoint] });
 ```
 
 ## Available Tools
 
 The following tools are available in this MCP server.
-
-### Resource `models`:
-
-- `retrieve_models` (`read`): Retrieve a model.
-
-  Retrieve detailed information about a specific model, including its capabilities,
-  provider, and supported features.
-
-  Args:
-  model_id: The ID of the model to retrieve (e.g., 'openai/gpt-4', 'anthropic/claude-3-5-sonnet-20241022')
-  user: Authenticated user obtained from API key validation
-
-  Returns:
-  Model: Information about the requested model
-
-  Raises:
-  HTTPException: - 401 if authentication fails - 404 if model not found or not accessible with current API key - 500 if internal error occurs
-
-  Requires:
-  Valid API key with 'read' scope permission
-
-  Example:
-  ```python
-  import dedalus_labs
-
-      client = dedalus_labs.Client(api_key="your-api-key")
-      model = client.models.retrieve("openai/gpt-4")
-
-      print(f"Model: {model.id}")
-      print(f"Owner: {model.owned_by}")
-      ```
-
-      Response:
-      ```json
-      {
-          "id": "openai/gpt-4",
-          "object": "model",
-          "created": 1687882411,
-          "owned_by": "openai"
-      }
-      ```
-
-- `list_models` (`read`): List available models.
-
-  Retrieve the complete list of models available to your organization, including
-  models from OpenAI, Anthropic, Google, xAI, Mistral, Fireworks, and DeepSeek.
-
-  Returns:
-  ListModelsResponse: List of available models across all supported providers
-
-### Resource `embeddings`:
-
-- `create_embeddings` (`write`): Create embeddings using the configured provider.
-
-### Resource `audio.speech`:
-
-- `create_audio_speech` (`write`): Generate speech audio from text.
-
-  Generates audio from the input text using text-to-speech models. Supports multiple
-  voices and output formats including mp3, opus, aac, flac, wav, and pcm.
-
-  Returns streaming audio data that can be saved to a file or streamed directly to users.
-
-### Resource `audio.transcriptions`:
-
-- `create_audio_transcriptions` (`write`): Transcribe audio into text.
-
-  Transcribes audio files using OpenAI's Whisper model. Supports multiple audio formats
-  including mp3, mp4, mpeg, mpga, m4a, wav, and webm. Maximum file size is 25 MB.
-
-  Args:
-  file: Audio file to transcribe (required)
-  model: Model ID to use (e.g., "openai/whisper-1")
-  language: ISO-639-1 language code (e.g., "en", "es") - improves accuracy
-  prompt: Optional text to guide the model's style
-  response_format: Format of the output (json, text, srt, verbose_json, vtt)
-  temperature: Sampling temperature between 0 and 1
-
-  Returns:
-  Transcription object with the transcribed text
-
-### Resource `audio.translations`:
-
-- `create_audio_translations` (`write`): Translate audio into English.
-
-  Translates audio files in any supported language to English text using OpenAI's
-  Whisper model. Supports the same audio formats as transcription. Maximum file size
-  is 25 MB.
-
-  Args:
-  file: Audio file to translate (required)
-  model: Model ID to use (e.g., "openai/whisper-1")
-  prompt: Optional text to guide the model's style
-  response_format: Format of the output (json, text, srt, verbose_json, vtt)
-  temperature: Sampling temperature between 0 and 1
-
-  Returns:
-  Translation object with the English translation
-
-### Resource `images`:
-
-- `create_variation_images` (`write`): Create variations of an image.
-
-  DALL·E 2 only. Upload an image to generate variations.
-
-- `edit_images` (`write`): Edit images using inpainting.
-
-  Supports dall-e-2 and gpt-image-1. Upload an image and optionally a mask
-  to indicate which areas to regenerate based on the prompt.
-
-- `generate_images` (`write`): Generate images from text prompts.
-
-  Pure image generation models only (DALL-E, GPT Image).
-  For multimodal models like gemini-2.5-flash-image, use /v1/chat/completions.
-
-### Resource `chat.completions`:
-
-- `create_chat_completions` (`write`): Create a chat completion.
-
-  Generates a model response for the given conversation and configuration.
-  Supports OpenAI-compatible parameters and provider-specific extensions.
-
-  Headers:
-
-  - Authorization: bearer key for the calling account.
-  - Optional BYOK or provider headers if applicable.
-
-  Behavior:
-
-  - If multiple models are supplied, the first one is used, and the agent may hand off to another model.
-  - Tools may be invoked on the server or signaled for the client to run.
-  - Streaming responses emit incremental deltas; non-streaming returns a single object.
-  - Usage metrics are computed when available and returned in the response.
-
-  Responses:
-
-  - 200 OK: JSON completion object with choices, message content, and usage.
-  - 400 Bad Request: validation error.
-  - 401 Unauthorized: authentication failed.
-  - 402 Payment Required or 429 Too Many Requests: quota, balance, or rate limit issue.
-  - 500 Internal Server Error: unexpected failure.
-
-  Billing:
-
-  - Token usage metered by the selected model(s).
-  - Tool calls and MCP sessions may be billed separately.
-  - Streaming is settled after the stream ends via an async task.
-
-  Example (non-streaming HTTP):
-  POST /v1/chat/completions
-  Content-Type: application/json
-  Authorization: Bearer <key>
-
-  {
-  "model": "provider/model-name",
-  "messages": [{"role": "user", "content": "Hello"}]
-  }
-
-  200 OK
-  {
-  "id": "cmpl_123",
-  "object": "chat.completion",
-  "choices": [
-  {"index": 0, "message": {"role": "assistant", "content": "Hi there!"}, "finish_reason": "stop"}
-  ],
-  "usage": {"prompt_tokens": 3, "completion_tokens": 4, "total_tokens": 7}
-  }
-
-  Example (streaming over SSE):
-  POST /v1/chat/completions
-  Accept: text/event-stream
-
-  data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":"Hi"}}]}
-  data: {"id":"cmpl_123","choices":[{"index":0,"delta":{"content":" there!"}}]}
-  data: [DONE]

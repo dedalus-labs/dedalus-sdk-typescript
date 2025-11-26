@@ -24,7 +24,6 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
-  environment: 'development', // defaults to 'production'
 });
 
 const completion = await client.chat.completions.create({
@@ -73,7 +72,6 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
-  environment: 'development', // defaults to 'production'
 });
 
 const params: Dedalus.Chat.CompletionCreateParams = {

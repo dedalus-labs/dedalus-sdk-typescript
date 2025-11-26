@@ -88,7 +88,6 @@ export function initMcpServer(params: {
   };
 
   let client = new Dedalus({
-    ...{ environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any },
     logger,
     ...params.clientOptions,
     defaultHeaders: {
