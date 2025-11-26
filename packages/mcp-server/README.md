@@ -221,7 +221,7 @@ http://localhost:3000?client=cursor&capability=tool-name-length%3D40
 import { server, endpoints, init } from "dedalus-labs-mcp/server";
 
 // import a specific tool
-import getClient from "dedalus-labs-mcp/tools/top-level/get-client";
+import retrieveModels from "dedalus-labs-mcp/tools/models/retrieve-models";
 
 // initialize the server and all endpoints
 init({ server, endpoints });
@@ -246,20 +246,12 @@ const myCustomEndpoint = {
 };
 
 // initialize the server with your custom endpoints
-init({ server: myServer, endpoints: [getClient, myCustomEndpoint] });
+init({ server: myServer, endpoints: [retrieveModels, myCustomEndpoint] });
 ```
 
 ## Available Tools
 
 The following tools are available in this MCP server.
-
-### Resource `$client`:
-
-- `get_client` (`read`): Root
-
-### Resource `health`:
-
-- `check_health` (`read`): Simple health check.
 
 ### Resource `models`:
 

@@ -4,8 +4,6 @@ import { Metadata, Endpoint, HandlerFunction } from './types';
 
 export { Metadata, Endpoint, HandlerFunction };
 
-import get_client from './top-level/get-client';
-import check_health from './health/check-health';
 import retrieve_models from './models/retrieve-models';
 import list_models from './models/list-models';
 import create_embeddings from './embeddings/create-embeddings';
@@ -23,8 +21,6 @@ function addEndpoint(endpoint: Endpoint) {
   endpoints.push(endpoint);
 }
 
-addEndpoint(get_client);
-addEndpoint(check_health);
 addEndpoint(retrieve_models);
 addEndpoint(list_models);
 addEndpoint(create_embeddings);

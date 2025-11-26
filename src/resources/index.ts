@@ -9,7 +9,6 @@ export {
   type CreateEmbeddingResponse,
   type EmbeddingCreateParams,
 } from './embeddings';
-export { Health, type HealthCheckResponse } from './health';
 export {
   Images,
   type CreateImageRequest,
@@ -20,5 +19,3 @@ export {
   type ImageGenerateParams,
 } from './images';
 export { Models, type ListModelsResponse, type Model } from './models';
-export { _Private } from './-private';
-export { type GetResponse } from './top-level';
