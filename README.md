@@ -29,7 +29,10 @@ const client = new Dedalus({
 
 const completion = await client.chat.completions.create({
   model: 'openai/gpt-5-nano',
-  messages: [{ role: 'user', content: 'Hello, how are you today?' }],
+  messages: [
+    { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+    { role: 'user', content: 'Hello, how are you today?' },
+  ],
 });
 
 console.log(completion.id);
@@ -73,7 +76,14 @@ const client = new Dedalus({
   environment: 'development', // defaults to 'production'
 });
 
-const response: Dedalus.HealthCheckResponse = await client.health.check();
+const params: Dedalus.Chat.CompletionCreateParams = {
+  model: 'openai/gpt-5-nano',
+  messages: [
+    { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+    { role: 'user', content: 'Hello, how are you today?' },
+  ],
+};
+const completion: Dedalus.Chat.Completion = await client.chat.completions.create(params);
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
@@ -121,15 +131,23 @@ a subclass of `APIError` will be thrown:
 
 <!-- prettier-ignore -->
 ```ts
-const response = await client.health.check().catch(async (err) => {
-  if (err instanceof Dedalus.APIError) {
-    console.log(err.status); // 400
-    console.log(err.name); // BadRequestError
-    console.log(err.headers); // {server: 'nginx', ...}
-  } else {
-    throw err;
-  }
-});
+const completion = await client.chat.completions
+  .create({
+    model: 'openai/gpt-5-nano',
+    messages: [
+      { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+      { role: 'user', content: 'Hello, how are you today?' },
+    ],
+  })
+  .catch(async (err) => {
+    if (err instanceof Dedalus.APIError) {
+      console.log(err.status); // 400
+      console.log(err.name); // BadRequestError
+      console.log(err.headers); // {server: 'nginx', ...}
+    } else {
+      throw err;
+    }
+  });
 ```
 
 Error codes are as follows:
@@ -161,7 +179,7 @@ const client = new Dedalus({
 });
 
 // Or, configure per-request:
-await client.health.check({
+await client.chat.completions.create({ model: 'openai/gpt-5-nano', messages: [{ role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' }, { role: 'user', content: 'Hello, how are you today?' }] }, {
   maxRetries: 5,
 });
 ```
@@ -178,7 +196,7 @@ const client = new Dedalus({
 });
 
 // Override per-request:
-await client.health.check({
+await client.chat.completions.create({ model: 'openai/gpt-5-nano', messages: [{ role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' }, { role: 'user', content: 'Hello, how are you today?' }] }, {
   timeout: 5 * 1000,
 });
 ```
@@ -203,7 +221,16 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus();
 
-const response = await client.health.check({ headers: { 'User-Agent': 'My-Custom-Value' } });
+const completion = await client.chat.completions.create(
+  {
+    model: 'openai/gpt-5-nano',
+    messages: [
+      { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+      { role: 'user', content: 'Hello, how are you today?' },
+    ],
+  },
+  { headers: { 'User-Agent': 'My-Custom-Value' } },
+);
 ```
 
 ## Advanced Usage
@@ -220,13 +247,29 @@ Unlike `.asResponse()` this method consumes the body, returning once it is parse
 ```ts
 const client = new Dedalus();
 
-const response = await client.health.check().asResponse();
+const response = await client.chat.completions
+  .create({
+    model: 'openai/gpt-5-nano',
+    messages: [
+      { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+      { role: 'user', content: 'Hello, how are you today?' },
+    ],
+  })
+  .asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: response, response: raw } = await client.health.check().withResponse();
+const { data: completion, response: raw } = await client.chat.completions
+  .create({
+    model: 'openai/gpt-5-nano',
+    messages: [
+      { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
+      { role: 'user', content: 'Hello, how are you today?' },
+    ],
+  })
+  .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(response.status);
+console.log(completion.id);
 ```
 
 ### Logging

@@ -15,17 +15,13 @@ import { VERSION } from './version';
 import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
-import * as TopLevelAPI from './resources/top-level';
-import { GetResponse } from './resources/top-level';
 import { APIPromise } from './core/api-promise';
-import { _Private } from './resources/-private';
 import {
   CreateEmbeddingRequest,
   CreateEmbeddingResponse,
   EmbeddingCreateParams,
   Embeddings,
 } from './resources/embeddings';
-import { Health, HealthCheckResponse } from './resources/health';
 import {
   CreateImageRequest,
   Image,
@@ -74,7 +70,7 @@ export interface ClientOptions {
   organization?: string | null | undefined;
 
   /**
-   * Provider name for BYOK mode.
+   * Provider name for BYOK mode (e.g., 'openai', 'anthropic').
    */
   provider?: string | null | undefined;
 
@@ -291,13 +287,6 @@ export class Dedalus {
    */
   #baseURLOverridden(): boolean {
     return this.baseURL !== environments[this._options.environment || 'production'];
-  }
-
-  /**
-   * Root
-   */
-  get(options?: RequestOptions): APIPromise<TopLevelAPI.GetResponse> {
-    return this.get('/', options);
   }
 
   protected defaultQuery(): Record<string, string | undefined> | undefined {
@@ -849,8 +838,6 @@ export class Dedalus {
 
   static toFile = Uploads.toFile;
 
-  _private: API._Private = new API._Private(this);
-  health: API.Health = new API.Health(this);
   models: API.Models = new API.Models(this);
   embeddings: API.Embeddings = new API.Embeddings(this);
   audio: API.Audio = new API.Audio(this);
@@ -858,8 +845,6 @@ export class Dedalus {
   chat: API.Chat = new API.Chat(this);
 }
 
-Dedalus._Private = _Private;
-Dedalus.Health = Health;
 Dedalus.Models = Models;
 Dedalus.Embeddings = Embeddings;
 Dedalus.Audio = Audio;
@@ -868,12 +853,6 @@ Dedalus.Chat = Chat;
 
 export declare namespace Dedalus {
   export type RequestOptions = Opts.RequestOptions;
-
-  export { type GetResponse as GetResponse };
-
-  export { _Private as _Private };
-
-  export { Health as Health, type HealthCheckResponse as HealthCheckResponse };
 
   export { Models as Models, type ListModelsResponse as ListModelsResponse, type Model as Model };
 
@@ -900,6 +879,8 @@ export declare namespace Dedalus {
 
   export type DedalusModel = API.DedalusModel;
   export type DedalusModelChoice = API.DedalusModelChoice;
+  export type FunctionDefinition = API.FunctionDefinition;
+  export type FunctionParameters = API.FunctionParameters;
   export type ResponseFormatJSONObject = API.ResponseFormatJSONObject;
   export type ResponseFormatJSONSchema = API.ResponseFormatJSONSchema;
   export type ResponseFormatText = API.ResponseFormatText;
