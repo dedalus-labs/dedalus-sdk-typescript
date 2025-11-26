@@ -31,7 +31,7 @@ function checkZodAvailable(): void {
  * @example
  * ```ts
  * import { z } from 'zod';
- * import { zodResponseFormat } from 'dedalus-sdk/helpers/zod';
+ * import { zodResponseFormat } from 'dedalus-labs/helpers/zod';
  *
  * const MathAnswer = z.object({
  *   steps: z.array(z.object({
@@ -144,7 +144,7 @@ export function zodResponseFormat<ZodInput extends ZodType>(
  * @example
  * ```ts
  * import { z } from 'zod';
- * import { zodFunction } from 'dedalus-sdk/helpers/zod';
+ * import { zodFunction } from 'dedalus-labs/helpers/zod';
  *
  * const GetWeather = zodFunction({
  *   name: 'get_weather',
