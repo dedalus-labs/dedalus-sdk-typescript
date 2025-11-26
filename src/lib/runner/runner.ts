@@ -12,9 +12,10 @@ import { buildInitialMessages, coerceToolCall } from './messages';
 import { buildRequestKwargs, normalizeModelSpec } from './validation';
 import { jsonify } from '../utils/format';
 import type { Dedalus } from '../../client';
-import type { CompletionCreateParamsBase } from '../../resources/chat/completions';
+import type { CompletionCreateParamsBase, StreamChunk } from '../../resources/chat/completions';
 import type { DedalusModelChoice } from '../../resources/shared';
 import { loggerFor } from '../../internal/utils/log';
+import type { Stream } from '../../core/streaming';
 
 export type RunParams = Omit<
   CompletionCreateParamsBase,
@@ -179,7 +180,7 @@ export class DedalusRunner {
       mcpServers: Array.from(mcpServers ?? []),
       logger,
       toolHandler,
-      stream,
+      stream: Boolean(stream ?? false),
     };
 
     const conversation = buildInitialMessages({
@@ -361,7 +362,7 @@ export class DedalusRunner {
         ...state.requestKwargs,
       };
 
-      const stream = await this.client.chat.completions.create(createParams);
+      const stream = (await this.client.chat.completions.create(createParams)) as Stream<StreamChunk>;
 
       const collectedToolCalls: Array<{
         index?: number;
@@ -371,7 +372,7 @@ export class DedalusRunner {
       }> = [];
       const collectedContent: string[] = [];
 
-      for await (const chunk of stream as any) {
+      for await (const chunk of stream) {
         yield chunk;
 
         if (chunk.choices) {

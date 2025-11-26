@@ -6,6 +6,16 @@ import * as Shared from '../shared';
 import { APIPromise } from '../../core/api-promise';
 import { Stream } from '../../core/streaming';
 import { RequestOptions } from '../../internal/request-options';
+import {
+  maybeParseChatCompletion,
+  parseChatCompletion,
+  validateInputTools,
+  type ExtractParsedContentFromParams,
+  type ParsedChatCompletion as _ParsedChatCompletion,
+  type ParsedChoice as _ParsedChoice,
+  type ParsedMessage as _ParsedMessage,
+  type ParsedFunctionToolCall,
+} from '../../lib/parser';
 
 export class Completions extends APIResource {
   /**
@@ -78,9 +88,32 @@ export class Completions extends APIResource {
     body: CompletionCreateParams,
     options?: RequestOptions,
   ): APIPromise<Completion> | APIPromise<Stream<StreamChunk>> {
-    return this._client.post('/v1/chat/completions', { body, ...options, stream: body.stream ?? false }) as
-      | APIPromise<Completion>
-      | APIPromise<Stream<StreamChunk>>;
+    const isStreaming = body.stream ?? false;
+
+    if (!isStreaming) {
+      return this._client
+        .post<Completion>('/v1/chat/completions', { body, ...options, stream: false })
+        .then((completion) => maybeParseChatCompletion(completion, body as any)) as APIPromise<Completion>;
+    }
+
+    return this._client.post('/v1/chat/completions', { body, ...options, stream: true }) as APIPromise<
+      Stream<StreamChunk>
+    >;
+  }
+
+  parse<Params extends CompletionCreateParams>(
+    body: Params,
+    options?: RequestOptions,
+  ): APIPromise<_ParsedChatCompletion<ExtractParsedContentFromParams<Params>>> {
+    if (body.tools) {
+      validateInputTools(body.tools);
+    }
+
+    return this._client
+      .post<Completion>('/v1/chat/completions', { body, ...options, stream: false })
+      .then((completion) => parseChatCompletion(completion, body)) as APIPromise<
+      _ParsedChatCompletion<ExtractParsedContentFromParams<Params>>
+    >;
   }
 }
 
@@ -3376,6 +3409,11 @@ export interface CompletionCreateParamsStreaming extends CompletionCreateParamsB
   [k: string]: unknown;
 }
 
+export type ParsedChatCompletion<ParsedT> = _ParsedChatCompletion<ParsedT>;
+export type ParsedChoice<ParsedT> = _ParsedChoice<ParsedT>;
+export type ParsedMessage<ParsedT> = _ParsedMessage<ParsedT>;
+export { type ParsedFunctionToolCall };
+
 export declare namespace Completions {
   export {
     type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
@@ -3386,5 +3424,9 @@ export declare namespace Completions {
     type CompletionCreateParams as CompletionCreateParams,
     type CompletionCreateParamsNonStreaming as CompletionCreateParamsNonStreaming,
     type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming,
+    type ParsedChatCompletion as ParsedChatCompletion,
+    type ParsedChoice as ParsedChoice,
+    type ParsedMessage as ParsedMessage,
+    type ParsedFunctionToolCall as ParsedFunctionToolCall,
   };
 }

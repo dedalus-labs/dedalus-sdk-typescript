@@ -128,3 +128,5 @@ export class UnprocessableEntityError extends APIError<422, Headers> {}
 export class RateLimitError extends APIError<429, Headers> {}
 
 export class InternalServerError extends APIError<number, Headers> {}
+
+export { LengthFinishReasonError, ContentFilterFinishReasonError } from '../lib/parser';
