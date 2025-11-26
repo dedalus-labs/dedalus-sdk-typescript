@@ -12,6 +12,7 @@ import {
 } from '../../src/lib/parser';
 import type { Completion, CompletionCreateParams } from '../../src/resources/chat/completions';
 import type { ResponseFormatJSONSchema } from '../../src/resources/shared';
+import type { MockParsedCompletion } from '../utils/mock-completions';
 
 describe('Parser - Brand Markers', () => {
   describe('makeParseableResponseFormat', () => {
@@ -175,7 +176,7 @@ describe('Parser - Completion Parsing', () => {
         messages: [],
       };
 
-      const parsed = maybeParseChatCompletion(completion, params);
+      const parsed = maybeParseChatCompletion(completion, params) as MockParsedCompletion<null>;
 
       expect(parsed.choices[0].message.parsed).toBeNull();
     });
@@ -212,7 +213,9 @@ describe('Parser - Completion Parsing', () => {
         response_format: parseable,
       };
 
-      const parsed = maybeParseChatCompletion(completion, params);
+      const parsed = maybeParseChatCompletion(completion, params) as MockParsedCompletion<{
+        result: string;
+      }>;
 
       expect(parsed.choices[0].message.parsed).toEqual({ result: 'success' });
     });
@@ -249,7 +252,7 @@ describe('Parser - Completion Parsing', () => {
         response_format: parseable,
       };
 
-      const parsed = maybeParseChatCompletion(completion, params);
+      const parsed = maybeParseChatCompletion(completion, params) as MockParsedCompletion<null>;
 
       expect(parsed.choices[0].message.parsed).toBeNull();
       expect(parsed.choices[0].message.refusal).toBe('I cannot help with that');

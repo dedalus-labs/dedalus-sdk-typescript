@@ -1,5 +1,23 @@
 import { transformJSONSchema } from '../../../src/lib/schemas/transform';
-import { JSONSchema } from '../../../src/lib/schemas/jsonschema';
+import type { JSONSchema, JSONSchemaDefinition } from '../../../src/lib/schemas/jsonschema';
+
+/** Array with at least two elements for test assertions */
+type TwoElementArray<T> = [T, T, ...T[]];
+
+/** Extended JSONSchema for testing non-standard nested $defs paths */
+interface NestedDefsJSONSchema extends JSONSchema {
+  $defs?: {
+    [key: string]:
+      | JSONSchemaDefinition
+      | {
+          [key: string]:
+            | JSONSchemaDefinition
+            | {
+                [key: string]: JSONSchemaDefinition;
+              };
+        };
+  };
+}
 
 describe('transformJSONSchema - Edge Cases', () => {
   describe('Circular References', () => {
@@ -91,7 +109,7 @@ describe('transformJSONSchema - Edge Cases', () => {
       const strict = transformJSONSchema(schema);
       const items = strict.properties!['items'] as JSONSchema;
       const itemSchema = items.items as JSONSchema;
-      const variants = itemSchema.anyOf as JSONSchema[];
+      const variants = itemSchema.anyOf as TwoElementArray<JSONSchema>;
 
       expect(variants[0].additionalProperties).toBe(false);
       expect(variants[1].additionalProperties).toBe(false);
@@ -117,7 +135,7 @@ describe('transformJSONSchema - Edge Cases', () => {
 
       const strict = transformJSONSchema(schema);
       const data = strict.properties!['data'] as JSONSchema;
-      const variants = data.anyOf as JSONSchema[];
+      const variants = data.anyOf as TwoElementArray<JSONSchema>;
 
       expect(variants[1].additionalProperties).toBe(false);
     });
@@ -155,7 +173,7 @@ describe('transformJSONSchema - Edge Cases', () => {
     });
 
     it('handles deeply nested $ref paths', () => {
-      const schema: JSONSchema = {
+      const schema: NestedDefsJSONSchema = {
         type: 'object',
         properties: {
           data: { $ref: '#/$defs/level1/level2/level3' },

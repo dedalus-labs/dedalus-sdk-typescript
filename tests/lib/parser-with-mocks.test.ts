@@ -10,12 +10,18 @@ import {
   createMockCompletionWithContent,
   createMockCompletionWithRefusal,
   createMockCompletionWithTools,
+  type MockParsedCompletion,
 } from '../utils/mock-completions';
 import type { CompletionCreateParams } from '../../src/resources/chat/completions';
 
 describe('Parser - Mock-Based Integration Tests', () => {
   describe('Response Format Parsing', () => {
     it('parses valid JSON with Zod schema', () => {
+      interface Weather {
+        city: string;
+        temperature: number;
+      }
+
       const schema = z.object({
         city: z.string(),
         temperature: z.number(),
@@ -32,7 +38,7 @@ describe('Parser - Mock-Based Integration Tests', () => {
         response_format: format,
       };
 
-      const parsed = parseChatCompletion(completion, params);
+      const parsed = parseChatCompletion(completion, params) as MockParsedCompletion<Weather>;
 
       expect(parsed.choices[0].message.parsed).toEqual({
         city: 'San Francisco',
@@ -68,7 +74,7 @@ describe('Parser - Mock-Based Integration Tests', () => {
         response_format: format,
       };
 
-      const parsed = parseChatCompletion(completion, params);
+      const parsed = parseChatCompletion(completion, params) as MockParsedCompletion<{ answer: string }>;
 
       expect(parsed.choices[0].message.parsed).toBeNull();
       expect(parsed.choices[0].message.refusal).toBe('I cannot help with that');
@@ -128,7 +134,7 @@ describe('Parser - Mock-Based Integration Tests', () => {
         tools: [tool],
       };
 
-      const parsed = parseChatCompletion(completion, params);
+      const parsed = parseChatCompletion(completion, params) as MockParsedCompletion<null>;
       const toolCall = parsed.choices[0].message.tool_calls?.[0];
 
       expect(toolCall?.function.parsed_arguments).toEqual({
@@ -193,7 +199,7 @@ describe('Parser - Mock-Based Integration Tests', () => {
         tools: [getTool, calcTool],
       };
 
-      const parsed = parseChatCompletion(completion, params);
+      const parsed = parseChatCompletion(completion, params) as MockParsedCompletion<null>;
 
       expect(parsed.choices[0].message.tool_calls).toHaveLength(2);
       expect(parsed.choices[0].message.tool_calls?.[0]?.function.parsed_arguments).toEqual({
@@ -214,12 +220,16 @@ describe('Parser - Mock-Based Integration Tests', () => {
         messages: [],
       };
 
-      const result = maybeParseChatCompletion(completion, params);
+      const result = maybeParseChatCompletion(completion, params) as MockParsedCompletion<null>;
 
       expect(result.choices[0].message.parsed).toBeNull();
     });
 
     it('auto-parses when format is detected', () => {
+      interface DataResult {
+        data: string;
+      }
+
       const schema = z.object({ data: z.string() });
       const format = zodResponseFormat(schema, 'test');
       const completion = createMockCompletionWithContent('{"data": "hello"}');
@@ -230,7 +240,7 @@ describe('Parser - Mock-Based Integration Tests', () => {
         response_format: format,
       };
 
-      const result = maybeParseChatCompletion(completion, params);
+      const result = maybeParseChatCompletion(completion, params) as MockParsedCompletion<DataResult>;
 
       expect(result.choices[0].message.parsed).toEqual({ data: 'hello' });
     });
@@ -238,6 +248,17 @@ describe('Parser - Mock-Based Integration Tests', () => {
 
   describe('Complex Schemas', () => {
     it('handles deeply nested objects', () => {
+      interface NestedUser {
+        user: {
+          profile: {
+            personal: {
+              name: string;
+              age: number;
+            };
+          };
+        };
+      }
+
       const schema = z.object({
         user: z.object({
           profile: z.object({
@@ -269,12 +290,21 @@ describe('Parser - Mock-Based Integration Tests', () => {
         response_format: format,
       };
 
-      const parsed = parseChatCompletion(completion, params);
+      const parsed = parseChatCompletion(completion, params) as MockParsedCompletion<NestedUser>;
 
       expect(parsed.choices[0].message.parsed?.user.profile.personal.name).toBe('Alice');
     });
 
     it('handles arrays of complex objects', () => {
+      interface ItemsResult {
+        items: Array<{
+          id: string;
+          metadata: {
+            tags: string[];
+          };
+        }>;
+      }
+
       const schema = z.object({
         items: z.array(
           z.object({
@@ -302,10 +332,10 @@ describe('Parser - Mock-Based Integration Tests', () => {
         response_format: format,
       };
 
-      const parsed = parseChatCompletion(completion, params);
+      const parsed = parseChatCompletion(completion, params) as MockParsedCompletion<ItemsResult>;
 
       expect(parsed.choices[0].message.parsed?.items).toHaveLength(2);
-      expect(parsed.choices[0].message.parsed?.items[0].metadata.tags).toEqual(['a', 'b']);
+      expect(parsed.choices[0].message.parsed?.items[0]?.metadata.tags).toEqual(['a', 'b']);
     });
   });
 });

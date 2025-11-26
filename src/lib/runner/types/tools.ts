@@ -5,8 +5,6 @@
 // ==============================================================================
 
 import type {
-  Completion,
-  CompletionCreateParams,
   ChatCompletionToolParam,
   ChatCompletionMessageToolCall,
   ChatCompletionMessageCustomToolCall,

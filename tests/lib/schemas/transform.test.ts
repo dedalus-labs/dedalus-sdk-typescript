@@ -1,5 +1,8 @@
 import { transformJSONSchema } from '../../../src/lib/schemas/transform';
-import { JSONSchema } from '../../../src/lib/schemas/jsonschema';
+import type { JSONSchema } from '../../../src/lib/schemas/jsonschema';
+
+/** Array with at least two elements for test assertions */
+type TwoElementArray<T> = [T, T, ...T[]];
 
 describe('transformJSONSchema', () => {
   describe('Root Schema Validation', () => {
@@ -219,7 +222,7 @@ describe('transformJSONSchema', () => {
 
       const strict = transformJSONSchema(schema);
       const data = strict.properties!['data'] as JSONSchema;
-      const variants = data.anyOf as JSONSchema[];
+      const variants = data.anyOf as TwoElementArray<JSONSchema>;
 
       expect(variants[0].additionalProperties).toBe(false);
       expect(variants[1].additionalProperties).toBe(false);

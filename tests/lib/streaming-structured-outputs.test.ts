@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import Dedalus from '../../src/index';
 import { zodResponseFormat } from '../../src/helpers/zod';
+import type { MockParsedCompletion } from '../utils/mock-completions';
 
 /**
  * Streaming + Structured Outputs Integration Test
@@ -88,8 +89,14 @@ describe('Structured Outputs - Completions API', () => {
       response_format: zodResponseFormat(schema, 'math'),
     });
 
-    expect(completion.choices[0].message.parsed).toBeDefined();
-    expect(typeof completion.choices[0].message.parsed?.answer).toBe('string');
-    expect(typeof completion.choices[0].message.parsed?.confidence).toBe('number');
+    interface MathResult {
+      answer: string;
+      confidence: number;
+    }
+
+    const result = completion as MockParsedCompletion<MathResult>;
+    expect(result.choices[0].message.parsed).toBeDefined();
+    expect(typeof result.choices[0].message.parsed?.answer).toBe('string');
+    expect(typeof result.choices[0].message.parsed?.confidence).toBe('number');
   }, 30000);
 });
