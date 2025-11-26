@@ -46,6 +46,7 @@ import {
   parseLogLevel,
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
+import { transformRequestBody } from './lib/case-conversion';
 
 const environments = {
   production: 'https://api.dedaluslabs.ai',
@@ -70,7 +71,7 @@ export interface ClientOptions {
   organization?: string | null | undefined;
 
   /**
-   * Provider name for BYOK mode (e.g., 'openai', 'anthropic').
+   * Provider name for BYOK mode.
    */
   provider?: string | null | undefined;
 
@@ -392,9 +393,18 @@ export class Dedalus {
   }
 
   /**
-   * Used as a callback for mutating the given `FinalRequestOptions` object.
+   * Convert camelCase parameters to snake_case for API compatibility.
+   * We preserve the structured output schemas, which are already in the correct format.
    */
-  protected async prepareOptions(options: FinalRequestOptions): Promise<void> {}
+  protected async prepareOptions(options: FinalRequestOptions): Promise<void> {
+    if (options.body) {
+      options.body = transformRequestBody(options.body);
+    }
+
+    if (options.query) {
+      options.query = transformRequestBody(options.query);
+    }
+  }
 
   /**
    * Used as a callback for mutating the given `RequestInit` object.
@@ -879,8 +889,6 @@ export declare namespace Dedalus {
 
   export type DedalusModel = API.DedalusModel;
   export type DedalusModelChoice = API.DedalusModelChoice;
-  export type FunctionDefinition = API.FunctionDefinition;
-  export type FunctionParameters = API.FunctionParameters;
   export type ResponseFormatJSONObject = API.ResponseFormatJSONObject;
   export type ResponseFormatJSONSchema = API.ResponseFormatJSONSchema;
   export type ResponseFormatText = API.ResponseFormatText;

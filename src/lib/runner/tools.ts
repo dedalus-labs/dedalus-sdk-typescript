@@ -4,6 +4,7 @@
 //           github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
+import type { ChatCompletionToolParam } from '../../resources/chat/completions';
 import type { JsonValue, Tool } from './types/tools';
 import { toSchema } from '../utils/schemas';
 
@@ -12,8 +13,8 @@ export function createToolHandler(tools: Iterable<Tool>) {
   const toolsByName = new Map(Array.from(tools).map((fn) => [fn.name, fn]));
 
   return {
-    schemas(): Array<Record<string, any>> {
-      const schemas: Array<Record<string, any>> = [];
+    schemas(): Array<ChatCompletionToolParam> {
+      const schemas: Array<ChatCompletionToolParam> = [];
       for (const fn of toolsByName.values()) {
         try {
           schemas.push(toSchema(fn));
