@@ -6,6 +6,9 @@ Types:
 - <code><a href="./src/resources/shared.ts">DedalusModelChoice</a></code>
 - <code><a href="./src/resources/shared.ts">FunctionDefinition</a></code>
 - <code><a href="./src/resources/shared.ts">FunctionParameters</a></code>
+- <code><a href="./src/resources/shared.ts">MCPServerInput</a></code>
+- <code><a href="./src/resources/shared.ts">MCPServerParam</a></code>
+- <code><a href="./src/resources/shared.ts">MCPServers</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONObject</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONSchema</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatText</a></code>
