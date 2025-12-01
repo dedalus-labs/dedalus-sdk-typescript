@@ -193,6 +193,39 @@ export interface FunctionDefinition {
 export type FunctionParameters = { [key: string]: unknown };
 
 /**
+ * Single MCP server input: slug string or structured MCPServerParam.
+ */
+export type MCPServerInput = string | MCPServerParam;
+
+/**
+ * Structured MCP server parameter.
+ *
+ * Slug-based: {"slug": "dedalus-labs/brave-search", "version": "v1.0.0"}
+ * URL-based: {"url": "https://mcp.dedaluslabs.ai/acme/my-server/mcp"}
+ */
+export interface MCPServerParam {
+  /**
+   * Marketplace slug.
+   */
+  slug?: string | null;
+
+  /**
+   * Direct URL to MCP server endpoint.
+   */
+  url?: string | null;
+
+  /**
+   * Version constraint for slug-based servers.
+   */
+  version?: string | null;
+}
+
+/**
+ * List of MCP server inputs.
+ */
+export type MCPServers = Array<MCPServerInput>;
+
+/**
  * JSON object response format. An older method of generating JSON responses. Using
  * `json_schema` is recommended for models that support it. Note that the model
  * will not generate JSON without a system or user message instructing it to do so.

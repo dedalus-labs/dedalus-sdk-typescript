@@ -143,14 +143,15 @@ export interface Annotation {
  * Fields:
  *
  * - content (optional): str |
- *   Annotated[list[ChatCompletionRequestAssistantMessageContentPart], MinLen(1)] |
- *   None
+ *   Annotated[list[ChatCompletionRequestAssistantMessageContentPart], MinLen(1),
+ *   ArrayTitle("ChatCompletionRequestAssistantMessageContentArray")] | None
  * - refusal (optional): str | None
  * - role (required): Literal["assistant"]
  * - name (optional): str
  * - audio (optional): Audio | None
  * - tool_calls (optional): ChatCompletionMessageToolCalls
- * - function_call (optional): FunctionCallInline | None
+ * - function_call (optional): ChatCompletionRequestAssistantMessageFunctionCall |
+ *   None
  */
 export interface ChatCompletionAssistantMessageParam {
   /**
@@ -571,7 +572,8 @@ export interface ChatCompletionContentPartTextParam {
  * Fields:
  *
  * - content (required): str |
- *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1)]
+ *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1),
+ *   ArrayTitle("ChatCompletionRequestDeveloperMessageContentArray")]
  * - role (required): Literal["developer"]
  * - name (optional): str
  */
@@ -774,7 +776,8 @@ export interface ChatCompletionMessageToolCall {
  * Fields:
  *
  * - content (required): str |
- *   Annotated[list[ChatCompletionRequestSystemMessageContentPart], MinLen(1)]
+ *   Annotated[list[ChatCompletionRequestSystemMessageContentPart], MinLen(1),
+ *   ArrayTitle("ChatCompletionRequestSystemMessageContentArray")]
  * - role (required): Literal["system"]
  * - name (optional): str
  */
@@ -835,7 +838,8 @@ export interface ChatCompletionTokenLogprob {
  *
  * - role (required): Literal["tool"]
  * - content (required): str |
- *   Annotated[list[ChatCompletionRequestToolMessageContentPart], MinLen(1)]
+ *   Annotated[list[ChatCompletionRequestToolMessageContentPart], MinLen(1),
+ *   ArrayTitle("ChatCompletionRequestToolMessageContentArray")]
  * - tool_call_id (required): str
  */
 export interface ChatCompletionToolMessageParam {
@@ -889,7 +893,8 @@ export interface ChatCompletionToolParam {
  * Fields:
  *
  * - content (required): str |
- *   Annotated[list[ChatCompletionRequestUserMessageContentPart], MinLen(1)]
+ *   Annotated[list[ChatCompletionRequestUserMessageContentPart], MinLen(1),
+ *   ArrayTitle("ChatCompletionRequestUserMessageContentArray")]
  * - role (required): Literal["user"]
  * - name (optional): str
  */
@@ -1212,9 +1217,10 @@ export interface CompletionRequest {
   max_turns?: number | null;
 
   /**
-   * MCP server identifiers. Accepts URLs, repository slugs, or server IDs.
+   * MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerParam
+   * objects. MCP tools are executed server-side and billed separately.
    */
-  mcp_servers?: string | Array<string> | null;
+  mcp_servers?: string | Shared.MCPServerParam | Shared.MCPServers | null;
 
   /**
    * Conversation history (OpenAI: messages, Google: contents, Responses: input)
@@ -1262,7 +1268,8 @@ export interface CompletionRequest {
    *
    * - type (required): Literal["content"]
    * - content (required): str |
-   *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1)]
+   *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1),
+   *   ArrayTitle("PredictionContentArray")]
    */
   prediction?: PredictionContent | null;
 
@@ -1727,7 +1734,8 @@ export interface InputTokenDetails {
  *
  * - type (required): Literal["content"]
  * - content (required): str |
- *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1)]
+ *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1),
+ *   ArrayTitle("PredictionContentArray")]
  */
 export interface PredictionContent {
   /**
@@ -2103,9 +2111,10 @@ export interface CompletionCreateParamsBase {
   max_turns?: number | null;
 
   /**
-   * MCP server identifiers. Accepts URLs, repository slugs, or server IDs.
+   * MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerParam
+   * objects. MCP tools are executed server-side and billed separately.
    */
-  mcp_servers?: string | Array<string> | null;
+  mcp_servers?: string | Shared.MCPServerParam | Shared.MCPServers | null;
 
   /**
    * Conversation history (OpenAI: messages, Google: contents, Responses: input)
@@ -2153,7 +2162,8 @@ export interface CompletionCreateParamsBase {
    *
    * - type (required): Literal["content"]
    * - content (required): str |
-   *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1)]
+   *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1),
+   *   ArrayTitle("PredictionContentArray")]
    */
   prediction?: PredictionContent | null;
 
