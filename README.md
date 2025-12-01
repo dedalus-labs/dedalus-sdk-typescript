@@ -26,7 +26,7 @@ const client = new Dedalus({
   apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted
 });
 
-const completion = await client.chat.completions.create({
+const chatCompletion = await client.chat.completions.create({
   model: 'openai/gpt-5-nano',
   messages: [
     { role: 'system', content: 'You are Stephen Dedalus. Respond in morose Joycean malaise.' },
@@ -34,7 +34,7 @@ const completion = await client.chat.completions.create({
   ],
 });
 
-console.log(completion.id);
+console.log(chatCompletion.id);
 ```
 
 ## Streaming responses
@@ -54,8 +54,8 @@ const stream = await client.chat.completions.create({
     { role: 'user', content: 'What do you think of artificial intelligence?' },
   ],
 });
-for await (const streamChunk of stream) {
-  console.log(streamChunk.id);
+for await (const chatCompletionChunk of stream) {
+  console.log(chatCompletionChunk.id);
 }
 ```
 
@@ -81,7 +81,7 @@ const params: Dedalus.Chat.CompletionCreateParams = {
     { role: 'user', content: 'Hello, how are you today?' },
   ],
 };
-const completion: Dedalus.Chat.Completion = await client.chat.completions.create(params);
+const chatCompletion: Dedalus.Chat.ChatCompletion = await client.chat.completions.create(params);
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
@@ -129,7 +129,7 @@ a subclass of `APIError` will be thrown:
 
 <!-- prettier-ignore -->
 ```ts
-const completion = await client.chat.completions
+const chatCompletion = await client.chat.completions
   .create({
     model: 'openai/gpt-5-nano',
     messages: [
@@ -219,7 +219,7 @@ import Dedalus from 'dedalus-labs';
 
 const client = new Dedalus();
 
-const completion = await client.chat.completions.create(
+const chatCompletion = await client.chat.completions.create(
   {
     model: 'openai/gpt-5-nano',
     messages: [
@@ -257,7 +257,7 @@ const response = await client.chat.completions
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: completion, response: raw } = await client.chat.completions
+const { data: chatCompletion, response: raw } = await client.chat.completions
   .create({
     model: 'openai/gpt-5-nano',
     messages: [
@@ -267,7 +267,7 @@ const { data: completion, response: raw } = await client.chat.completions
   })
   .withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(completion.id);
+console.log(chatCompletion.id);
 ```
 
 ### Logging

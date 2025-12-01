@@ -85,14 +85,17 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/chat/completions.ts">Annotation</a></code>
+- <code><a href="./src/resources/chat/completions.ts">ChatCompletion</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionAssistantMessageParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionAudio</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionAudioParam</a></code>
+- <code><a href="./src/resources/chat/completions.ts">ChatCompletionChunk</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartAudioParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartFileParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartImageParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartRefusalParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartTextParam</a></code>
+- <code><a href="./src/resources/chat/completions.ts">ChatCompletionCreateParams</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionDeveloperMessageParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionFunctionMessageParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionFunctions</a></code>
@@ -106,13 +109,9 @@ Types:
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionUserMessageParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">Choice</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChoiceDelta</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ChoiceDeltaFunctionCall</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChoiceDeltaToolCall</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChoiceDeltaToolCallFunction</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChoiceLogprobs</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ChunkChoice</a></code>
-- <code><a href="./src/resources/chat/completions.ts">Completion</a></code>
-- <code><a href="./src/resources/chat/completions.ts">CompletionRequest</a></code>
 - <code><a href="./src/resources/chat/completions.ts">CompletionTokensDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">CompletionUsage</a></code>
 - <code><a href="./src/resources/chat/completions.ts">Custom</a></code>
@@ -122,7 +121,6 @@ Types:
 - <code><a href="./src/resources/chat/completions.ts">PredictionContent</a></code>
 - <code><a href="./src/resources/chat/completions.ts">PromptTokensDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">Reasoning</a></code>
-- <code><a href="./src/resources/chat/completions.ts">StreamChunk</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ThinkingConfigDisabled</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ThinkingConfigEnabled</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoice</a></code>
@@ -135,4 +133,4 @@ Types:
 
 Methods:
 
-- <code title="post /v1/chat/completions">client.chat.completions.<a href="./src/resources/chat/completions.ts">create</a>({ ...params }) -> Completion</code>
+- <code title="post /v1/chat/completions">client.chat.completions.<a href="./src/resources/chat/completions.ts">create</a>({ ...params }) -> ChatCompletion</code>

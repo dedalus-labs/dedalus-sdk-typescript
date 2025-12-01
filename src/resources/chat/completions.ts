@@ -73,31 +73,34 @@ export class Completions extends APIResource {
    *
    * @example
    * ```ts
-   * const completion = await client.chat.completions.create({
-   *   model: 'openai/gpt-5',
-   * });
+   * const chatCompletion = await client.chat.completions.create(
+   *   { model: 'openai/gpt-5' },
+   * );
    * ```
    */
-  create(body: CompletionCreateParamsNonStreaming, options?: RequestOptions): APIPromise<Completion>;
-  create(body: CompletionCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<StreamChunk>>;
+  create(body: CompletionCreateParamsNonStreaming, options?: RequestOptions): APIPromise<ChatCompletion>;
+  create(
+    body: CompletionCreateParamsStreaming,
+    options?: RequestOptions,
+  ): APIPromise<Stream<ChatCompletionChunk>>;
   create(
     body: CompletionCreateParamsBase,
     options?: RequestOptions,
-  ): APIPromise<Stream<StreamChunk> | Completion>;
+  ): APIPromise<Stream<ChatCompletionChunk> | ChatCompletion>;
   create(
     body: CompletionCreateParams,
     options?: RequestOptions,
-  ): APIPromise<Completion> | APIPromise<Stream<StreamChunk>> {
+  ): APIPromise<ChatCompletion> | APIPromise<Stream<ChatCompletionChunk>> {
     const isStreaming = body.stream ?? false;
 
     if (!isStreaming) {
       return this._client
         .post<Completion>('/v1/chat/completions', { body, ...options, stream: false })
-        .then((completion) => maybeParseChatCompletion(completion, body as any)) as APIPromise<Completion>;
+        .then((completion) => maybeParseChatCompletion(completion, body as any)) as APIPromise<ChatCompletion>;
     }
 
     return this._client.post('/v1/chat/completions', { body, ...options, stream: true }) as APIPromise<
-      Stream<StreamChunk>
+      Stream<ChatCompletionChunk>
     >;
   }
 
@@ -135,6 +138,88 @@ export interface Annotation {
    * A URL citation when using web search.
    */
   url_citation: URLCitation;
+}
+
+/**
+ * Chat completion response for Dedalus API.
+ *
+ * OpenAI-compatible chat completion response with Dedalus extensions. Maintains
+ * full compatibility with OpenAI API while providing additional features like
+ * server-side tool execution tracking and MCP error reporting.
+ */
+export interface ChatCompletion {
+  /**
+   * A unique identifier for the chat completion.
+   */
+  id: string;
+
+  /**
+   * A list of chat completion choices. Can be more than one if `n` is greater
+   * than 1.
+   */
+  choices: Array<Choice>;
+
+  /**
+   * The Unix timestamp (in seconds) of when the chat completion was created.
+   */
+  created: number;
+
+  /**
+   * The model used for the chat completion.
+   */
+  model: string;
+
+  /**
+   * The object type, which is always `chat.completion`.
+   */
+  object: 'chat.completion';
+
+  /**
+   * Information about MCP server failures, if any occurred during the request.
+   * Contains details about which servers failed and why, along with recommendations
+   * for the user. Only present when MCP server failures occurred.
+   */
+  mcp_server_errors?: { [key: string]: unknown } | null;
+
+  /**
+   * Specifies the processing type used for serving the request.
+   *
+   * - If set to 'auto', then the request will be processed with the service tier
+   *   configured in the Project settings. Unless otherwise configured, the Project
+   *   will use 'default'.
+   * - If set to 'default', then the request will be processed with the standard
+   *   pricing and performance for the selected model.
+   * - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+   *   '[priority](https://openai.com/api-priority-processing/)', then the request
+   *   will be processed with the corresponding service tier.
+   * - When not set, the default behavior is 'auto'.
+   *
+   * When the `service_tier` parameter is set, the response body will include the
+   * `service_tier` value based on the processing mode actually used to serve the
+   * request. This response value may be different from the value set in the
+   * parameter.
+   */
+  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
+
+  /**
+   * This fingerprint represents the backend configuration that the model runs with.
+   *
+   * Can be used in conjunction with the `seed` request parameter to understand when
+   * backend changes have been made that might impact determinism.
+   */
+  system_fingerprint?: string;
+
+  /**
+   * List of tool names that were executed server-side (e.g., MCP tools). Only
+   * present when tools were executed on the server rather than returned for
+   * client-side execution.
+   */
+  tools_executed?: Array<string> | null;
+
+  /**
+   * Usage statistics for the completion request.
+   */
+  usage?: CompletionUsage;
 }
 
 /**
@@ -249,32 +334,12 @@ export namespace ChatCompletionAssistantMessageParam {
     /**
      * The function that the model called.
      */
-    function: ChatCompletionMessageToolCallInput.Function;
+    function: CompletionsAPI.ChoiceDeltaToolCallFunction;
 
     /**
      * The type of the tool. Currently, only `function` is supported.
      */
     type: 'function';
-  }
-
-  export namespace ChatCompletionMessageToolCallInput {
-    /**
-     * The function that the model called.
-     */
-    export interface Function {
-      /**
-       * The arguments to call the function with, as generated by the model in JSON
-       * format. Note that the model does not always generate valid JSON, and may
-       * hallucinate parameters not defined by your function schema. Validate the
-       * arguments in your code before calling your function.
-       */
-      arguments: string;
-
-      /**
-       * The name of the function to call.
-       */
-      name: string;
-    }
   }
 
   /**
@@ -370,6 +435,159 @@ export interface ChatCompletionAudioParam {
    * Unique identifier for a previous audio response from the model.
    */
   id: string;
+}
+
+/**
+ * Represents a streamed chunk of a chat completion response returned by the model,
+ * based on the provided input.
+ * [Learn more](https://platform.openai.com/docs/guides/streaming-responses).
+ *
+ * Fields:
+ *
+ * - id (required): str
+ * - choices (required): list[ChoicesItem]
+ * - created (required): int
+ * - model (required): str
+ * - service_tier (optional): ServiceTier
+ * - system_fingerprint (optional): str
+ * - object (required): Literal["chat.completion.chunk"]
+ * - usage (optional): CompletionUsage
+ */
+export interface ChatCompletionChunk {
+  /**
+   * A unique identifier for the chat completion. Each chunk has the same ID.
+   */
+  id: string;
+
+  /**
+   * A list of chat completion choices. Can contain more than one elements if `n` is
+   * greater than 1. Can also be empty for the last chunk if you set
+   * `stream_options: {"include_usage": true}`.
+   */
+  choices: Array<ChatCompletionChunk.Choice>;
+
+  /**
+   * The Unix timestamp (in seconds) of when the chat completion was created. Each
+   * chunk has the same timestamp.
+   */
+  created: number;
+
+  /**
+   * The model to generate the completion.
+   */
+  model: string;
+
+  /**
+   * The object type, which is always `chat.completion.chunk`.
+   */
+  object: 'chat.completion.chunk';
+
+  /**
+   * Specifies the processing type used for serving the request.
+   *
+   * - If set to 'auto', then the request will be processed with the service tier
+   *   configured in the Project settings. Unless otherwise configured, the Project
+   *   will use 'default'.
+   * - If set to 'default', then the request will be processed with the standard
+   *   pricing and performance for the selected model.
+   * - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+   *   '[priority](https://openai.com/api-priority-processing/)', then the request
+   *   will be processed with the corresponding service tier.
+   * - When not set, the default behavior is 'auto'.
+   *
+   * When the `service_tier` parameter is set, the response body will include the
+   * `service_tier` value based on the processing mode actually used to serve the
+   * request. This response value may be different from the value set in the
+   * parameter.
+   */
+  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
+
+  /**
+   * This fingerprint represents the backend configuration that the model runs with.
+   * Can be used in conjunction with the `seed` request parameter to understand when
+   * backend changes have been made that might impact determinism.
+   */
+  system_fingerprint?: string;
+
+  /**
+   * Usage statistics for the completion request.
+   *
+   * Fields:
+   *
+   * - completion_tokens (required): int
+   * - prompt_tokens (required): int
+   * - total_tokens (required): int
+   * - completion_tokens_details (optional): CompletionTokensDetails
+   * - prompt_tokens_details (optional): PromptTokensDetails
+   */
+  usage?: CompletionUsage | null;
+}
+
+export namespace ChatCompletionChunk {
+  /**
+   * Schema for ChoicesItem.
+   *
+   * Fields:
+   *
+   * - delta (required): ChatCompletionStreamResponseDelta
+   * - logprobs (optional): Logprobs
+   * - finish_reason (required): Literal["stop", "length", "tool_calls",
+   *   "content_filter", "function_call"]
+   * - index (required): int
+   */
+  export interface Choice {
+    /**
+     * A chat completion delta generated by streamed model responses.
+     */
+    delta: CompletionsAPI.ChoiceDelta;
+
+    /**
+     * The reason the model stopped generating tokens. This will be `stop` if the model
+     * hit a natural stop point or a provided stop sequence, `length` if the maximum
+     * number of tokens specified in the request was reached, `content_filter` if
+     * content was omitted due to a flag from our content filters, `tool_calls` if the
+     * model called a tool, or `function_call` (deprecated) if the model called a
+     * function.
+     */
+    finish_reason: 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call';
+
+    /**
+     * The index of the choice in the list of choices.
+     */
+    index: number;
+
+    /**
+     * Log probability information for the choice.
+     *
+     * Fields:
+     *
+     * - content (required): list[ChatCompletionTokenLogprob]
+     * - refusal (required): list[ChatCompletionTokenLogprob]
+     */
+    logprobs?: Choice.Logprobs | null;
+  }
+
+  export namespace Choice {
+    /**
+     * Log probability information for the choice.
+     *
+     * Fields:
+     *
+     * - content (required): list[ChatCompletionTokenLogprob]
+     * - refusal (required): list[ChatCompletionTokenLogprob]
+     */
+    export interface Logprobs {
+      /**
+       * A list of message content tokens with log probability information.
+       */
+      content: Array<CompletionsAPI.ChatCompletionTokenLogprob>;
+
+      /**
+       * A list of message refusal tokens with log probability information.
+       */
+      refusal: Array<CompletionsAPI.ChatCompletionTokenLogprob>;
+    }
+  }
 }
 
 /**
@@ -562,6 +780,448 @@ export interface ChatCompletionContentPartTextParam {
    * The type of the content part.
    */
   type: 'text';
+}
+
+/**
+ * ChatCompletion request schema.
+ *
+ * Supports OpenAI-compatible parameters, provider-specific extensions, server-side
+ * execution, and agent orchestration features.
+ */
+export interface ChatCompletionCreateParams {
+  /**
+   * Model identifier. Accepts model ID strings, lists for routing, or DedalusModel
+   * objects with per-model settings.
+   */
+  model: string | Shared.DedalusModel | Array<Shared.DedalusModelChoice>;
+
+  /**
+   * Agent attributes. Values in [0.0, 1.0].
+   */
+  agent_attributes?: { [key: string]: number } | null;
+
+  /**
+   * Parameters for audio output. Required when audio output is requested with `mo...
+   */
+  audio?: { [key: string]: unknown } | null;
+
+  /**
+   * Execute tools server-side. If false, returns raw tool calls for manual handling.
+   */
+  automatic_tool_execution?: boolean;
+
+  /**
+   * Optional. The name of the content [cached](https://ai.google.dev/gemini-api/d...
+   */
+  cached_content?: string | null;
+
+  /**
+   * If set to `true`, the request returns a `request_id`. You can then get the de...
+   */
+  deferred?: boolean | null;
+
+  /**
+   * Number between -2.0 and 2.0. Positive values penalize new tokens based on the...
+   */
+  frequency_penalty?: number | null;
+
+  /**
+   * Wrapper for union variant: function call mode.
+   */
+  function_call?: string | null;
+
+  /**
+   * Deprecated in favor of `tools`. A list of functions the model may generate J...
+   */
+  functions?: Array<ChatCompletionFunctions> | null;
+
+  /**
+   * Generation parameters wrapper (Google-specific)
+   */
+  generation_config?: { [key: string]: unknown } | null;
+
+  /**
+   * Content filtering and safety policy configuration.
+   */
+  guardrails?: Array<{ [key: string]: unknown }> | null;
+
+  /**
+   * Configuration for multi-model handoffs.
+   */
+  handoff_config?: { [key: string]: unknown } | null;
+
+  /**
+   * Modify the likelihood of specified tokens appearing in the completion. Accep...
+   */
+  logit_bias?: { [key: string]: number } | null;
+
+  /**
+   * Whether to return log probabilities of the output tokens or not. If true, ret...
+   */
+  logprobs?: boolean | null;
+
+  /**
+   * Maximum tokens in completion (newer parameter name)
+   */
+  max_completion_tokens?: number | null;
+
+  /**
+   * Maximum tokens in completion
+   */
+  max_tokens?: number | null;
+
+  /**
+   * Maximum conversation turns.
+   */
+  max_turns?: number | null;
+
+  /**
+   * MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerParam
+   * objects. MCP tools are executed server-side and billed separately.
+   */
+  mcp_servers?: string | Shared.MCPServerParam | Shared.MCPServers | null;
+
+  /**
+   * Conversation history (OpenAI: messages, Google: contents, Responses: input)
+   */
+  messages?: Array<
+    | ChatCompletionDeveloperMessageParam
+    | ChatCompletionSystemMessageParam
+    | ChatCompletionUserMessageParam
+    | ChatCompletionAssistantMessageParam
+    | ChatCompletionToolMessageParam
+    | ChatCompletionFunctionMessageParam
+  > | null;
+
+  /**
+   * Set of 16 key-value pairs that can be attached to an object. This can be usef...
+   */
+  metadata?: { [key: string]: unknown } | null;
+
+  /**
+   * Output types that you would like the model to generate. Most models are capab...
+   */
+  modalities?: Array<string> | null;
+
+  /**
+   * Model attributes for routing. Maps model IDs to attribute dictionaries with
+   * values in [0.0, 1.0].
+   */
+  model_attributes?: { [key: string]: { [key: string]: number } } | null;
+
+  /**
+   * How many chat completion choices to generate for each input message. Note tha...
+   */
+  n?: number | null;
+
+  /**
+   * Whether to enable parallel tool calls (Anthropic uses inverted polarity)
+   */
+  parallel_tool_calls?: boolean | null;
+
+  /**
+   * Static predicted output content, such as the content of a text file that is
+   * being regenerated.
+   *
+   * Fields:
+   *
+   * - type (required): Literal["content"]
+   * - content (required): str |
+   *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1),
+   *   ArrayTitle("PredictionContentArray")]
+   */
+  prediction?: PredictionContent | null;
+
+  /**
+   * Number between -2.0 and 2.0. Positive values penalize new tokens based on whe...
+   */
+  presence_penalty?: number | null;
+
+  /**
+   * Used by OpenAI to cache responses for similar requests to optimize your cache...
+   */
+  prompt_cache_key?: string | null;
+
+  /**
+   * The retention policy for the prompt cache. Set to `24h` to enable extended pr...
+   */
+  prompt_cache_retention?: string | null;
+
+  /**
+   * Allows toggling between the reasoning mode and no system prompt. When set to ...
+   */
+  prompt_mode?: 'reasoning' | null;
+
+  /**
+   * Constrains effort on reasoning for [reasoning models](https://platform.openai...
+   */
+  reasoning_effort?: string | null;
+
+  /**
+   * An object specifying the format that the model must output. Setting to `{ "...
+   */
+  response_format?:
+    | Shared.ResponseFormatText
+    | Shared.ResponseFormatJSONSchema
+    | Shared.ResponseFormatJSONObject
+    | null;
+
+  /**
+   * Whether to inject a safety prompt before all conversations.
+   */
+  safe_prompt?: boolean | null;
+
+  /**
+   * A stable identifier used to help detect users of your application that may be...
+   */
+  safety_identifier?: string | null;
+
+  /**
+   * Safety/content filtering settings (Google-specific)
+   */
+  safety_settings?: Array<ChatCompletionCreateParams.SafetySetting> | null;
+
+  /**
+   * Set the parameters to be used for searched data. If not set, no data will be ...
+   */
+  search_parameters?: { [key: string]: unknown } | null;
+
+  /**
+   * Random seed for deterministic output
+   */
+  seed?: number | null;
+
+  /**
+   * Service tier for request processing
+   */
+  service_tier?: string | null;
+
+  /**
+   * Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 seque...
+   */
+  stop?: Array<string> | string | null;
+
+  /**
+   * Custom text sequences that will cause the model to stop generating. Our mode...
+   */
+  stop_sequences?: Array<string> | null;
+
+  /**
+   * Whether or not to store the output of this chat completion request for use in...
+   */
+  store?: boolean | null;
+
+  /**
+   * Enable streaming response
+   */
+  stream?: boolean | null;
+
+  /**
+   * Options for streaming response. Only set this when you set `stream: true`.
+   */
+  stream_options?: { [key: string]: unknown } | null;
+
+  /**
+   * System instruction/prompt
+   */
+  system_instruction?: { [key: string]: unknown } | string | null;
+
+  /**
+   * Sampling temperature (0-2 for most providers)
+   */
+  temperature?: number | null;
+
+  /**
+   * Extended thinking configuration (Anthropic-specific)
+   */
+  thinking?: ThinkingConfigEnabled | ThinkingConfigDisabled | null;
+
+  /**
+   * Controls which (if any) tool is called by the model. `none` means the model w...
+   */
+  tool_choice?: ToolChoiceAuto | ToolChoiceAny | ToolChoiceTool | ToolChoiceNone | null;
+
+  /**
+   * Tool calling configuration (Google-specific)
+   */
+  tool_config?: { [key: string]: unknown } | null;
+
+  /**
+   * Available tools/functions for the model
+   */
+  tools?: Array<ChatCompletionToolParam | ChatCompletionCreateParams.CustomToolChatCompletions> | null;
+
+  /**
+   * Top-k sampling parameter
+   */
+  top_k?: number | null;
+
+  /**
+   * An integer between 0 and 20 specifying the number of most likely tokens to re...
+   */
+  top_logprobs?: number | null;
+
+  /**
+   * Nucleus sampling threshold
+   */
+  top_p?: number | null;
+
+  /**
+   * This field is being replaced by `safety_identifier` and `prompt_cache_key`. U...
+   */
+  user?: string | null;
+
+  /**
+   * Constrains the verbosity of the model's response. Lower values will result in...
+   */
+  verbosity?: string | null;
+
+  /**
+   * This tool searches the web for relevant results to use in a response. Learn m...
+   */
+  web_search_options?: { [key: string]: unknown } | null;
+
+  [k: string]: unknown;
+}
+
+export namespace ChatCompletionCreateParams {
+  /**
+   * Safety setting, affecting the safety-blocking behavior.
+   *
+   * Passing a safety setting for a category changes the allowed probability that
+   * content is blocked.
+   *
+   * Fields:
+   *
+   * - category (required): HarmCategory
+   * - threshold (required): Literal["HARM_BLOCK_THRESHOLD_UNSPECIFIED",
+   *   "BLOCK_LOW_AND_ABOVE", "BLOCK_MEDIUM_AND_ABOVE", "BLOCK_ONLY_HIGH",
+   *   "BLOCK_NONE", "OFF"]
+   */
+  export interface SafetySetting {
+    /**
+     * Required. The category for this setting.
+     */
+    category:
+      | 'HARM_CATEGORY_UNSPECIFIED'
+      | 'HARM_CATEGORY_DEROGATORY'
+      | 'HARM_CATEGORY_TOXICITY'
+      | 'HARM_CATEGORY_VIOLENCE'
+      | 'HARM_CATEGORY_SEXUAL'
+      | 'HARM_CATEGORY_MEDICAL'
+      | 'HARM_CATEGORY_DANGEROUS'
+      | 'HARM_CATEGORY_HARASSMENT'
+      | 'HARM_CATEGORY_HATE_SPEECH'
+      | 'HARM_CATEGORY_SEXUALLY_EXPLICIT'
+      | 'HARM_CATEGORY_DANGEROUS_CONTENT'
+      | 'HARM_CATEGORY_CIVIC_INTEGRITY';
+
+    /**
+     * Required. Controls the probability threshold at which harm is blocked.
+     */
+    threshold:
+      | 'HARM_BLOCK_THRESHOLD_UNSPECIFIED'
+      | 'BLOCK_LOW_AND_ABOVE'
+      | 'BLOCK_MEDIUM_AND_ABOVE'
+      | 'BLOCK_ONLY_HIGH'
+      | 'BLOCK_NONE'
+      | 'OFF';
+  }
+
+  /**
+   * A custom tool that processes input using a specified format.
+   *
+   * Fields:
+   *
+   * - type (required): Literal["custom"]
+   * - custom (required): CustomToolProperties
+   */
+  export interface CustomToolChatCompletions {
+    /**
+     * Properties of the custom tool.
+     */
+    custom: CustomToolChatCompletions.Custom;
+
+    /**
+     * The type of the custom tool. Always `custom`.
+     */
+    type: 'custom';
+  }
+
+  export namespace CustomToolChatCompletions {
+    /**
+     * Properties of the custom tool.
+     */
+    export interface Custom {
+      /**
+       * The name of the custom tool, used to identify it in tool calls.
+       */
+      name: string;
+
+      /**
+       * Optional description of the custom tool, used to provide more context.
+       */
+      description?: string;
+
+      /**
+       * The input format for the custom tool. Default is unconstrained text.
+       */
+      format?: Custom.TextFormat | Custom.GrammarFormat;
+    }
+
+    export namespace Custom {
+      /**
+       * Unconstrained free-form text.
+       *
+       * Fields:
+       *
+       * - type (required): Literal["text"]
+       */
+      export interface TextFormat {
+        /**
+         * Unconstrained text format. Always `text`.
+         */
+        type: 'text';
+      }
+
+      /**
+       * A grammar defined by the user.
+       *
+       * Fields:
+       *
+       * - type (required): Literal["grammar"]
+       * - grammar (required): GrammarFormatGrammarFormat
+       */
+      export interface GrammarFormat {
+        /**
+         * Your chosen grammar.
+         */
+        grammar: GrammarFormat.Grammar;
+
+        /**
+         * Grammar format. Always `grammar`.
+         */
+        type: 'grammar';
+      }
+
+      export namespace GrammarFormat {
+        /**
+         * Your chosen grammar.
+         */
+        export interface Grammar {
+          /**
+           * The grammar definition.
+           */
+          definition: string;
+
+          /**
+           * The syntax of the grammar definition. One of `lark` or `regex`.
+           */
+          syntax: 'lark' | 'regex';
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -956,46 +1616,97 @@ export interface Choice {
   logprobs?: ChoiceLogprobs | null;
 }
 
+/**
+ * A chat completion delta generated by streamed model responses.
+ *
+ * Fields:
+ *
+ * - content (optional): str | None
+ * - function_call (optional): FunctionCall
+ * - tool_calls (optional): list[ChatCompletionMessageToolCallChunk]
+ * - role (optional): Literal["developer", "system", "user", "assistant", "tool"]
+ * - refusal (optional): str | None
+ */
 export interface ChoiceDelta {
+  /**
+   * The contents of the chunk message.
+   */
   content?: string | null;
 
-  function_call?: ChoiceDeltaFunctionCall | null;
+  /**
+   * Deprecated and replaced by `tool_calls`. The name and arguments of a function
+   * that should be called, as generated by the model.
+   */
+  function_call?: FunctionCall;
 
+  /**
+   * The refusal message generated by the model.
+   */
   refusal?: string | null;
 
-  role?: 'developer' | 'system' | 'user' | 'assistant' | 'tool' | null;
+  /**
+   * The role of the author of this message.
+   */
+  role?: 'developer' | 'system' | 'user' | 'assistant' | 'tool';
 
-  tool_calls?: Array<ChoiceDeltaToolCall> | null;
-
-  [k: string]: unknown;
+  tool_calls?: Array<ChoiceDeltaToolCall>;
 }
 
-export interface ChoiceDeltaFunctionCall {
-  arguments?: string | null;
-
-  name?: string | null;
-
-  [k: string]: unknown;
-}
-
+/**
+ * Schema for ChatCompletionMessageToolCallChunk.
+ *
+ * Fields:
+ *
+ * - index (required): int
+ * - id (optional): str
+ * - type (optional): Literal["function"]
+ * - function (optional): Function
+ */
 export interface ChoiceDeltaToolCall {
   index: number;
 
-  id?: string | null;
+  /**
+   * The ID of the tool call.
+   */
+  id?: string;
 
-  function?: ChoiceDeltaToolCallFunction | null;
+  /**
+   * The function that the model called.
+   *
+   * Fields:
+   *
+   * - name (required): str
+   * - arguments (required): str
+   */
+  function?: Function;
 
-  type?: 'function' | null;
-
-  [k: string]: unknown;
+  /**
+   * The type of the tool. Currently, only `function` is supported.
+   */
+  type?: 'function';
 }
 
+/**
+ * The function that the model called.
+ *
+ * Fields:
+ *
+ * - name (required): str
+ * - arguments (required): str
+ */
 export interface ChoiceDeltaToolCallFunction {
-  arguments?: string | null;
+  /**
+   * The arguments to call the function with, as generated by the model in JSON
+   * format. Note that the model does not always generate valid JSON, and may
+   * hallucinate parameters not defined by your function schema. Validate the
+   * arguments in your code before calling your function.
+   */
+  arguments: string;
 
-  name?: string | null;
-
-  [k: string]: unknown;
+  /**
+   * The name of the function to call.
+   */
+  name: string;
 }
 
 /**
@@ -1011,558 +1722,6 @@ export interface ChoiceLogprobs {
    * A list of message refusal tokens with log probability information.
    */
   refusal?: Array<ChatCompletionTokenLogprob> | null;
-}
-
-/**
- * A streaming chat completion choice chunk.
- *
- * OpenAI-compatible choice object for streaming responses. Part of the
- * ChatCompletionChunk response in SSE streams.
- */
-export interface ChunkChoice {
-  /**
-   * Delta content for streaming responses
-   */
-  delta: ChoiceDelta;
-
-  /**
-   * The index of this choice in the list of choices
-   */
-  index: number;
-
-  /**
-   * The reason the model stopped (only in final chunk)
-   */
-  finish_reason?: 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call' | null;
-
-  /**
-   * Log probability information for the choice.
-   */
-  logprobs?: ChoiceLogprobs | null;
-}
-
-/**
- * Chat completion response for Dedalus API.
- *
- * OpenAI-compatible chat completion response with Dedalus extensions. Maintains
- * full compatibility with OpenAI API while providing additional features like
- * server-side tool execution tracking and MCP error reporting.
- */
-export interface Completion {
-  /**
-   * A unique identifier for the chat completion.
-   */
-  id: string;
-
-  /**
-   * A list of chat completion choices. Can be more than one if `n` is greater
-   * than 1.
-   */
-  choices: Array<Choice>;
-
-  /**
-   * The Unix timestamp (in seconds) of when the chat completion was created.
-   */
-  created: number;
-
-  /**
-   * The model used for the chat completion.
-   */
-  model: string;
-
-  /**
-   * The object type, which is always `chat.completion`.
-   */
-  object: 'chat.completion';
-
-  /**
-   * Information about MCP server failures, if any occurred during the request.
-   * Contains details about which servers failed and why, along with recommendations
-   * for the user. Only present when MCP server failures occurred.
-   */
-  mcp_server_errors?: { [key: string]: unknown } | null;
-
-  /**
-   * Specifies the processing type used for serving the request.
-   *
-   * - If set to 'auto', then the request will be processed with the service tier
-   *   configured in the Project settings. Unless otherwise configured, the Project
-   *   will use 'default'.
-   * - If set to 'default', then the request will be processed with the standard
-   *   pricing and performance for the selected model.
-   * - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
-   *   '[priority](https://openai.com/api-priority-processing/)', then the request
-   *   will be processed with the corresponding service tier.
-   * - When not set, the default behavior is 'auto'.
-   *
-   * When the `service_tier` parameter is set, the response body will include the
-   * `service_tier` value based on the processing mode actually used to serve the
-   * request. This response value may be different from the value set in the
-   * parameter.
-   */
-  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
-
-  /**
-   * This fingerprint represents the backend configuration that the model runs with.
-   *
-   * Can be used in conjunction with the `seed` request parameter to understand when
-   * backend changes have been made that might impact determinism.
-   */
-  system_fingerprint?: string;
-
-  /**
-   * List of tool names that were executed server-side (e.g., MCP tools). Only
-   * present when tools were executed on the server rather than returned for
-   * client-side execution.
-   */
-  tools_executed?: Array<string> | null;
-
-  /**
-   * Usage statistics for the completion request.
-   */
-  usage?: CompletionUsage;
-}
-
-/**
- * ChatCompletion request schema.
- *
- * Supports OpenAI-compatible parameters, provider-specific extensions, server-side
- * execution, and agent orchestration features.
- */
-export interface CompletionRequest {
-  /**
-   * Model identifier. Accepts model ID strings, lists for routing, or DedalusModel
-   * objects with per-model settings.
-   */
-  model: string | Shared.DedalusModel | Array<Shared.DedalusModelChoice>;
-
-  /**
-   * Agent attributes. Values in [0.0, 1.0].
-   */
-  agent_attributes?: { [key: string]: number } | null;
-
-  /**
-   * Parameters for audio output. Required when audio output is requested with `mo...
-   */
-  audio?: { [key: string]: unknown } | null;
-
-  /**
-   * Execute tools server-side. If false, returns raw tool calls for manual handling.
-   */
-  automatic_tool_execution?: boolean;
-
-  /**
-   * Optional. The name of the content [cached](https://ai.google.dev/gemini-api/d...
-   */
-  cached_content?: string | null;
-
-  /**
-   * If set to `true`, the request returns a `request_id`. You can then get the de...
-   */
-  deferred?: boolean | null;
-
-  /**
-   * Number between -2.0 and 2.0. Positive values penalize new tokens based on the...
-   */
-  frequency_penalty?: number | null;
-
-  /**
-   * Wrapper for union variant: function call mode.
-   */
-  function_call?: string | null;
-
-  /**
-   * Deprecated in favor of `tools`. A list of functions the model may generate J...
-   */
-  functions?: Array<ChatCompletionFunctions> | null;
-
-  /**
-   * Generation parameters wrapper (Google-specific)
-   */
-  generation_config?: { [key: string]: unknown } | null;
-
-  /**
-   * Content filtering and safety policy configuration.
-   */
-  guardrails?: Array<{ [key: string]: unknown }> | null;
-
-  /**
-   * Configuration for multi-model handoffs.
-   */
-  handoff_config?: { [key: string]: unknown } | null;
-
-  /**
-   * Modify the likelihood of specified tokens appearing in the completion. Accep...
-   */
-  logit_bias?: { [key: string]: number } | null;
-
-  /**
-   * Whether to return log probabilities of the output tokens or not. If true, ret...
-   */
-  logprobs?: boolean | null;
-
-  /**
-   * Maximum tokens in completion (newer parameter name)
-   */
-  max_completion_tokens?: number | null;
-
-  /**
-   * Maximum tokens in completion
-   */
-  max_tokens?: number | null;
-
-  /**
-   * Maximum conversation turns.
-   */
-  max_turns?: number | null;
-
-  /**
-   * MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerParam
-   * objects. MCP tools are executed server-side and billed separately.
-   */
-  mcp_servers?: string | Shared.MCPServerParam | Shared.MCPServers | null;
-
-  /**
-   * Conversation history (OpenAI: messages, Google: contents, Responses: input)
-   */
-  messages?: Array<
-    | ChatCompletionDeveloperMessageParam
-    | ChatCompletionSystemMessageParam
-    | ChatCompletionUserMessageParam
-    | ChatCompletionAssistantMessageParam
-    | ChatCompletionToolMessageParam
-    | ChatCompletionFunctionMessageParam
-  > | null;
-
-  /**
-   * Set of 16 key-value pairs that can be attached to an object. This can be usef...
-   */
-  metadata?: { [key: string]: unknown } | null;
-
-  /**
-   * Output types that you would like the model to generate. Most models are capab...
-   */
-  modalities?: Array<string> | null;
-
-  /**
-   * Model attributes for routing. Maps model IDs to attribute dictionaries with
-   * values in [0.0, 1.0].
-   */
-  model_attributes?: { [key: string]: { [key: string]: number } } | null;
-
-  /**
-   * How many chat completion choices to generate for each input message. Note tha...
-   */
-  n?: number | null;
-
-  /**
-   * Whether to enable parallel tool calls (Anthropic uses inverted polarity)
-   */
-  parallel_tool_calls?: boolean | null;
-
-  /**
-   * Static predicted output content, such as the content of a text file that is
-   * being regenerated.
-   *
-   * Fields:
-   *
-   * - type (required): Literal["content"]
-   * - content (required): str |
-   *   Annotated[list[ChatCompletionRequestMessageContentPartText], MinLen(1),
-   *   ArrayTitle("PredictionContentArray")]
-   */
-  prediction?: PredictionContent | null;
-
-  /**
-   * Number between -2.0 and 2.0. Positive values penalize new tokens based on whe...
-   */
-  presence_penalty?: number | null;
-
-  /**
-   * Used by OpenAI to cache responses for similar requests to optimize your cache...
-   */
-  prompt_cache_key?: string | null;
-
-  /**
-   * The retention policy for the prompt cache. Set to `24h` to enable extended pr...
-   */
-  prompt_cache_retention?: string | null;
-
-  /**
-   * Allows toggling between the reasoning mode and no system prompt. When set to ...
-   */
-  prompt_mode?: 'reasoning' | null;
-
-  /**
-   * Constrains effort on reasoning for [reasoning models](https://platform.openai...
-   */
-  reasoning_effort?: string | null;
-
-  /**
-   * An object specifying the format that the model must output. Setting to `{ "...
-   */
-  response_format?:
-    | Shared.ResponseFormatText
-    | Shared.ResponseFormatJSONSchema
-    | Shared.ResponseFormatJSONObject
-    | null;
-
-  /**
-   * Whether to inject a safety prompt before all conversations.
-   */
-  safe_prompt?: boolean | null;
-
-  /**
-   * A stable identifier used to help detect users of your application that may be...
-   */
-  safety_identifier?: string | null;
-
-  /**
-   * Safety/content filtering settings (Google-specific)
-   */
-  safety_settings?: Array<CompletionRequest.SafetySetting> | null;
-
-  /**
-   * Set the parameters to be used for searched data. If not set, no data will be ...
-   */
-  search_parameters?: { [key: string]: unknown } | null;
-
-  /**
-   * Random seed for deterministic output
-   */
-  seed?: number | null;
-
-  /**
-   * Service tier for request processing
-   */
-  service_tier?: string | null;
-
-  /**
-   * Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 seque...
-   */
-  stop?: Array<string> | string | null;
-
-  /**
-   * Custom text sequences that will cause the model to stop generating. Our mode...
-   */
-  stop_sequences?: Array<string> | null;
-
-  /**
-   * Whether or not to store the output of this chat completion request for use in...
-   */
-  store?: boolean | null;
-
-  /**
-   * Enable streaming response
-   */
-  stream?: boolean | null;
-
-  /**
-   * Options for streaming response. Only set this when you set `stream: true`.
-   */
-  stream_options?: { [key: string]: unknown } | null;
-
-  /**
-   * System instruction/prompt
-   */
-  system_instruction?: { [key: string]: unknown } | string | null;
-
-  /**
-   * Sampling temperature (0-2 for most providers)
-   */
-  temperature?: number | null;
-
-  /**
-   * Extended thinking configuration (Anthropic-specific)
-   */
-  thinking?: ThinkingConfigEnabled | ThinkingConfigDisabled | null;
-
-  /**
-   * Controls which (if any) tool is called by the model. `none` means the model w...
-   */
-  tool_choice?: ToolChoiceAuto | ToolChoiceAny | ToolChoiceTool | ToolChoiceNone | null;
-
-  /**
-   * Tool calling configuration (Google-specific)
-   */
-  tool_config?: { [key: string]: unknown } | null;
-
-  /**
-   * Available tools/functions for the model
-   */
-  tools?: Array<ChatCompletionToolParam | CompletionRequest.CustomToolChatCompletions> | null;
-
-  /**
-   * Top-k sampling parameter
-   */
-  top_k?: number | null;
-
-  /**
-   * An integer between 0 and 20 specifying the number of most likely tokens to re...
-   */
-  top_logprobs?: number | null;
-
-  /**
-   * Nucleus sampling threshold
-   */
-  top_p?: number | null;
-
-  /**
-   * This field is being replaced by `safety_identifier` and `prompt_cache_key`. U...
-   */
-  user?: string | null;
-
-  /**
-   * Constrains the verbosity of the model's response. Lower values will result in...
-   */
-  verbosity?: string | null;
-
-  /**
-   * This tool searches the web for relevant results to use in a response. Learn m...
-   */
-  web_search_options?: { [key: string]: unknown } | null;
-
-  [k: string]: unknown;
-}
-
-export namespace CompletionRequest {
-  /**
-   * Safety setting, affecting the safety-blocking behavior.
-   *
-   * Passing a safety setting for a category changes the allowed probability that
-   * content is blocked.
-   *
-   * Fields:
-   *
-   * - category (required): HarmCategory
-   * - threshold (required): Literal["HARM_BLOCK_THRESHOLD_UNSPECIFIED",
-   *   "BLOCK_LOW_AND_ABOVE", "BLOCK_MEDIUM_AND_ABOVE", "BLOCK_ONLY_HIGH",
-   *   "BLOCK_NONE", "OFF"]
-   */
-  export interface SafetySetting {
-    /**
-     * Required. The category for this setting.
-     */
-    category:
-      | 'HARM_CATEGORY_UNSPECIFIED'
-      | 'HARM_CATEGORY_DEROGATORY'
-      | 'HARM_CATEGORY_TOXICITY'
-      | 'HARM_CATEGORY_VIOLENCE'
-      | 'HARM_CATEGORY_SEXUAL'
-      | 'HARM_CATEGORY_MEDICAL'
-      | 'HARM_CATEGORY_DANGEROUS'
-      | 'HARM_CATEGORY_HARASSMENT'
-      | 'HARM_CATEGORY_HATE_SPEECH'
-      | 'HARM_CATEGORY_SEXUALLY_EXPLICIT'
-      | 'HARM_CATEGORY_DANGEROUS_CONTENT'
-      | 'HARM_CATEGORY_CIVIC_INTEGRITY';
-
-    /**
-     * Required. Controls the probability threshold at which harm is blocked.
-     */
-    threshold:
-      | 'HARM_BLOCK_THRESHOLD_UNSPECIFIED'
-      | 'BLOCK_LOW_AND_ABOVE'
-      | 'BLOCK_MEDIUM_AND_ABOVE'
-      | 'BLOCK_ONLY_HIGH'
-      | 'BLOCK_NONE'
-      | 'OFF';
-  }
-
-  /**
-   * A custom tool that processes input using a specified format.
-   *
-   * Fields:
-   *
-   * - type (required): Literal["custom"]
-   * - custom (required): CustomToolProperties
-   */
-  export interface CustomToolChatCompletions {
-    /**
-     * Properties of the custom tool.
-     */
-    custom: CustomToolChatCompletions.Custom;
-
-    /**
-     * The type of the custom tool. Always `custom`.
-     */
-    type: 'custom';
-  }
-
-  export namespace CustomToolChatCompletions {
-    /**
-     * Properties of the custom tool.
-     */
-    export interface Custom {
-      /**
-       * The name of the custom tool, used to identify it in tool calls.
-       */
-      name: string;
-
-      /**
-       * Optional description of the custom tool, used to provide more context.
-       */
-      description?: string;
-
-      /**
-       * The input format for the custom tool. Default is unconstrained text.
-       */
-      format?: Custom.TextFormat | Custom.GrammarFormat;
-    }
-
-    export namespace Custom {
-      /**
-       * Unconstrained free-form text.
-       *
-       * Fields:
-       *
-       * - type (required): Literal["text"]
-       */
-      export interface TextFormat {
-        /**
-         * Unconstrained text format. Always `text`.
-         */
-        type: 'text';
-      }
-
-      /**
-       * A grammar defined by the user.
-       *
-       * Fields:
-       *
-       * - type (required): Literal["grammar"]
-       * - grammar (required): GrammarFormatGrammarFormat
-       */
-      export interface GrammarFormat {
-        /**
-         * Your chosen grammar.
-         */
-        grammar: GrammarFormat.Grammar;
-
-        /**
-         * Grammar format. Always `grammar`.
-         */
-        type: 'grammar';
-      }
-
-      export namespace GrammarFormat {
-        /**
-         * Your chosen grammar.
-         */
-        export interface Grammar {
-          /**
-           * The grammar definition.
-           */
-          definition: string;
-
-          /**
-           * The syntax of the grammar definition. One of `lark` or `regex`.
-           */
-          syntax: 'lark' | 'regex';
-        }
-      }
-    }
-  }
 }
 
 /**
@@ -1780,59 +1939,6 @@ export interface Reasoning {
   summary?: 'auto' | 'concise' | 'detailed' | null;
 
   [k: string]: unknown;
-}
-
-/**
- * Server-Sent Event streaming format for chat completions
- */
-export interface StreamChunk {
-  /**
-   * Unique identifier for the chat completion
-   */
-  id: string;
-
-  /**
-   * List of completion choice chunks
-   */
-  choices: Array<ChunkChoice>;
-
-  /**
-   * Unix timestamp when the chunk was created
-   */
-  created: number;
-
-  /**
-   * ID of the model used for the completion
-   */
-  model: string;
-
-  /**
-   * Object type, always 'chat.completion.chunk'
-   */
-  object?: 'chat.completion.chunk';
-
-  /**
-   * Service tier used for processing the request
-   */
-  service_tier?: 'auto' | 'default' | 'flex' | 'scale' | 'priority' | null;
-
-  /**
-   * System fingerprint representing backend configuration
-   */
-  system_fingerprint?: string | null;
-
-  /**
-   * Usage statistics for the completion request.
-   *
-   * Fields:
-   *
-   * - completion_tokens (required): int
-   * - prompt_tokens (required): int
-   * - total_tokens (required): int
-   * - completion_tokens_details (optional): CompletionTokensDetails
-   * - prompt_tokens_details (optional): PromptTokensDetails
-   */
-  usage?: CompletionUsage | null;
 }
 
 /**
@@ -2488,14 +2594,17 @@ export { type ParsedFunctionToolCall };
 export declare namespace Completions {
   export {
     type Annotation as Annotation,
+    type ChatCompletion as ChatCompletion,
     type ChatCompletionAssistantMessageParam as ChatCompletionAssistantMessageParam,
     type ChatCompletionAudio as ChatCompletionAudio,
     type ChatCompletionAudioParam as ChatCompletionAudioParam,
+    type ChatCompletionChunk as ChatCompletionChunk,
     type ChatCompletionContentPartAudioParam as ChatCompletionContentPartAudioParam,
     type ChatCompletionContentPartFileParam as ChatCompletionContentPartFileParam,
     type ChatCompletionContentPartImageParam as ChatCompletionContentPartImageParam,
     type ChatCompletionContentPartRefusalParam as ChatCompletionContentPartRefusalParam,
     type ChatCompletionContentPartTextParam as ChatCompletionContentPartTextParam,
+    type ChatCompletionCreateParams as ChatCompletionCreateParams,
     type ChatCompletionDeveloperMessageParam as ChatCompletionDeveloperMessageParam,
     type ChatCompletionFunctionMessageParam as ChatCompletionFunctionMessageParam,
     type ChatCompletionFunctions as ChatCompletionFunctions,
@@ -2509,13 +2618,9 @@ export declare namespace Completions {
     type ChatCompletionUserMessageParam as ChatCompletionUserMessageParam,
     type Choice as Choice,
     type ChoiceDelta as ChoiceDelta,
-    type ChoiceDeltaFunctionCall as ChoiceDeltaFunctionCall,
     type ChoiceDeltaToolCall as ChoiceDeltaToolCall,
     type ChoiceDeltaToolCallFunction as ChoiceDeltaToolCallFunction,
     type ChoiceLogprobs as ChoiceLogprobs,
-    type ChunkChoice as ChunkChoice,
-    type Completion as Completion,
-    type CompletionRequest as CompletionRequest,
     type CompletionTokensDetails as CompletionTokensDetails,
     type CompletionUsage as CompletionUsage,
     type Custom as Custom,
@@ -2525,7 +2630,6 @@ export declare namespace Completions {
     type PredictionContent as PredictionContent,
     type PromptTokensDetails as PromptTokensDetails,
     type Reasoning as Reasoning,
-    type StreamChunk as StreamChunk,
     type ThinkingConfigDisabled as ThinkingConfigDisabled,
     type ThinkingConfigEnabled as ThinkingConfigEnabled,
     type ToolChoice as ToolChoice,
