@@ -324,6 +324,7 @@ export namespace ChatCompletionAssistantMessageParam {
    * - id (required): str
    * - type (required): Literal["function"]
    * - function (required): ChatCompletionMessageToolCallFunction
+   * - thought_signature (optional): str
    */
   export interface ChatCompletionMessageToolCallInput {
     /**
@@ -340,6 +341,12 @@ export namespace ChatCompletionAssistantMessageParam {
      * The type of the tool. Currently, only `function` is supported.
      */
     type: 'function';
+
+    /**
+     * Opaque signature for thought continuity in multi-turn tool use (Google-specific,
+     * base64 encoded)
+     */
+    thought_signature?: string | null;
   }
 
   /**
@@ -1410,6 +1417,7 @@ export interface ChatCompletionMessageCustomToolCall {
  * - id (required): str
  * - type (required): Literal["function"]
  * - function (required): Function
+ * - thought_signature (optional): str
  */
 export interface ChatCompletionMessageToolCall {
   /**
@@ -1426,6 +1434,12 @@ export interface ChatCompletionMessageToolCall {
    * The type of the tool. Currently, only `function` is supported.
    */
   type: 'function';
+
+  /**
+   * Opaque signature for thought continuity in multi-turn tool use (Google-specific,
+   * base64 encoded)
+   */
+  thought_signature?: string | null;
 }
 
 /**
