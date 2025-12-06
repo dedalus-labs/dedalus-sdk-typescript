@@ -47,6 +47,12 @@ import {
 } from './internal/utils/log';
 import { isEmptyObj } from './internal/utils/values';
 
+const environments = {
+  production: 'https://api.dedaluslabs.ai',
+  development: 'http://localhost:4010',
+};
+type Environment = keyof typeof environments;
+
 export interface ClientOptions {
   /**
    * API key for Bearer token authentication.
@@ -77,6 +83,15 @@ export interface ClientOptions {
    * Model identifier for BYOK provider.
    */
   providerModel?: string | null | undefined;
+
+  /**
+   * Specifies the environment to use for the API.
+   *
+   * Each environment maps to a different base URL:
+   * - `production` corresponds to `https://api.dedaluslabs.ai`
+   * - `development` corresponds to `http://localhost:4010`
+   */
+  environment?: Environment | undefined;
 
   /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
@@ -179,6 +194,7 @@ export class Dedalus {
    * @param {string | null | undefined} [opts.provider=process.env['DEDALUS_PROVIDER'] ?? null]
    * @param {string | null | undefined} [opts.providerKey=process.env['DEDALUS_PROVIDER_KEY'] ?? null]
    * @param {string | null | undefined} [opts.providerModel=process.env['DEDALUS_PROVIDER_MODEL'] ?? null]
+   * @param {Environment} [opts.environment=production] - Specifies the environment URL to use for the API.
    * @param {string} [opts.baseURL=process.env['DEDALUS_BASE_URL'] ?? https://api.dedaluslabs.ai] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
@@ -205,10 +221,17 @@ export class Dedalus {
       providerKey,
       providerModel,
       ...opts,
-      baseURL: baseURL || `https://api.dedaluslabs.ai`,
+      baseURL,
+      environment: opts.environment ?? 'production',
     };
 
-    this.baseURL = options.baseURL!;
+    if (baseURL && opts.environment) {
+      throw new Errors.DedalusError(
+        'Ambiguous URL; The `baseURL` option (or DEDALUS_BASE_URL env var) and the `environment` option are given. If you want to use the environment you must pass baseURL: null',
+      );
+    }
+
+    this.baseURL = options.baseURL || environments[options.environment || 'production'];
     this.timeout = options.timeout ?? Dedalus.DEFAULT_TIMEOUT /* 1 minute */;
     this.logger = options.logger ?? console;
     const defaultLogLevel = 'warn';
@@ -240,7 +263,8 @@ export class Dedalus {
   withOptions(options: Partial<ClientOptions>): this {
     const client = new (this.constructor as any as new (props: ClientOptions) => typeof this)({
       ...this._options,
-      baseURL: this.baseURL,
+      environment: options.environment ? options.environment : undefined,
+      baseURL: options.environment ? undefined : this.baseURL,
       maxRetries: this.maxRetries,
       timeout: this.timeout,
       logger: this.logger,
@@ -262,7 +286,7 @@ export class Dedalus {
    * Check whether the base URL is set to its default.
    */
   #baseURLOverridden(): boolean {
-    return this.baseURL !== 'https://api.dedaluslabs.ai';
+    return this.baseURL !== environments[this._options.environment || 'production'];
   }
 
   protected defaultQuery(): Record<string, string | undefined> | undefined {

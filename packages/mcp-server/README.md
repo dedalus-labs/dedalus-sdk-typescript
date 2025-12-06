@@ -15,6 +15,7 @@ export DEDALUS_ORG_ID="My Organization"
 export DEDALUS_PROVIDER="My Provider"
 export DEDALUS_PROVIDER_KEY="My Provider Key"
 export DEDALUS_PROVIDER_MODEL="My Provider Model"
+export DEDALUS_ENVIRONMENT="production"
 npx -y dedalus-labs-mcp@latest
 ```
 
@@ -37,7 +38,8 @@ For clients with a configuration JSON, it might look something like this:
         "DEDALUS_ORG_ID": "My Organization",
         "DEDALUS_PROVIDER": "My Provider",
         "DEDALUS_PROVIDER_KEY": "My Provider Key",
-        "DEDALUS_PROVIDER_MODEL": "My Provider Model"
+        "DEDALUS_PROVIDER_MODEL": "My Provider Model",
+        "DEDALUS_ENVIRONMENT": "production"
       }
     }
   }
