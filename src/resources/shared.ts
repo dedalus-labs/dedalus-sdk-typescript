@@ -205,6 +205,18 @@ export type MCPServerInput = string | MCPServerParam;
  */
 export interface MCPServerParam {
   /**
+   * Connection name for credential matching. Must match a key in the client's
+   * credentials list.
+   */
+  connection?: string | null;
+
+  /**
+   * Schema declaring what credentials are needed. Maps field names to their bindings
+   * (e.g., env var names).
+   */
+  credentials?: { [key: string]: string | MCPServerParam.BindingSpec } | null;
+
+  /**
    * Marketplace slug.
    */
   slug?: string | null;
@@ -218,6 +230,35 @@ export interface MCPServerParam {
    * Version constraint for slug-based servers.
    */
   version?: string | null;
+}
+
+export namespace MCPServerParam {
+  /**
+   * Detailed credential binding with options.
+   *
+   * Used when a binding needs default values, optional flags, or type casting.
+   */
+  export interface BindingSpec {
+    /**
+     * Environment variable name or source identifier.
+     */
+    name: string;
+
+    /**
+     * Type to cast value to (e.g., 'int', 'bool').
+     */
+    cast?: string | null;
+
+    /**
+     * Default value if source not set.
+     */
+    default?: unknown;
+
+    /**
+     * If true, missing value is allowed.
+     */
+    optional?: boolean;
+  }
 }
 
 /**
