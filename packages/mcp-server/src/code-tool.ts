@@ -38,6 +38,7 @@ export async function codeTool() {
         client_envs: JSON.stringify({
           DEDALUS_API_KEY: readEnv('DEDALUS_API_KEY'),
           DEDALUS_X_API_KEY: readEnv('DEDALUS_X_API_KEY'),
+          DEDALUS_AS_URL: readEnv('DEDALUS_AS_URL'),
           DEDALUS_ORG_ID: readEnv('DEDALUS_ORG_ID'),
           DEDALUS_PROVIDER: readEnv('DEDALUS_PROVIDER'),
           DEDALUS_PROVIDER_KEY: readEnv('DEDALUS_PROVIDER_KEY'),

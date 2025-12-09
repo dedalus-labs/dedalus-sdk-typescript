@@ -66,6 +66,11 @@ export interface ClientOptions {
   xAPIKey?: string | null | undefined;
 
   /**
+   * MCP Authorization Server URL
+   */
+  asBaseURL?: string | null | undefined;
+
+  /**
    * Organization ID for request scoping.
    */
   organization?: string | null | undefined;
@@ -169,6 +174,7 @@ export interface ClientOptions {
 export class Dedalus {
   apiKey: string | null;
   xAPIKey: string | null;
+  asBaseURL: string | null;
   organization: string | null;
   provider: string | null;
   providerKey: string | null;
@@ -191,6 +197,7 @@ export class Dedalus {
    *
    * @param {string | null | undefined} [opts.apiKey=process.env['DEDALUS_API_KEY'] ?? null]
    * @param {string | null | undefined} [opts.xAPIKey=process.env['DEDALUS_X_API_KEY'] ?? null]
+   * @param {string | null | undefined} [opts.asBaseURL=process.env['DEDALUS_AS_URL'] ?? null]
    * @param {string | null | undefined} [opts.organization=process.env['DEDALUS_ORG_ID'] ?? null]
    * @param {string | null | undefined} [opts.provider=process.env['DEDALUS_PROVIDER'] ?? null]
    * @param {string | null | undefined} [opts.providerKey=process.env['DEDALUS_PROVIDER_KEY'] ?? null]
@@ -208,6 +215,7 @@ export class Dedalus {
     baseURL = readEnv('DEDALUS_BASE_URL'),
     apiKey = readEnv('DEDALUS_API_KEY') ?? null,
     xAPIKey = readEnv('DEDALUS_X_API_KEY') ?? null,
+    asBaseURL = readEnv('DEDALUS_AS_URL') ?? null,
     organization = readEnv('DEDALUS_ORG_ID') ?? null,
     provider = readEnv('DEDALUS_PROVIDER') ?? null,
     providerKey = readEnv('DEDALUS_PROVIDER_KEY') ?? null,
@@ -217,6 +225,7 @@ export class Dedalus {
     const options: ClientOptions = {
       apiKey,
       xAPIKey,
+      asBaseURL,
       organization,
       provider,
       providerKey,
@@ -252,6 +261,7 @@ export class Dedalus {
 
     this.apiKey = apiKey;
     this.xAPIKey = xAPIKey;
+    this.asBaseURL = asBaseURL;
     this.organization = organization;
     this.provider = provider;
     this.providerKey = providerKey;
@@ -274,6 +284,7 @@ export class Dedalus {
       fetchOptions: this.fetchOptions,
       apiKey: this.apiKey,
       xAPIKey: this.xAPIKey,
+      asBaseURL: this.asBaseURL,
       organization: this.organization,
       provider: this.provider,
       providerKey: this.providerKey,
@@ -892,7 +903,7 @@ export declare namespace Dedalus {
   export type FunctionDefinition = API.FunctionDefinition;
   export type FunctionParameters = API.FunctionParameters;
   export type MCPServerInput = API.MCPServerInput;
-  export type MCPServerParam = API.MCPServerParam;
+  export type MCPServerSpec = API.MCPServerSpec;
   export type MCPServers = API.MCPServers;
   export type ResponseFormatJSONObject = API.ResponseFormatJSONObject;
   export type ResponseFormatJSONSchema = API.ResponseFormatJSONSchema;
