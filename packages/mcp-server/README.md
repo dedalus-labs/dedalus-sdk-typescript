@@ -11,6 +11,7 @@ You can run the MCP Server directly via `npx`:
 ```sh
 export DEDALUS_API_KEY="My API Key"
 export DEDALUS_X_API_KEY="My X API Key"
+export DEDALUS_AS_URL="My As Base URL"
 export DEDALUS_ORG_ID="My Organization"
 export DEDALUS_PROVIDER="My Provider"
 export DEDALUS_PROVIDER_KEY="My Provider Key"
@@ -35,6 +36,7 @@ For clients with a configuration JSON, it might look something like this:
       "env": {
         "DEDALUS_API_KEY": "My API Key",
         "DEDALUS_X_API_KEY": "My X API Key",
+        "DEDALUS_AS_URL": "My As Base URL",
         "DEDALUS_ORG_ID": "My Organization",
         "DEDALUS_PROVIDER": "My Provider",
         "DEDALUS_PROVIDER_KEY": "My Provider Key",
@@ -51,14 +53,14 @@ For clients with a configuration JSON, it might look something like this:
 If you use Cursor, you can install the MCP server by using the button below. You will need to set your environment variables
 in Cursor's `mcp.json`, which can be found in Cursor Settings > Tools & MCP > New MCP Server.
 
-[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=dedalus-labs-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImRlZGFsdXMtbGFicy1tY3AiXSwiZW52Ijp7IkRFREFMVVNfQVBJX0tFWSI6IlNldCB5b3VyIERFREFMVVNfQVBJX0tFWSBoZXJlLiIsIkRFREFMVVNfWF9BUElfS0VZIjoiU2V0IHlvdXIgREVEQUxVU19YX0FQSV9LRVkgaGVyZS4iLCJERURBTFVTX09SR19JRCI6IlNldCB5b3VyIERFREFMVVNfT1JHX0lEIGhlcmUuIiwiREVEQUxVU19QUk9WSURFUiI6IlNldCB5b3VyIERFREFMVVNfUFJPVklERVIgaGVyZS4iLCJERURBTFVTX1BST1ZJREVSX0tFWSI6IlNldCB5b3VyIERFREFMVVNfUFJPVklERVJfS0VZIGhlcmUuIiwiREVEQUxVU19QUk9WSURFUl9NT0RFTCI6IlNldCB5b3VyIERFREFMVVNfUFJPVklERVJfTU9ERUwgaGVyZS4ifX0)
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=dedalus-labs-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImRlZGFsdXMtbGFicy1tY3AiXSwiZW52Ijp7IkRFREFMVVNfQVBJX0tFWSI6IlNldCB5b3VyIERFREFMVVNfQVBJX0tFWSBoZXJlLiIsIkRFREFMVVNfWF9BUElfS0VZIjoiU2V0IHlvdXIgREVEQUxVU19YX0FQSV9LRVkgaGVyZS4iLCJERURBTFVTX0FTX1VSTCI6IlNldCB5b3VyIERFREFMVVNfQVNfVVJMIGhlcmUuIiwiREVEQUxVU19PUkdfSUQiOiJTZXQgeW91ciBERURBTFVTX09SR19JRCBoZXJlLiIsIkRFREFMVVNfUFJPVklERVIiOiJTZXQgeW91ciBERURBTFVTX1BST1ZJREVSIGhlcmUuIiwiREVEQUxVU19QUk9WSURFUl9LRVkiOiJTZXQgeW91ciBERURBTFVTX1BST1ZJREVSX0tFWSBoZXJlLiIsIkRFREFMVVNfUFJPVklERVJfTU9ERUwiOiJTZXQgeW91ciBERURBTFVTX1BST1ZJREVSX01PREVMIGhlcmUuIn19)
 
 ### VS Code
 
 If you use MCP, you can install the MCP server by clicking the link below. You will need to set your environment variables
 in VS Code's `mcp.json`, which can be found via Command Palette > MCP: Open User Configuration.
 
-[Open VS Code](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22dedalus-labs-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22dedalus-labs-mcp%22%5D%2C%22env%22%3A%7B%22DEDALUS_API_KEY%22%3A%22Set%20your%20DEDALUS_API_KEY%20here.%22%2C%22DEDALUS_X_API_KEY%22%3A%22Set%20your%20DEDALUS_X_API_KEY%20here.%22%2C%22DEDALUS_ORG_ID%22%3A%22Set%20your%20DEDALUS_ORG_ID%20here.%22%2C%22DEDALUS_PROVIDER%22%3A%22Set%20your%20DEDALUS_PROVIDER%20here.%22%2C%22DEDALUS_PROVIDER_KEY%22%3A%22Set%20your%20DEDALUS_PROVIDER_KEY%20here.%22%2C%22DEDALUS_PROVIDER_MODEL%22%3A%22Set%20your%20DEDALUS_PROVIDER_MODEL%20here.%22%7D%7D)
+[Open VS Code](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22dedalus-labs-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22dedalus-labs-mcp%22%5D%2C%22env%22%3A%7B%22DEDALUS_API_KEY%22%3A%22Set%20your%20DEDALUS_API_KEY%20here.%22%2C%22DEDALUS_X_API_KEY%22%3A%22Set%20your%20DEDALUS_X_API_KEY%20here.%22%2C%22DEDALUS_AS_URL%22%3A%22Set%20your%20DEDALUS_AS_URL%20here.%22%2C%22DEDALUS_ORG_ID%22%3A%22Set%20your%20DEDALUS_ORG_ID%20here.%22%2C%22DEDALUS_PROVIDER%22%3A%22Set%20your%20DEDALUS_PROVIDER%20here.%22%2C%22DEDALUS_PROVIDER_KEY%22%3A%22Set%20your%20DEDALUS_PROVIDER_KEY%20here.%22%2C%22DEDALUS_PROVIDER_MODEL%22%3A%22Set%20your%20DEDALUS_PROVIDER_MODEL%20here.%22%7D%7D)
 
 ### Claude Code
 
@@ -66,7 +68,7 @@ If you use Claude Code, you can install the MCP server by running the command be
 environment variables in Claude Code's `.claude.json`, which can be found in your home directory.
 
 ```
-claude mcp add --transport stdio dedalus_labs_api --env DEDALUS_API_KEY="Your DEDALUS_API_KEY here." DEDALUS_X_API_KEY="Your DEDALUS_X_API_KEY here." DEDALUS_ORG_ID="Your DEDALUS_ORG_ID here." DEDALUS_PROVIDER="Your DEDALUS_PROVIDER here." DEDALUS_PROVIDER_KEY="Your DEDALUS_PROVIDER_KEY here." DEDALUS_PROVIDER_MODEL="Your DEDALUS_PROVIDER_MODEL here." -- npx -y dedalus-labs-mcp
+claude mcp add --transport stdio dedalus_labs_api --env DEDALUS_API_KEY="Your DEDALUS_API_KEY here." DEDALUS_X_API_KEY="Your DEDALUS_X_API_KEY here." DEDALUS_AS_URL="Your DEDALUS_AS_URL here." DEDALUS_ORG_ID="Your DEDALUS_ORG_ID here." DEDALUS_PROVIDER="Your DEDALUS_PROVIDER here." DEDALUS_PROVIDER_KEY="Your DEDALUS_PROVIDER_KEY here." DEDALUS_PROVIDER_MODEL="Your DEDALUS_PROVIDER_MODEL here." -- npx -y dedalus-labs-mcp
 ```
 
 ## Exposing endpoints to your MCP Client

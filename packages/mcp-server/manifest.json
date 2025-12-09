@@ -22,6 +22,7 @@
       "env": {
         "DEDALUS_API_KEY": "${user_config.DEDALUS_API_KEY}",
         "DEDALUS_X_API_KEY": "${user_config.DEDALUS_X_API_KEY}",
+        "DEDALUS_AS_URL": "${user_config.DEDALUS_AS_URL}",
         "DEDALUS_ORG_ID": "${user_config.DEDALUS_ORG_ID}",
         "DEDALUS_PROVIDER": "${user_config.DEDALUS_PROVIDER}",
         "DEDALUS_PROVIDER_KEY": "${user_config.DEDALUS_PROVIDER_KEY}",
@@ -39,6 +40,12 @@
     "DEDALUS_X_API_KEY": {
       "title": "x_api_key",
       "description": "API key for X-API-Key header authentication.",
+      "required": false,
+      "type": "string"
+    },
+    "DEDALUS_AS_URL": {
+      "title": "as_base_url",
+      "description": "MCP Authorization Server URL",
       "required": false,
       "type": "string"
     },

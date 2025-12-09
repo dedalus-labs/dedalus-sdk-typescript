@@ -193,17 +193,17 @@ export interface FunctionDefinition {
 export type FunctionParameters = { [key: string]: unknown };
 
 /**
- * Single MCP server input: slug string or structured MCPServerParam.
+ * Single MCP server input: slug string or structured MCPServerSpec.
  */
-export type MCPServerInput = string | MCPServerParam;
+export type MCPServerInput = string | MCPServerSpec;
 
 /**
- * Structured MCP server parameter.
+ * Structured MCP server specification.
  *
  * Slug-based: {"slug": "dedalus-labs/brave-search", "version": "v1.0.0"}
  * URL-based: {"url": "https://mcp.dedaluslabs.ai/acme/my-server/mcp"}
  */
-export interface MCPServerParam {
+export interface MCPServerSpec {
   /**
    * Connection name for credential matching. Must match a key in the client's
    * credentials list.
@@ -214,7 +214,14 @@ export interface MCPServerParam {
    * Schema declaring what credentials are needed. Maps field names to their bindings
    * (e.g., env var names).
    */
-  credentials?: { [key: string]: string | MCPServerParam.BindingSpec } | null;
+  credentials?: { [key: string]: string | MCPServerSpec.BindingSpec } | null;
+
+  /**
+   * Client-encrypted credential values. Maps connection names to encrypted envelopes
+   * (base64url JWE). SDK encrypts credentials client-side using the enclave's public
+   * key from authorization server.
+   */
+  encrypted_credentials?: { [key: string]: string } | null;
 
   /**
    * Marketplace slug.
@@ -232,7 +239,7 @@ export interface MCPServerParam {
   version?: string | null;
 }
 
-export namespace MCPServerParam {
+export namespace MCPServerSpec {
   /**
    * Detailed credential binding with options.
    *

@@ -850,10 +850,10 @@ export interface ChatCompletionCreateParams {
   max_turns?: number | null;
 
   /**
-   * MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerParam
+   * MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerSpec
    * objects. MCP tools are executed server-side and billed separately.
    */
-  mcp_servers?: string | Shared.MCPServerParam | Shared.MCPServers | null;
+  mcp_servers?: string | Shared.MCPServerSpec | Shared.MCPServers | null;
 
   /**
    * Conversation history (OpenAI: messages, Google: contents, Responses: input)
@@ -971,14 +971,9 @@ export interface ChatCompletionCreateParams {
   service_tier?: string | null;
 
   /**
-   * Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 seque...
+   * Sequences that stop generation
    */
   stop?: Array<string> | string | null;
-
-  /**
-   * Custom text sequences that will cause the model to stop generating. Our mode...
-   */
-  stop_sequences?: Array<string> | null;
 
   /**
    * Whether or not to store the output of this chat completion request for use in...
@@ -2198,10 +2193,10 @@ export interface CompletionCreateParamsBase {
   max_turns?: number | null;
 
   /**
-   * MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerParam
+   * MCP server identifiers. Accepts marketplace slugs, URLs, or MCPServerSpec
    * objects. MCP tools are executed server-side and billed separately.
    */
-  mcp_servers?: string | Shared.MCPServerParam | Shared.MCPServers | null;
+  mcp_servers?: string | Shared.MCPServerSpec | Shared.MCPServers | null;
 
   /**
    * Conversation history (OpenAI: messages, Google: contents, Responses: input)
@@ -2319,14 +2314,9 @@ export interface CompletionCreateParamsBase {
   service_tier?: string | null;
 
   /**
-   * Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 seque...
+   * Sequences that stop generation
    */
   stop?: Array<string> | string | null;
-
-  /**
-   * Custom text sequences that will cause the model to stop generating. Our mode...
-   */
-  stop_sequences?: Array<string> | null;
 
   /**
    * Whether or not to store the output of this chat completion request for use in...

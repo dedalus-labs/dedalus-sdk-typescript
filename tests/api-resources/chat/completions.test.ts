@@ -63,7 +63,6 @@ describe('resource completions', () => {
       seed: 0,
       service_tier: 'service_tier',
       stop: ['string'],
-      stop_sequences: ['string'],
       store: true,
       stream: false,
       stream_options: { foo: 'bar' },
