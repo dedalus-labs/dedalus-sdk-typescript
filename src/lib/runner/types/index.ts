@@ -5,4 +5,12 @@
 // ==============================================================================
 
 export type { Message } from './messages';
-export type { Tool, ToolCall, ToolResult, ToolHandler } from './tools';
+export type {
+  Tool,
+  ToolFunction,
+  ToolDefinition,
+  ToolParametersSchema,
+  ToolCall,
+  ToolResult,
+  ToolHandler,
+} from './tools';

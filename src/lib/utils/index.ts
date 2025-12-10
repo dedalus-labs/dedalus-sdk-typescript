@@ -6,5 +6,5 @@
 
 export { jsonify } from './format';
 export type { JsonValue, JsonObject, JsonArray, JsonPrimitive } from './json';
-export { toSchema } from './schemas';
+export { toSchema, toSchemaFromDefinition } from './schemas';
 export { streamAsync, streamSync } from './stream';

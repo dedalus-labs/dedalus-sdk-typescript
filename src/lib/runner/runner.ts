@@ -60,9 +60,15 @@ function createLogger(client: Dedalus, verbose: boolean, debug: boolean) {
       }
     },
 
-    toolSchema: (toolNames: string[]) => {
-      if (verbose && toolNames.length) {
-        logger.info(`[DedalusRunner] Local tools available: ${toolNames.join(', ')}`);
+    toolSchema: (toolHandler: ReturnType<typeof createToolHandler>) => {
+      if (!verbose || !toolHandler.toolNames.length) return;
+      const serverNames = toolHandler.toolNames.filter((n) => !toolHandler.isClientTool(n));
+      const clientNames = toolHandler.toolNames.filter((n) => toolHandler.isClientTool(n));
+      if (serverNames.length) {
+        logger.info(`[DedalusRunner] Server tools: ${serverNames.join(', ')}`);
+      }
+      if (clientNames.length) {
+        logger.info(`[DedalusRunner] Client tools: ${clientNames.join(', ')}`);
       }
     },
 
@@ -167,7 +173,7 @@ export class DedalusRunner {
 
     const toolHandler = createToolHandler(tools ?? []);
     const logger = createLogger(this.client, this.verbose ?? !!verbose, !!debug);
-    logger.toolSchema(toolHandler.listNames());
+    logger.toolSchema(toolHandler);
 
     const modelSpec = normalizeModelSpec(model);
     const requestKwargs = buildRequestKwargs(apiParams);
@@ -199,7 +205,7 @@ export class DedalusRunner {
   /** Executes synchronous multi-turn conversation with tool support. */
   private async runTurns(conversation: Message[], state: RunnerState): Promise<RunResult> {
     const history = [...conversation];
-    const toolSchemas = state.toolHandler.schemas() || null;
+    const toolSchemas = state.toolHandler.schemas;
     let finalText = '';
     const toolResults: ToolResult[] = [];
     const toolsCalled: string[] = [];
@@ -254,7 +260,7 @@ export class DedalusRunner {
         }
 
         if (collectedToolCalls.length) {
-          const localToolNames = new Set(state.toolHandler.listNames());
+          const localToolNames = new Set(state.toolHandler.toolNames);
           const mcpNames = collectedToolCalls
             .map((call) => call.function?.name)
             .filter((name): name is string => name != null && !localToolNames.has(name));
@@ -309,24 +315,45 @@ export class DedalusRunner {
       }
 
       const toolPayloads = toolCalls.map((call) => coerceToolCall(call));
+
+      // Separate client vs server tools
+      const clientToolCalls = toolPayloads.filter((tc) =>
+        state.toolHandler.isClientTool(tc.function?.name ?? ''),
+      );
+      const serverToolCalls = toolPayloads.filter(
+        (tc) => !state.toolHandler.isClientTool(tc.function?.name ?? ''),
+      );
+
+      // Track all tool names
       for (const payload of toolPayloads) {
         const name = payload.function?.name;
         if (name && !toolsCalled.includes(name)) toolsCalled.push(name);
       }
 
+      // Push assistant message with ALL tool calls (client needs to see them)
       history.push({ role: 'assistant', tool_calls: toolPayloads } as unknown as Message);
 
+      // If autoExecuteTools is false, break immediately (existing behavior)
       if (!state.autoExecuteTools) break;
 
-      await this.executeToolCallsSync({
-        toolCalls: toolPayloads,
-        toolHandler: state.toolHandler,
-        history,
-        toolResults,
-        toolsCalled,
-        step: steps,
-        logger: state.logger,
-      });
+      // Execute server-side tools only
+      if (serverToolCalls.length > 0) {
+        await this.executeToolCallsSync({
+          toolCalls: serverToolCalls,
+          toolHandler: state.toolHandler,
+          history,
+          toolResults,
+          toolsCalled,
+          step: steps,
+          logger: state.logger,
+        });
+      }
+
+      // If there are client tools, stop the loop
+      // Client will handle via onToolCall, add results, send new request
+      if (clientToolCalls.length > 0) {
+        break;
+      }
     }
 
     state.logger.finalSummary(modelsUsed, toolsCalled);
@@ -336,7 +363,7 @@ export class DedalusRunner {
   /** Executes streaming conversation, yielding content deltas. */
   private async *runStreaming(conversation: Message[], state: RunnerState): AsyncIterableIterator<any> {
     const history = [...conversation];
-    const toolSchemas = state.toolHandler.schemas() || null;
+    const toolSchemas = state.toolHandler.schemas;
     let previousModel: DedalusModelChoice | DedalusModelChoice[] | null = null;
     let steps = 0;
     const modelsUsed: DedalusModelChoice[] = [];
@@ -397,7 +424,7 @@ export class DedalusRunner {
         break;
       }
 
-      const localToolNames = new Set(state.toolHandler.listNames());
+      const localToolNames = new Set(state.toolHandler.toolNames);
       const mcpNames = collectedToolCalls
         .map((call) => call.function?.name)
         .filter((name): name is string => name != null && !localToolNames.has(name));
@@ -427,14 +454,26 @@ export class DedalusRunner {
       });
 
       const toolPayloads = localToolCalls.map((call) => coerceToolCall(call));
+
+      // Separate client vs server tools
+      const clientToolCalls = toolPayloads.filter((tc) =>
+        state.toolHandler.isClientTool(tc.function?.name ?? ''),
+      );
+      const serverToolCalls = toolPayloads.filter(
+        (tc) => !state.toolHandler.isClientTool(tc.function?.name ?? ''),
+      );
+
+      // Push assistant message with ALL tool calls
       history.push({ role: 'assistant', tool_calls: toolPayloads } as unknown as Message);
 
+      // If autoExecuteTools is false, break
       if (!state.autoExecuteTools) break;
 
+      // Execute server-side tools only
       const toolResults: ToolResult[] = [];
       const toolsCalled: string[] = [];
 
-      for (const toolCall of toolPayloads) {
+      for (const toolCall of serverToolCalls) {
         const name = toolCall.function?.name ?? '';
         const argsRaw = toolCall.function?.arguments;
         let args: Record<string, any> = {};
@@ -467,6 +506,11 @@ export class DedalusRunner {
           } as unknown as Message);
           state.logger.toolExecution(name, error, true);
         }
+      }
+
+      // If there are client tools, stop streaming loop
+      if (clientToolCalls.length > 0) {
+        break;
       }
     }
   }
