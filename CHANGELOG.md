@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.1.0-alpha.9 (2025-12-10)
+
+Full Changelog: [v0.1.0-alpha.8...v0.1.0-alpha.9](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.8...v0.1.0-alpha.9)
+
+### Features
+
+* **api:** config update for dedalus-ai/dev ([8c11861](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/8c118618ec69f55a087a043abee618119a0606d2))
+* **api:** mcp server params ([8c60036](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/8c60036fbf24faa8cb214d374b1ff3e870729305))
+* **mcp:** add typescript check to code execution tool ([024c566](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/024c5668e2f25b52976ba1f8fc3630db0a6d0597))
+* **mcp:** handle code mode calls in the Stainless API ([5207502](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/52075024138a9341c20391f339c2f628a7dfb535))
+* **mcp:** return logs on code tool errors ([0c59c13](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/0c59c13635e51387660f81e8290a42b26ac2ec15))
+
+
+### Bug Fixes
+
+* **api:** add thought signature ([4564ccb](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/4564ccb11385c0570266eee44798058d9f73fe48))
+* **mcp:** add client instantiation options to code tool ([42dcae2](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/42dcae291dd96814dc9f011f04101ede35a7622c))
+* **mcp:** correct code tool API endpoint ([610456d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/610456d624c5e6409392bd50df2221a7ed97552f))
+* **mcp:** return correct lines on typescript errors ([4e10642](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/4e106423fa976e775f8d747b66514f1dd72eb294))
+
+
+### Chores
+
+* **api:** migrate pkg manager to uv ([12a8f74](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/12a8f74e586a131a1cbd7a0dddfbb5da2a50e0a0))
+* **api:** point local dev to 4010 port for prism ([cfe1692](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/cfe16928baeb37d7fcd422879ae0a4232624a195))
+* **auth:** add minor auth params ([608e4d7](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/608e4d70e8ea3fc924233d163b3184ac711a42c0))
+* **client:** fix logger property type ([a57767f](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/a57767f1f7b579882068f6f59a3694bb24981fc9))
+* **internal:** codegen related update ([982e9e4](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/982e9e41b28d038bbc7427d5ac0aadb4a7270710))
+* **internal:** codegen related update ([1acc8d1](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/1acc8d1b39c3f006b11c31db7e82421a2c6edc29))
+* **internal:** upgrade eslint ([394adcd](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/394adcd67ceefa5c42d245e0ece3afaa1c844d96))
+* **mcp:** update lockfile ([23018bd](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/23018bdf22d044a0a19ffe7ffb80d66e03442ebb))
+* use latest @modelcontextprotocol/sdk ([ab3663d](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/ab3663ddb7d7f38e12c57f790319ef3561ba1974))
+
+
+### Refactors
+
+* **api:** types for mcp server serialization ([bee486b](https://github.com/dedalus-labs/dedalus-sdk-typescript/commit/bee486b02939c3c7a0016c2e32dd9fc1df3f1b84))
+
 ## 0.1.0-alpha.8 (2025-11-26)
 
 Full Changelog: [v0.1.0-alpha.7...v0.1.0-alpha.8](https://github.com/dedalus-labs/dedalus-sdk-typescript/compare/v0.1.0-alpha.7...v0.1.0-alpha.8)
