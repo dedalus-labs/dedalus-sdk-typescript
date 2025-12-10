@@ -47,6 +47,7 @@ export async function codeTool() {
       },
       body: JSON.stringify({
         project_name: 'dedalus-sdk',
+        client_opts: { environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any },
         code,
       }),
     });
