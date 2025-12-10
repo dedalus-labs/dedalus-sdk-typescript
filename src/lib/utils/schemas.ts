@@ -99,3 +99,37 @@ export function toSchema(
     };
   }
 }
+
+// ---------------------------------------------------------------------------
+// ToolDefinition schema conversion
+// ---------------------------------------------------------------------------
+
+import type { ToolDefinition, ToolParametersSchema } from '../runner/types/tools';
+import type { ChatCompletionToolParam } from '../../resources/chat/completions';
+import { isZodSchema, zodToJsonSchema } from './zod';
+
+/** Convert ToolDefinition to OpenAI-compatible tool schema */
+export function toSchemaFromDefinition(tool: ToolDefinition): ChatCompletionToolParam {
+  let parameters: Record<string, unknown>;
+
+  if (!tool.parameters) {
+    parameters = { type: 'object', properties: {} };
+  } else if (isZodSchema(tool.parameters)) {
+    parameters = zodToJsonSchema(tool.parameters);
+    if (parameters['type'] !== 'object') {
+      throw new Error(`Tool parameters must be an object type, got: ${parameters['type']}`);
+    }
+  } else {
+    parameters = tool.parameters as unknown as Record<string, unknown>;
+  }
+
+  return {
+    type: 'function',
+    function: {
+      name: tool.name,
+      description: tool.description ?? `Execute ${tool.name}`,
+      parameters,
+      ...(tool.strict !== undefined && { strict: tool.strict }),
+    },
+  };
+}

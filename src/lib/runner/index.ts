@@ -5,5 +5,14 @@
 // ==============================================================================
 
 export { DedalusRunner, RunResult } from './runner';
-export type { Tool, Message, ToolCall, ToolResult, ToolHandler } from './types';
-export { toSchema } from '../utils';
+export type {
+  Tool,
+  ToolFunction,
+  ToolDefinition,
+  ToolParametersSchema,
+  Message,
+  ToolCall,
+  ToolResult,
+  ToolHandler,
+} from './types';
+export { toSchema, toSchemaFromDefinition } from '../utils';

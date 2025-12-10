@@ -63,6 +63,180 @@ for await (const streamChunk of stream) {
 If you need to cancel a stream, you can `break` from the loop
 or call `stream.controller.abort()`.
 
+## DedalusRunner
+
+`DedalusRunner` is a high-level wrapper that handles multi-turn conversations with automatic tool execution. It manages the tool-calling loop, conversation history, and supports both server-side and client-side tools.
+
+### Basic usage
+
+```ts
+import Dedalus, { DedalusRunner } from 'dedalus-labs';
+
+const client = new Dedalus();
+const runner = new DedalusRunner(client);
+
+const result = await runner.run({
+  model: 'openai/gpt-4o',
+  input: 'What is the weather in San Francisco?',
+  tools: [weatherTool],
+});
+
+console.log(result.output); // Final text response
+console.log(result.toolResults); // Results from tool executions
+console.log(result.stepsUsed); // Number of conversation turns
+```
+
+### Defining tools
+
+Tools can be defined in two ways: as a `ToolDefinition` object or as a plain function (`ToolFunction`).
+
+#### ToolFunction
+
+A plain function that will be called directly. The schema is minimal (empty parameters):
+
+```ts
+import { ToolFunction } from 'dedalus-labs';
+
+const getCurrentTime: ToolFunction = async () => {
+  return new Date().toISOString();
+};
+
+await runner.run({
+  model: 'openai/gpt-4o',
+  input: 'What time is it?',
+  tools: [getCurrentTime],
+});
+```
+
+#### ToolDefinition
+
+A structured object with explicit schema. Supports both JSON Schema and Zod schemas for parameters:
+
+```ts
+import { ToolDefinition } from 'dedalus-labs';
+import { z } from 'zod';
+
+// Using Zod schema
+const weatherTool: ToolDefinition = {
+  name: 'getWeather',
+  description: 'Get current weather for a location',
+  parameters: z.object({
+    location: z.string().describe('City name'),
+    unit: z.enum(['celsius', 'fahrenheit']).optional(),
+  }),
+  execute: async ({ location, unit }) => {
+    const weather = await fetchWeather(location, unit);
+    return { temperature: weather.temp, conditions: weather.conditions };
+  },
+};
+
+// Using JSON Schema
+const calculatorTool: ToolDefinition = {
+  name: 'calculate',
+  description: 'Perform arithmetic calculations',
+  parameters: {
+    type: 'object',
+    properties: {
+      expression: { type: 'string', description: 'Math expression to evaluate' },
+    },
+    required: ['expression'],
+  },
+  execute: async ({ expression }) => {
+    return { result: eval(expression) };
+  },
+};
+```
+
+### Client-side tools
+
+Tools without an `execute` function are treated as client-side tools. When the model calls these tools, the runner pauses and returns control to the client to handle the tool execution.
+
+This pattern is useful for tools that require user interaction (confirmations, form inputs) or access to browser APIs.
+
+```ts
+// Client-side tool (no execute function)
+const askConfirmation: ToolDefinition = {
+  name: 'askConfirmation',
+  description: 'Ask the user to confirm an action',
+  parameters: z.object({
+    message: z.string().describe('Confirmation message to show'),
+  }),
+  // No execute - handled on client
+};
+
+// Server-side tool (has execute function)
+const deleteFile: ToolDefinition = {
+  name: 'deleteFile',
+  description: 'Delete a file from the system',
+  parameters: z.object({ path: z.string() }),
+  execute: async ({ path }) => {
+    await fs.unlink(path);
+    return { success: true };
+  },
+};
+
+const result = await runner.run({
+  model: 'openai/gpt-4o',
+  input: 'Delete the file at /tmp/test.txt',
+  tools: [askConfirmation, deleteFile],
+});
+
+// Check if runner paused for client tools
+const lastMessage = result.conversationHistory.at(-1);
+if (lastMessage?.role === 'assistant' && lastMessage.tool_calls) {
+  const clientToolCalls = lastMessage.tool_calls.filter((tc) => tc.function?.name === 'askConfirmation');
+  // Handle client tool calls, then continue conversation
+}
+```
+
+### Streaming
+
+Enable streaming to receive content deltas as they arrive:
+
+```ts
+const stream = await runner.run({
+  model: 'openai/gpt-4o',
+  input: 'Tell me a story',
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  if (chunk.choices?.[0]?.delta?.content) {
+    process.stdout.write(chunk.choices[0].delta.content);
+  }
+}
+```
+
+### RunResult
+
+The `run()` method returns a `RunResult` object with:
+
+| Property              | Type                   | Description                            |
+| --------------------- | ---------------------- | -------------------------------------- |
+| `output` / `content`  | `string`               | Final text response from the model     |
+| `toolResults`         | `ToolResult[]`         | Results from all tool executions       |
+| `stepsUsed`           | `number`               | Number of conversation turns           |
+| `conversationHistory` | `Message[]`            | Full conversation including tool calls |
+| `toolsCalled`         | `string[]`             | Names of tools that were called        |
+| `modelsUsed`          | `DedalusModelChoice[]` | Models used during the conversation    |
+
+### Configuration options
+
+```ts
+await runner.run({
+  model: 'openai/gpt-4o', // Required: model to use
+  input: 'User message', // Input string or message array
+  tools: [tool1, tool2], // Optional: tools to make available
+  maxSteps: 10, // Max conversation turns (default: 10)
+  autoExecuteTools: true, // Auto-execute server tools (default: true)
+  mcpServers: ['server-name'], // MCP servers for remote tools
+  instructions: 'System prompt', // System message prepended to conversation
+  stream: false, // Enable streaming (default: false)
+  verbose: false, // Enable logging (default: false)
+  debug: false, // Enable debug logging (default: false)
+});
+```
+
 ### Request & Response types
 
 This library includes TypeScript definitions for all request params and response fields. You may import and use them like so:

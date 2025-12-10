@@ -7,18 +7,7 @@ import {
 } from '../lib/parser';
 import { transformJSONSchema } from '../lib/schemas/transform';
 import type { JSONSchema } from '../lib/schemas/jsonschema';
-
-// Type guard to check if Zod is available
-function checkZodAvailable(): void {
-  try {
-    require.resolve('zod');
-  } catch {
-    throw new Error(
-      'Zod is not installed. Install it with: npm install zod\n' +
-        'Zod helpers require zod >= 3.23 as a peer dependency.',
-    );
-  }
-}
+import { zodToJsonSchema, isZodSchema } from '../lib/utils/zod';
 
 /**
  * Creates a response format object from a Zod schema for structured outputs.
@@ -68,39 +57,11 @@ export function zodResponseFormat<ZodInput extends ZodType>(
   name: string,
   props?: Omit<ResponseFormatJSONSchema.JSONSchema, 'schema' | 'strict' | 'name'>,
 ): AutoParseableResponseFormat<ReturnType<ZodInput['parse']>> {
-  checkZodAvailable();
-
-  // Dynamically import Zod to avoid hard dependency
-  const z = require('zod');
-
-  // Check if the zodObject is actually a Zod schema
-  if (!('_def' in zodObject && typeof zodObject.parse === 'function')) {
+  if (!isZodSchema(zodObject)) {
     throw new Error('zodObject must be a Zod schema with _def and parse method');
   }
 
-  // Use Zod's native toJSONSchema (available since v3.23)
-  let jsonSchema: Record<string, unknown>;
-
-  // Try Zod v4 first (has toJSONSchema static method)
-  if (typeof z.toJSONSchema === 'function') {
-    jsonSchema = z.toJSONSchema(zodObject, {
-      target: 'draft-7',
-      reused: 'ref', // Handle circular references
-    }) as Record<string, unknown>;
-  }
-  // Try Zod v3 (has toJSONSchema on instance)
-  else if ('toJSONSchema' in zodObject && typeof zodObject.toJSONSchema === 'function') {
-    jsonSchema = zodObject.toJSONSchema({
-      target: 'draft-7',
-      reused: 'ref',
-    }) as Record<string, unknown>;
-  }
-  // Fallback error
-  else {
-    throw new Error(
-      'Zod version does not support toJSONSchema(). ' + 'Please upgrade to Zod >= 3.23 or Zod v4.',
-    );
-  }
+  const jsonSchema = zodToJsonSchema(zodObject);
 
   // Apply strict transformations for OpenAI compatibility
   const strictSchema = transformJSONSchema(jsonSchema as JSONSchema);
@@ -183,32 +144,11 @@ export function zodFunction<Parameters extends ZodType>(options: {
   description?: string;
   function?: ((args: ReturnType<Parameters['parse']>) => unknown | Promise<unknown>) | undefined;
 }): AutoParseableTool<{ name: string; arguments: ReturnType<Parameters['parse']>; function?: Function }> {
-  checkZodAvailable();
-
-  const z = require('zod');
-
-  if (!('_def' in options.parameters && typeof options.parameters.parse === 'function')) {
+  if (!isZodSchema(options.parameters)) {
     throw new Error('parameters must be a Zod schema with _def and parse method');
   }
 
-  // Generate JSON Schema from Zod parameters
-  let jsonSchema: Record<string, unknown>;
-
-  if (typeof z.toJSONSchema === 'function') {
-    jsonSchema = z.toJSONSchema(options.parameters, {
-      target: 'draft-7',
-      reused: 'ref',
-    }) as Record<string, unknown>;
-  } else if ('toJSONSchema' in options.parameters && typeof options.parameters.toJSONSchema === 'function') {
-    jsonSchema = options.parameters.toJSONSchema({
-      target: 'draft-7',
-      reused: 'ref',
-    }) as Record<string, unknown>;
-  } else {
-    throw new Error(
-      'Zod version does not support toJSONSchema(). ' + 'Please upgrade to Zod >= 3.23 or Zod v4.',
-    );
-  }
+  const jsonSchema = zodToJsonSchema(options.parameters);
 
   // Validate that the schema is an object type (required for function parameters)
   if (jsonSchema['type'] !== 'object') {
