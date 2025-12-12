@@ -3,6 +3,25 @@
 import * as CompletionsAPI from './chat/completions';
 
 /**
+ * Credential for MCP server authentication.
+ *
+ * Passed at endpoint level (e.g., chat.completions.create) and matched to MCP
+ * servers by connection name. Wire format matches
+ * dedalus_mcp.Credential.to_dict().
+ */
+export interface Credential {
+  /**
+   * Connection name. Must match an MCPServerSpec's connection field.
+   */
+  connection_name: string;
+
+  /**
+   * Credential values. Keys are credential field names, values are the secrets.
+   */
+  values: { [key: string]: string | number | boolean };
+}
+
+/**
  * Detailed credential binding with options.
  *
  * Used when a binding needs default values, optional flags, or type casting.
@@ -218,6 +237,11 @@ export interface FunctionDefinition {
  * Omitting `parameters` defines a function with an empty parameter list.
  */
 export type FunctionParameters = { [key: string]: unknown };
+
+/**
+ * List of credentials for MCP server authentication.
+ */
+export type MCPCredentials = Array<Credential>;
 
 /**
  * Single MCP server input: slug string or structured MCPServerSpec.
