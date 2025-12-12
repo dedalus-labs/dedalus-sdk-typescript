@@ -72,10 +72,10 @@ export interface ClientOptions {
   /**
    * Organization ID for request scoping.
    */
-  organization?: string | null | undefined;
+  dedalusOrgID?: string | null | undefined;
 
   /**
-   * Provider name for BYOK mode (e.g., 'openai', 'anthropic').
+   * Provider name for BYOK mode (e.g., 'google', 'openai', 'anthropic').
    */
   provider?: string | null | undefined;
 
@@ -174,7 +174,7 @@ export class Dedalus {
   apiKey: string | null;
   xAPIKey: string | null;
   asBaseURL: string | null;
-  organization: string | null;
+  dedalusOrgID: string | null;
   provider: string | null;
   providerKey: string | null;
   providerModel: string | null;
@@ -197,7 +197,7 @@ export class Dedalus {
    * @param {string | null | undefined} [opts.apiKey=process.env['DEDALUS_API_KEY'] ?? null]
    * @param {string | null | undefined} [opts.xAPIKey=process.env['DEDALUS_X_API_KEY'] ?? null]
    * @param {string | null | undefined} [opts.asBaseURL=process.env['DEDALUS_AS_URL'] ?? null]
-   * @param {string | null | undefined} [opts.organization=process.env['DEDALUS_ORG_ID'] ?? null]
+   * @param {string | null | undefined} [opts.dedalusOrgID=process.env['DEDALUS_ORG_ID'] ?? null]
    * @param {string | null | undefined} [opts.provider=process.env['DEDALUS_PROVIDER'] ?? null]
    * @param {string | null | undefined} [opts.providerKey=process.env['DEDALUS_PROVIDER_KEY'] ?? null]
    * @param {string | null | undefined} [opts.providerModel=process.env['DEDALUS_PROVIDER_MODEL'] ?? null]
@@ -215,7 +215,7 @@ export class Dedalus {
     apiKey = readEnv('DEDALUS_API_KEY') ?? null,
     xAPIKey = readEnv('DEDALUS_X_API_KEY') ?? null,
     asBaseURL = readEnv('DEDALUS_AS_URL') ?? null,
-    organization = readEnv('DEDALUS_ORG_ID') ?? null,
+    dedalusOrgID = readEnv('DEDALUS_ORG_ID') ?? null,
     provider = readEnv('DEDALUS_PROVIDER') ?? null,
     providerKey = readEnv('DEDALUS_PROVIDER_KEY') ?? null,
     providerModel = readEnv('DEDALUS_PROVIDER_MODEL') ?? null,
@@ -225,7 +225,7 @@ export class Dedalus {
       apiKey,
       xAPIKey,
       asBaseURL,
-      organization,
+      dedalusOrgID,
       provider,
       providerKey,
       providerModel,
@@ -261,7 +261,7 @@ export class Dedalus {
     this.apiKey = apiKey;
     this.xAPIKey = xAPIKey;
     this.asBaseURL = asBaseURL;
-    this.organization = organization;
+    this.dedalusOrgID = dedalusOrgID;
     this.provider = provider;
     this.providerKey = providerKey;
     this.providerModel = providerModel;
@@ -284,7 +284,7 @@ export class Dedalus {
       apiKey: this.apiKey,
       xAPIKey: this.xAPIKey,
       asBaseURL: this.asBaseURL,
-      organization: this.organization,
+      dedalusOrgID: this.dedalusOrgID,
       provider: this.provider,
       providerKey: this.providerKey,
       providerModel: this.providerModel,
@@ -889,6 +889,7 @@ export declare namespace Dedalus {
 
   export { Chat as Chat };
 
+  export type CredentialsBindingSpec = API.CredentialsBindingSpec;
   export type DedalusModel = API.DedalusModel;
   export type DedalusModelChoice = API.DedalusModelChoice;
   export type FunctionDefinition = API.FunctionDefinition;

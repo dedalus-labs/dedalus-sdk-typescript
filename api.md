@@ -2,6 +2,7 @@
 
 Types:
 
+- <code><a href="./src/resources/shared.ts">CredentialsBindingSpec</a></code>
 - <code><a href="./src/resources/shared.ts">DedalusModel</a></code>
 - <code><a href="./src/resources/shared.ts">DedalusModelChoice</a></code>
 - <code><a href="./src/resources/shared.ts">FunctionDefinition</a></code>

@@ -3,6 +3,33 @@
 import * as CompletionsAPI from './chat/completions';
 
 /**
+ * Detailed credential binding with options.
+ *
+ * Used when a binding needs default values, optional flags, or type casting.
+ */
+export interface CredentialsBindingSpec {
+  /**
+   * Environment variable name or source identifier.
+   */
+  name: string;
+
+  /**
+   * Type to cast value to (e.g., 'int', 'bool').
+   */
+  cast?: string | null;
+
+  /**
+   * Default value if source not set.
+   */
+  default?: string | number | boolean | null;
+
+  /**
+   * If true, missing value is allowed.
+   */
+  optional?: boolean | null;
+}
+
+/**
  * Structured model selection entry used in request payloads.
  *
  * Supports OpenAI-style semantics (string model id) while enabling optional
@@ -214,12 +241,11 @@ export interface MCPServerSpec {
    * Schema declaring what credentials are needed. Maps field names to their bindings
    * (e.g., env var names).
    */
-  credentials?: { [key: string]: string | MCPServerSpec.BindingSpec } | null;
+  credentials?: { [key: string]: string | CredentialsBindingSpec } | null;
 
   /**
-   * Client-encrypted credential values. Maps connection names to encrypted envelopes
-   * (base64url JWE). SDK encrypts credentials client-side using the enclave's public
-   * key from authorization server.
+   * Client-encrypted credential values. Maps connection names to encrypted
+   * envelopes.
    */
   encrypted_credentials?: { [key: string]: string } | null;
 
@@ -237,35 +263,6 @@ export interface MCPServerSpec {
    * Version constraint for slug-based servers.
    */
   version?: string | null;
-}
-
-export namespace MCPServerSpec {
-  /**
-   * Detailed credential binding with options.
-   *
-   * Used when a binding needs default values, optional flags, or type casting.
-   */
-  export interface BindingSpec {
-    /**
-     * Environment variable name or source identifier.
-     */
-    name: string;
-
-    /**
-     * Type to cast value to (e.g., 'int', 'bool').
-     */
-    cast?: string | null;
-
-    /**
-     * Default value if source not set.
-     */
-    default?: unknown;
-
-    /**
-     * If true, missing value is allowed.
-     */
-    optional?: boolean;
-  }
 }
 
 /**

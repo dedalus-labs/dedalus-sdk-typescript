@@ -12,7 +12,7 @@ You can run the MCP Server directly via `npx`:
 export DEDALUS_API_KEY="My API Key"
 export DEDALUS_X_API_KEY="My X API Key"
 export DEDALUS_AS_URL="My As Base URL"
-export DEDALUS_ORG_ID="My Organization"
+export DEDALUS_ORG_ID="My Dedalus Org ID"
 export DEDALUS_PROVIDER="My Provider"
 export DEDALUS_PROVIDER_KEY="My Provider Key"
 export DEDALUS_PROVIDER_MODEL="My Provider Model"
@@ -37,7 +37,7 @@ For clients with a configuration JSON, it might look something like this:
         "DEDALUS_API_KEY": "My API Key",
         "DEDALUS_X_API_KEY": "My X API Key",
         "DEDALUS_AS_URL": "My As Base URL",
-        "DEDALUS_ORG_ID": "My Organization",
+        "DEDALUS_ORG_ID": "My Dedalus Org ID",
         "DEDALUS_PROVIDER": "My Provider",
         "DEDALUS_PROVIDER_KEY": "My Provider Key",
         "DEDALUS_PROVIDER_MODEL": "My Provider Model",
