@@ -28,6 +28,7 @@ describe('resource completions', () => {
       audio: { foo: 'bar' },
       automatic_tool_execution: true,
       cached_content: 'cached_content',
+      credentials: { connection_name: 'brave-api', values: { api_key: 'sk-...' } },
       deferred: true,
       frequency_penalty: -2,
       function_call: 'function_call',

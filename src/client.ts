@@ -76,7 +76,7 @@ export interface ClientOptions {
   dedalusOrgID?: string | null | undefined;
 
   /**
-   * Provider name for BYOK mode (e.g., 'google', 'openai', 'anthropic').
+   * Provider name for BYOK mode (e.g., 'openai', 'anthropic').
    */
   provider?: string | null | undefined;
 
@@ -898,11 +898,13 @@ export declare namespace Dedalus {
 
   export { Chat as Chat };
 
+  export type Credential = API.Credential;
   export type CredentialsBindingSpec = API.CredentialsBindingSpec;
   export type DedalusModel = API.DedalusModel;
   export type DedalusModelChoice = API.DedalusModelChoice;
   export type FunctionDefinition = API.FunctionDefinition;
   export type FunctionParameters = API.FunctionParameters;
+  export type MCPCredentials = API.MCPCredentials;
   export type MCPServerInput = API.MCPServerInput;
   export type MCPServerSpec = API.MCPServerSpec;
   export type MCPServers = API.MCPServers;

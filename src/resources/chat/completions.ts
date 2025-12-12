@@ -825,6 +825,12 @@ export interface ChatCompletionCreateParams {
   cached_content?: string | null;
 
   /**
+   * Credentials for MCP server authentication. Each credential is matched to servers
+   * by connection name.
+   */
+  credentials?: Shared.Credential | Shared.MCPCredentials | null;
+
+  /**
    * If set to `true`, the request returns a `request_id`. You can then get the de...
    */
   deferred?: boolean | null;
@@ -2166,6 +2172,12 @@ export interface CompletionCreateParamsBase {
    * Optional. The name of the content [cached](https://ai.google.dev/gemini-api/d...
    */
   cached_content?: string | null;
+
+  /**
+   * Credentials for MCP server authentication. Each credential is matched to servers
+   * by connection name.
+   */
+  credentials?: Shared.Credential | Shared.MCPCredentials | null;
 
   /**
    * If set to `true`, the request returns a `request_id`. You can then get the de...
