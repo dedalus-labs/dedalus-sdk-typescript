@@ -95,7 +95,7 @@ export class Completions extends APIResource {
 
     if (!isStreaming) {
       return this._client
-        .post<Completion>('/v1/chat/completions', { body, ...options, stream: false })
+        .post<ChatCompletion>('/v1/chat/completions', { body, ...options, stream: false })
         .then((completion) => maybeParseChatCompletion(completion, body as any)) as APIPromise<ChatCompletion>;
     }
 
@@ -113,7 +113,7 @@ export class Completions extends APIResource {
     }
 
     return this._client
-      .post<Completion>('/v1/chat/completions', { body, ...options, stream: false })
+      .post<ChatCompletion>('/v1/chat/completions', { body, ...options, stream: false })
       .then((completion) => parseChatCompletion(completion, body)) as APIPromise<
       _ParsedChatCompletion<ExtractParsedContentFromParams<Params>>
     >;

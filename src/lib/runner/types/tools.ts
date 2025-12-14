@@ -10,11 +10,15 @@ import type {
   ChatCompletionMessageCustomToolCall,
 } from '../../../resources/chat/completions';
 import type { JsonValue } from '../../utils/json';
+import type { AutoParseableTool } from '../../parser';
 
 export type { JsonValue };
 
 /** Callable function that returns JSON-serializable data, synchronously or asynchronously. */
-export type Tool = (...args: any[]) => JsonValue | Promise<JsonValue>;
+export type PlainTool = (...args: any[]) => JsonValue | Promise<JsonValue>;
+
+/** Tool that can be passed to the runner. Either a plain function or an AutoParseableTool. */
+export type Tool = PlainTool | AutoParseableTool<any>;
 
 /** Tool call type from Dedalus SDK. */
 export type ToolCall = ChatCompletionMessageToolCall | ChatCompletionMessageCustomToolCall;

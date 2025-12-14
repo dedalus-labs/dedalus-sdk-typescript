@@ -1,11 +1,11 @@
-import type { Completion, Choice } from '../../src/resources/chat/completions';
+import type { ChatCompletion, Choice } from '../../src/resources/chat/completions';
 import type { ParsedChatCompletion, ParsedChoice } from '../../src/lib/parser';
 
 /** Array guaranteed to have at least one element */
 export type NonEmptyArray<T> = [T, ...T[]];
 
 /** Completion with guaranteed non-empty choices */
-export interface MockCompletion extends Omit<Completion, 'choices'> {
+export interface MockCompletion extends Omit<ChatCompletion, 'choices'> {
   choices: NonEmptyArray<Choice>;
 }
 
@@ -17,7 +17,7 @@ export interface MockParsedCompletion<ParsedT> extends Omit<ParsedChatCompletion
 /**
  * Create a mock completion response for testing without API calls
  */
-export function createMockCompletion(overrides?: Partial<Completion>): MockCompletion {
+export function createMockCompletion(overrides?: Partial<ChatCompletion>): MockCompletion {
   return {
     id: 'cmpl_test_123',
     object: 'chat.completion' as const,
