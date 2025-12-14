@@ -108,7 +108,10 @@ export function effectResponseFormat<SchemaInput extends EffectSchemaType>(
         const parsed = JSON.parse(content);
         return Schema.decodeUnknownSync(schema)(parsed) as InferEffectType<SchemaInput>;
       } catch (err: unknown) {
-        if (err instanceof Error && (err.name === 'ParseError' || (err as ParseError)._tag === 'ParseError')) {
+        if (
+          err instanceof Error &&
+          (err.name === 'ParseError' || (err as ParseError)._tag === 'ParseError')
+        ) {
           const parseError = err as ParseError;
           throw new Error(`Failed to parse structured output: ${parseError.message}`);
         }
@@ -180,7 +183,8 @@ export function effectFunction<Parameters extends EffectSchemaType>(options: {
   // Validate that the schema is an object type (required for function parameters)
   if (jsonSchema['type'] !== 'object') {
     throw new Error(
-      `Effect schema for tool "${options.name}" must be an object type, ` + `but got type: ${jsonSchema['type']}`,
+      `Effect schema for tool "${options.name}" must be an object type, ` +
+        `but got type: ${jsonSchema['type']}`,
     );
   }
 
@@ -204,7 +208,10 @@ export function effectFunction<Parameters extends EffectSchemaType>(options: {
           const parsed = JSON.parse(args);
           return Schema.decodeUnknownSync(options.parameters)(parsed) as InferEffectType<Parameters>;
         } catch (err: unknown) {
-          if (err instanceof Error && (err.name === 'ParseError' || (err as ParseError)._tag === 'ParseError')) {
+          if (
+            err instanceof Error &&
+            (err.name === 'ParseError' || (err as ParseError)._tag === 'ParseError')
+          ) {
             const parseError = err as ParseError;
             throw new Error(`Failed to parse tool arguments for '${options.name}': ${parseError.message}`);
           }

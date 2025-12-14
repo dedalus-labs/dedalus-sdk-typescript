@@ -3,7 +3,6 @@ import * as Schema from 'effect/Schema';
 import { createToolHandler } from '../../../src/lib/runner/tools';
 import { zodFunction } from '../../../src/helpers/zod';
 import { effectFunction } from '../../../src/helpers/effect';
-import type { JsonValue } from '../../../src/lib/runner/types/tools';
 
 describe('createToolHandler', () => {
   describe('with plain functions', () => {
@@ -135,9 +134,7 @@ describe('createToolHandler', () => {
 
       const handler = createToolHandler([noCallbackTool]);
 
-      await expect(handler.exec('no_callback', { input: 'test' })).rejects.toThrow(
-        /no implementation/i,
-      );
+      await expect(handler.exec('no_callback', { input: 'test' })).rejects.toThrow(/no implementation/i);
     });
   });
 
