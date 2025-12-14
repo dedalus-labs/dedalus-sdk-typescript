@@ -12,7 +12,7 @@ import { buildInitialMessages, coerceToolCall } from './messages';
 import { buildRequestKwargs, normalizeModelSpec } from './validation';
 import { jsonify } from '../utils/format';
 import type { Dedalus } from '../../client';
-import type { CompletionCreateParamsBase, StreamChunk } from '../../resources/chat/completions';
+import type { CompletionCreateParamsBase, ChatCompletionChunk } from '../../resources/chat/completions';
 import type { DedalusModelChoice } from '../../resources/shared';
 import { loggerFor } from '../../internal/utils/log';
 import type { Stream } from '../../core/streaming';
@@ -362,7 +362,7 @@ export class DedalusRunner {
         ...state.requestKwargs,
       };
 
-      const stream = (await this.client.chat.completions.create(createParams)) as Stream<StreamChunk>;
+      const stream = (await this.client.chat.completions.create(createParams)) as Stream<ChatCompletionChunk>;
 
       const collectedToolCalls: Array<{
         index?: number;

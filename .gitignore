@@ -13,3 +13,7 @@ dist-bundle
 **/.claude/
 **/.agent/
 .mcp.json
+.env
+.env.*
+*.env
+!.env.example

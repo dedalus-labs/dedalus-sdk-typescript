@@ -1,6 +1,6 @@
 import type { ResponseFormatJSONSchema } from '../resources/shared';
 import type {
-  Completion,
+  ChatCompletion,
   CompletionCreateParams,
   CompletionCreateParamsBase,
   Choice,
@@ -122,7 +122,7 @@ export function isAutoParsableTool(tool: any): tool is AutoParseableTool<any> {
 /**
  * Parsed chat completion with typed parsed field.
  */
-export interface ParsedChatCompletion<ParsedT> extends Omit<Completion, 'choices'> {
+export interface ParsedChatCompletion<ParsedT> extends Omit<ChatCompletion, 'choices'> {
   choices: ParsedChoice<ParsedT>[];
 }
 
@@ -197,7 +197,7 @@ export class ContentFilterFinishReasonError extends Error {
 export function maybeParseChatCompletion<
   Params extends CompletionCreateParams | null,
   ParsedT = Params extends null ? null : ExtractParsedContentFromParams<NonNullable<Params>>,
->(completion: Completion, params: Params): ParsedChatCompletion<ParsedT> {
+>(completion: ChatCompletion, params: Params): ParsedChatCompletion<ParsedT> {
   if (!params || !hasAutoParseableInput(params)) {
     // No auto-parseable inputs - return completion with null parsed fields
     return {
@@ -233,7 +233,7 @@ export function maybeParseChatCompletion<
 export function parseChatCompletion<
   Params extends CompletionCreateParams,
   ParsedT = ExtractParsedContentFromParams<Params>,
->(completion: Completion, params: Params): ParsedChatCompletion<ParsedT> {
+>(completion: ChatCompletion, params: Params): ParsedChatCompletion<ParsedT> {
   const choices: ParsedChoice<ParsedT>[] = completion.choices.map((choice): ParsedChoice<ParsedT> => {
     // Throw on problematic finish reasons
     if (choice.finish_reason === 'length') {

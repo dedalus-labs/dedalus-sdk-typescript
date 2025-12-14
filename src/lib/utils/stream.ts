@@ -4,31 +4,9 @@
 //           github.com/dedalus-labs/dedalus-sdk-typescript/LICENSE
 // ==============================================================================
 
-/**
- * Minimal structural types to match the Python-side StreamChunk.
- * If you have generated SDK types, replace these with imports.
- */
+import type { ChatCompletionChunk } from '../../resources/chat/completions';
 
-export type ToolCallDelta = {
-  id?: string;
-  function?: { name?: string };
-};
-
-export type Delta = {
-  content?: string;
-  tool_calls?: ToolCallDelta[];
-};
-
-export type Choice = {
-  delta: Delta;
-  finish_reason?: string;
-};
-
-export type StreamChunk = {
-  choices?: Choice[];
-  /** Mirrors Python: sometimes metadata is stashed here by pydantic */
-  __pydantic_extra__?: Record<string, any>;
-};
+export type { ChatCompletionChunk };
 
 const isVerbose = () => {
   const v = (process.env['DEDALUS_SDK_VERBOSE'] || '').toLowerCase();
@@ -36,7 +14,7 @@ const isVerbose = () => {
 };
 
 /** Stream text content from an async streaming response. */
-export async function streamAsync(stream: AsyncIterable<StreamChunk>): Promise<void> {
+export async function streamAsync(stream: AsyncIterable<ChatCompletionChunk>): Promise<void> {
   const verbose = isVerbose();
 
   for await (const chunk of stream) {
@@ -83,7 +61,7 @@ export async function streamAsync(stream: AsyncIterable<StreamChunk>): Promise<v
 }
 
 /** Stream text content from a sync iterator-like streaming response. */
-export function streamSync(stream: Iterable<StreamChunk>): void {
+export function streamSync(stream: Iterable<ChatCompletionChunk>): void {
   const verbose = isVerbose();
 
   for (const chunk of stream) {

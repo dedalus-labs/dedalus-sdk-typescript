@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import * as Schema from 'effect/Schema';
 import {
   maybeParseChatCompletion,
   parseChatCompletion,
@@ -6,6 +7,7 @@ import {
   ContentFilterFinishReasonError,
 } from '../../src/lib/parser';
 import { zodResponseFormat, zodFunction } from '../../src/helpers/zod';
+import { effectFunction, effectResponseFormat } from '../../src/helpers/effect';
 import {
   createMockCompletionWithContent,
   createMockCompletionWithRefusal,
@@ -46,12 +48,59 @@ describe('Parser - Mock-Based Integration Tests', () => {
       });
     });
 
+    it('parses valid JSON with Effect schema', () => {
+      interface Weather {
+        city: string;
+        temperature: number;
+      }
+
+      const schema = Schema.Struct({
+        city: Schema.String,
+        temperature: Schema.Number,
+      });
+
+      const format = effectResponseFormat(schema, 'weather');
+      const completion = createMockCompletionWithContent(
+        JSON.stringify({ city: 'San Francisco', temperature: 72 }),
+      );
+
+      const params: CompletionCreateParams = {
+        model: 'test',
+        messages: [],
+        response_format: format,
+      };
+
+      const parsed = parseChatCompletion(completion, params) as MockParsedCompletion<Weather>;
+
+      expect(parsed.choices[0].message.parsed).toEqual({
+        city: 'San Francisco',
+        temperature: 72,
+      });
+    });
+
     it('throws on invalid JSON schema', () => {
       const schema = z.object({
         value: z.number(),
       });
 
       const format = zodResponseFormat(schema, 'test');
+      const completion = createMockCompletionWithContent(JSON.stringify({ value: 'not a number' }));
+
+      const params: CompletionCreateParams = {
+        model: 'test',
+        messages: [],
+        response_format: format,
+      };
+
+      expect(() => parseChatCompletion(completion, params)).toThrow(/Failed to parse structured output/);
+    });
+
+    it('throws on invalid Effect schema', () => {
+      const schema = Schema.Struct({
+        value: Schema.Number,
+      });
+
+      const format = effectResponseFormat(schema, 'test');
       const completion = createMockCompletionWithContent(JSON.stringify({ value: 'not a number' }));
 
       const params: CompletionCreateParams = {
@@ -144,11 +193,70 @@ describe('Parser - Mock-Based Integration Tests', () => {
       });
     });
 
+    it('parses tool calls with Effect schema', () => {
+      const tool = effectFunction({
+        name: 'calculator',
+        parameters: Schema.Struct({
+          a: Schema.Number,
+          b: Schema.Number,
+          operation: Schema.Literal('add', 'subtract'),
+        }),
+      });
+
+      const completion = createMockCompletionWithTools([
+        {
+          id: 'call_123',
+          name: 'calculator',
+          arguments: JSON.stringify({ a: 5, b: 3, operation: 'add' }),
+        },
+      ]);
+
+      const params: CompletionCreateParams = {
+        model: 'test',
+        messages: [],
+        tools: [tool],
+      };
+
+      const parsed = parseChatCompletion(completion, params) as MockParsedCompletion<null>;
+      const toolCall = parsed.choices[0].message.tool_calls?.[0];
+
+      expect(toolCall?.function.parsed_arguments).toEqual({
+        a: 5,
+        b: 3,
+        operation: 'add',
+      });
+    });
+
     it('throws on invalid tool arguments', () => {
       const tool = zodFunction({
         name: 'strict_tool',
         parameters: z.object({
           value: z.number(),
+        }),
+      });
+
+      const completion = createMockCompletionWithTools([
+        {
+          id: 'call_123',
+          name: 'strict_tool',
+          arguments: JSON.stringify({ value: 'not a number' }),
+        },
+      ]);
+
+      const params: CompletionCreateParams = {
+        model: 'test',
+        messages: [],
+        tools: [tool],
+      };
+
+      expect(() => parseChatCompletion(completion, params)).toThrow(/Failed to parse tool arguments/);
+    });
+
+    it('throws on invalid Effect tool arguments', () => {
+      const tool = effectFunction({
+        name: 'strict_tool',
+        parameters: Schema.Struct({
+          value: Schema.Number,
         }),
       });
 

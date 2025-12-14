@@ -10,7 +10,7 @@ import {
   LengthFinishReasonError,
   ContentFilterFinishReasonError,
 } from '../../src/lib/parser';
-import type { Completion, CompletionCreateParams } from '../../src/resources/chat/completions';
+import type { ChatCompletion, CompletionCreateParams } from '../../src/resources/chat/completions';
 import type { ResponseFormatJSONSchema } from '../../src/resources/shared';
 import type { MockParsedCompletion } from '../utils/mock-completions';
 
@@ -153,7 +153,7 @@ describe('Parser - Brand Markers', () => {
 describe('Parser - Completion Parsing', () => {
   describe('maybeParseChatCompletion', () => {
     it('returns completion with null parsed when no auto-parseable inputs', () => {
-      const completion: Completion = {
+      const completion: ChatCompletion = {
         id: 'test',
         object: 'chat.completion',
         created: Date.now(),
@@ -189,7 +189,7 @@ describe('Parser - Completion Parsing', () => {
 
       const parseable = makeParseableResponseFormat(format, (content) => JSON.parse(content));
 
-      const completion: Completion = {
+      const completion: ChatCompletion = {
         id: 'test',
         object: 'chat.completion',
         created: Date.now(),
@@ -228,7 +228,7 @@ describe('Parser - Completion Parsing', () => {
 
       const parseable = makeParseableResponseFormat(format, JSON.parse);
 
-      const completion: Completion = {
+      const completion: ChatCompletion = {
         id: 'test',
         object: 'chat.completion',
         created: Date.now(),
@@ -261,7 +261,7 @@ describe('Parser - Completion Parsing', () => {
 
   describe('parseChatCompletion', () => {
     it('throws LengthFinishReasonError on length finish reason', () => {
-      const completion: Completion = {
+      const completion: ChatCompletion = {
         id: 'test',
         object: 'chat.completion',
         created: Date.now(),
@@ -289,7 +289,7 @@ describe('Parser - Completion Parsing', () => {
     });
 
     it('throws ContentFilterFinishReasonError on content_filter', () => {
-      const completion: Completion = {
+      const completion: ChatCompletion = {
         id: 'test',
         object: 'chat.completion',
         created: Date.now(),
