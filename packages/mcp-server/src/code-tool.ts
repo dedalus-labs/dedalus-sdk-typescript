@@ -43,6 +43,7 @@ export async function codeTool() {
           DEDALUS_PROVIDER: readEnv('DEDALUS_PROVIDER'),
           DEDALUS_PROVIDER_KEY: readEnv('DEDALUS_PROVIDER_KEY'),
           DEDALUS_PROVIDER_MODEL: readEnv('DEDALUS_PROVIDER_MODEL'),
+          DEDALUS_BASE_URL: readEnv('DEDALUS_BASE_URL'),
         }),
       },
       body: JSON.stringify({
