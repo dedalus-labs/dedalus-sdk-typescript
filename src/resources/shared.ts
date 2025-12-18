@@ -103,9 +103,6 @@ export type JSONObjectInput = { [key: string]: JSONValueInput | null };
 
 export type JSONObjectOutput = { [key: string]: JSONValueOutput | null };
 
-/**
- * Recursive JSON value: primitive, object, or array.
- */
 export type JSONValueInput =
   | string
   | number
@@ -113,9 +110,6 @@ export type JSONValueInput =
   | { [key: string]: JSONValueInput | null }
   | Array<JSONValueInput | null>;
 
-/**
- * Recursive JSON value: primitive, object, or array.
- */
 export type JSONValueOutput =
   | string
   | number
@@ -201,7 +195,7 @@ export interface MCPToolResult {
   duration_ms?: number | null;
 
   /**
-   * Recursive JSON value: primitive, object, or array.
+   * Structured result from the tool (parsed from structuredContent or content)
    */
   result?: JSONValueOutput | null;
 }
@@ -253,6 +247,12 @@ export interface ModelSettings {
 
   prompt_cache_key?: string | null;
 
+  /**
+   * **gpt-5 and o-series models only**
+   *
+   * Configuration options for
+   * [reasoning models](https://platform.openai.com/docs/guides/reasoning).
+   */
   reasoning?: Reasoning | null;
 
   reasoning_effort?: string | null;
@@ -310,8 +310,14 @@ export interface ModelSettings {
   web_search_options?: JSONObjectInput | null;
 }
 
+/**
+ * **gpt-5 and o-series models only**
+ *
+ * Configuration options for
+ * [reasoning models](https://platform.openai.com/docs/guides/reasoning).
+ */
 export interface Reasoning {
-  effort?: 'minimal' | 'low' | 'medium' | 'high' | null;
+  effort?: 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh' | null;
 
   generate_summary?: 'auto' | 'concise' | 'detailed' | null;
 
