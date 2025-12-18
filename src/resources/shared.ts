@@ -11,7 +11,7 @@ import * as CompletionsAPI from './chat/completions';
  */
 export interface Credential {
   /**
-   * Connection name. Must match an MCPServerSpec's connection field.
+   * Connection name. Must match a connection in MCPServer.connections.
    */
   connection_name: string;
 
@@ -19,33 +19,6 @@ export interface Credential {
    * Credential values. Keys are credential field names, values are the secrets.
    */
   values: { [key: string]: string | number | boolean };
-}
-
-/**
- * Detailed credential binding with options.
- *
- * Used when a binding needs default values, optional flags, or type casting.
- */
-export interface CredentialsBindingSpec {
-  /**
-   * Environment variable name or source identifier.
-   */
-  name: string;
-
-  /**
-   * Type to cast value to (e.g., 'int', 'bool').
-   */
-  cast?: string | null;
-
-  /**
-   * Default value if source not set.
-   */
-  default?: string | number | boolean | null;
-
-  /**
-   * If true, missing value is allowed.
-   */
-  optional?: boolean | null;
 }
 
 /**
@@ -65,117 +38,7 @@ export interface DedalusModel {
    * Optional default generation settings (e.g., temperature, max_tokens) applied
    * when this model is selected.
    */
-  settings?: DedalusModel.Settings | null;
-}
-
-export namespace DedalusModel {
-  /**
-   * Optional default generation settings (e.g., temperature, max_tokens) applied
-   * when this model is selected.
-   */
-  export interface Settings {
-    attributes?: { [key: string]: unknown };
-
-    audio?: { [key: string]: unknown } | null;
-
-    deferred?: boolean | null;
-
-    extra_args?: { [key: string]: unknown } | null;
-
-    extra_headers?: { [key: string]: string } | null;
-
-    extra_query?: { [key: string]: unknown } | null;
-
-    frequency_penalty?: number | null;
-
-    generation_config?: { [key: string]: unknown } | null;
-
-    include_usage?: boolean | null;
-
-    input_audio_format?: string | null;
-
-    input_audio_transcription?: { [key: string]: unknown } | null;
-
-    logit_bias?: { [key: string]: number } | null;
-
-    logprobs?: boolean | null;
-
-    max_completion_tokens?: number | null;
-
-    max_tokens?: number | null;
-
-    metadata?: { [key: string]: string } | null;
-
-    modalities?: Array<string> | null;
-
-    n?: number | null;
-
-    output_audio_format?: string | null;
-
-    parallel_tool_calls?: boolean | null;
-
-    prediction?: { [key: string]: unknown } | null;
-
-    presence_penalty?: number | null;
-
-    prompt_cache_key?: string | null;
-
-    reasoning?: CompletionsAPI.Reasoning | null;
-
-    reasoning_effort?: string | null;
-
-    response_format?: { [key: string]: unknown } | null;
-
-    safety_identifier?: string | null;
-
-    safety_settings?: Array<{ [key: string]: unknown }> | null;
-
-    search_parameters?: { [key: string]: unknown } | null;
-
-    seed?: number | null;
-
-    service_tier?: string | null;
-
-    stop?: string | Array<string> | null;
-
-    store?: boolean | null;
-
-    stream?: boolean | null;
-
-    stream_options?: { [key: string]: unknown } | null;
-
-    structured_output?: unknown;
-
-    system_instruction?: { [key: string]: unknown } | null;
-
-    temperature?: number | null;
-
-    thinking?: { [key: string]: unknown } | null;
-
-    timeout?: number | null;
-
-    tool_choice?: CompletionsAPI.ToolChoice | null;
-
-    tool_config?: { [key: string]: unknown } | null;
-
-    top_k?: number | null;
-
-    top_logprobs?: number | null;
-
-    top_p?: number | null;
-
-    truncation?: 'auto' | 'disabled' | null;
-
-    turn_detection?: { [key: string]: unknown } | null;
-
-    user?: string | null;
-
-    verbosity?: string | null;
-
-    voice?: string | null;
-
-    web_search_options?: { [key: string]: unknown } | null;
-  }
+  settings?: ModelSettings | null;
 }
 
 /**
@@ -238,48 +101,55 @@ export interface FunctionDefinition {
  */
 export type FunctionParameters = { [key: string]: unknown };
 
+export type JSONObjectInput = { [key: string]: JSONValueInput | null };
+
+export type JSONObjectOutput = { [key: string]: JSONValueOutput | null };
+
+export type JSONValueInput =
+  | string
+  | number
+  | boolean
+  | { [key: string]: JSONValueInput | null }
+  | Array<JSONValueInput | null>;
+
+export type JSONValueOutput =
+  | string
+  | number
+  | boolean
+  | { [key: string]: JSONValueOutput | null }
+  | Array<JSONValueOutput | null>;
+
 /**
  * List of credentials for MCP server authentication.
  */
 export type MCPCredentials = Array<Credential>;
 
 /**
- * Single MCP server input: slug string or structured MCPServerSpec.
- */
-export type MCPServerInput = string | MCPServerSpec;
-
-/**
  * Structured MCP server specification.
  *
- * Slug-based: {"slug": "dedalus-labs/brave-search", "version": "v1.0.0"}
- * URL-based: {"url": "https://mcp.dedaluslabs.ai/acme/my-server/mcp"}
+ * Slug-based: {"slug": "dedalus-labs/brave-search", "name": "github-integration",
+ * "version": "v1.0.0"} URL-based: {"url":
+ * "https://mcp.dedaluslabs.ai/acme/my-server/mcp", "name": "custom-server"}
  */
 export interface MCPServerSpec {
   /**
-   * Connection name for credential matching. Must match a key in the client's
-   * credentials list.
+   * Server instance name for credential matching.
    */
-  connection?: string | null;
+  name: string;
 
   /**
-   * Schema declaring what credentials are needed. Maps field names to their bindings
-   * (e.g., env var names).
+   * Encrypted credential blobs keyed by connection name. Values are base64url
+   * ciphertext produced by the SDK (client-side encryption with the AS public key).
    */
-  credentials?: { [key: string]: string | CredentialsBindingSpec } | null;
+  credentials?: { [key: string]: string } | null;
 
   /**
-   * Client-encrypted credential values. Maps connection names to encrypted
-   * envelopes.
-   */
-  encrypted_credentials?: { [key: string]: string } | null;
-
-  /**
-   * Marketplace slug.
+   * Marketplace identifier.
    */
   slug?: string | null;
 
   /**
-   * Direct URL to MCP server endpoint.
+   * Direct URL to MCP server endpoint (Pro users).
    */
   url?: string | null;
 
@@ -292,7 +162,149 @@ export interface MCPServerSpec {
 /**
  * List of MCP server inputs.
  */
-export type MCPServers = Array<MCPServerInput>;
+export type MCPServers = Array<string | MCPServerSpec>;
+
+/**
+ * Details of a single MCP tool execution.
+ *
+ * Provides visibility into MCP tool calls including the full input arguments and
+ * structured output, enabling debugging and audit trails.
+ */
+export interface MCPToolExecution {
+  /**
+   * Name of the MCP server that handled the tool
+   */
+  server_name: string;
+
+  /**
+   * Name of the MCP tool that was executed
+   */
+  tool_name: string;
+
+  /**
+   * Input arguments passed to the tool
+   */
+  arguments?: JSONObjectOutput;
+
+  /**
+   * Execution time in milliseconds
+   */
+  duration_ms?: number | null;
+
+  /**
+   * Whether the tool execution resulted in an error
+   */
+  is_error?: boolean;
+
+  /**
+   * Structured result from the tool (parsed from structuredContent or content)
+   */
+  result?: JSONValueOutput | null;
+}
+
+export interface ModelSettings {
+  attributes?: { [key: string]: unknown };
+
+  audio?: JSONObjectInput | null;
+
+  deferred?: boolean | null;
+
+  extra_args?: { [key: string]: unknown } | null;
+
+  extra_headers?: { [key: string]: string } | null;
+
+  extra_query?: { [key: string]: unknown } | null;
+
+  frequency_penalty?: number | null;
+
+  generation_config?: JSONObjectInput | null;
+
+  include_usage?: boolean | null;
+
+  input_audio_format?: string | null;
+
+  input_audio_transcription?: JSONObjectInput | null;
+
+  logit_bias?: { [key: string]: number } | null;
+
+  logprobs?: boolean | null;
+
+  max_completion_tokens?: number | null;
+
+  max_tokens?: number | null;
+
+  metadata?: { [key: string]: string } | null;
+
+  modalities?: Array<string> | null;
+
+  n?: number | null;
+
+  output_audio_format?: string | null;
+
+  parallel_tool_calls?: boolean | null;
+
+  prediction?: JSONObjectInput | null;
+
+  presence_penalty?: number | null;
+
+  prompt_cache_key?: string | null;
+
+  reasoning?: CompletionsAPI.Reasoning | null;
+
+  reasoning_effort?: string | null;
+
+  response_format?: JSONObjectInput | null;
+
+  safety_identifier?: string | null;
+
+  safety_settings?: Array<JSONObjectInput> | null;
+
+  search_parameters?: JSONObjectInput | null;
+
+  seed?: number | null;
+
+  service_tier?: string | null;
+
+  stop?: string | Array<string> | null;
+
+  store?: boolean | null;
+
+  stream?: boolean | null;
+
+  stream_options?: JSONObjectInput | null;
+
+  structured_output?: unknown;
+
+  system_instruction?: JSONObjectInput | null;
+
+  temperature?: number | null;
+
+  thinking?: JSONObjectInput | null;
+
+  timeout?: number | null;
+
+  tool_choice?: CompletionsAPI.ToolChoice | null;
+
+  tool_config?: JSONObjectInput | null;
+
+  top_k?: number | null;
+
+  top_logprobs?: number | null;
+
+  top_p?: number | null;
+
+  truncation?: 'auto' | 'disabled' | null;
+
+  turn_detection?: JSONObjectInput | null;
+
+  user?: string | null;
+
+  verbosity?: string | null;
+
+  voice?: string | null;
+
+  web_search_options?: JSONObjectInput | null;
+}
 
 /**
  * JSON object response format. An older method of generating JSON responses. Using

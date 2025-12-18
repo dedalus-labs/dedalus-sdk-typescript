@@ -890,15 +890,19 @@ export declare namespace Dedalus {
   export { Chat as Chat };
 
   export type Credential = API.Credential;
-  export type CredentialsBindingSpec = API.CredentialsBindingSpec;
   export type DedalusModel = API.DedalusModel;
   export type DedalusModelChoice = API.DedalusModelChoice;
   export type FunctionDefinition = API.FunctionDefinition;
   export type FunctionParameters = API.FunctionParameters;
+  export type JSONObjectInput = API.JSONObjectInput;
+  export type JSONObjectOutput = API.JSONObjectOutput;
+  export type JSONValueInput = API.JSONValueInput;
+  export type JSONValueOutput = API.JSONValueOutput;
   export type MCPCredentials = API.MCPCredentials;
-  export type MCPServerInput = API.MCPServerInput;
   export type MCPServerSpec = API.MCPServerSpec;
   export type MCPServers = API.MCPServers;
+  export type MCPToolExecution = API.MCPToolExecution;
+  export type ModelSettings = API.ModelSettings;
   export type ResponseFormatJSONObject = API.ResponseFormatJSONObject;
   export type ResponseFormatJSONSchema = API.ResponseFormatJSONSchema;
   export type ResponseFormatText = API.ResponseFormatText;

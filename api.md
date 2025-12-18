@@ -3,15 +3,19 @@
 Types:
 
 - <code><a href="./src/resources/shared.ts">Credential</a></code>
-- <code><a href="./src/resources/shared.ts">CredentialsBindingSpec</a></code>
 - <code><a href="./src/resources/shared.ts">DedalusModel</a></code>
 - <code><a href="./src/resources/shared.ts">DedalusModelChoice</a></code>
 - <code><a href="./src/resources/shared.ts">FunctionDefinition</a></code>
 - <code><a href="./src/resources/shared.ts">FunctionParameters</a></code>
+- <code><a href="./src/resources/shared.ts">JSONObjectInput</a></code>
+- <code><a href="./src/resources/shared.ts">JSONObjectOutput</a></code>
+- <code><a href="./src/resources/shared.ts">JSONValueInput</a></code>
+- <code><a href="./src/resources/shared.ts">JSONValueOutput</a></code>
 - <code><a href="./src/resources/shared.ts">MCPCredentials</a></code>
-- <code><a href="./src/resources/shared.ts">MCPServerInput</a></code>
 - <code><a href="./src/resources/shared.ts">MCPServerSpec</a></code>
 - <code><a href="./src/resources/shared.ts">MCPServers</a></code>
+- <code><a href="./src/resources/shared.ts">MCPToolExecution</a></code>
+- <code><a href="./src/resources/shared.ts">ModelSettings</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONObject</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONSchema</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatText</a></code>
