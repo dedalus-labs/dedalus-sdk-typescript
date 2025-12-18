@@ -105,6 +105,9 @@ export type JSONObjectInput = { [key: string]: JSONValueInput | null };
 
 export type JSONObjectOutput = { [key: string]: JSONValueOutput | null };
 
+/**
+ * Recursive JSON value: primitive, object, or array.
+ */
 export type JSONValueInput =
   | string
   | number
@@ -112,6 +115,9 @@ export type JSONValueInput =
   | { [key: string]: JSONValueInput | null }
   | Array<JSONValueInput | null>;
 
+/**
+ * Recursive JSON value: primitive, object, or array.
+ */
 export type JSONValueOutput =
   | string
   | number
@@ -160,7 +166,7 @@ export interface MCPServerSpec {
 }
 
 /**
- * List of MCP server inputs.
+ * List of MCP server inputs (slugs or structured specs).
  */
 export type MCPServers = Array<string | MCPServerSpec>;
 
