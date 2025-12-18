@@ -184,6 +184,13 @@ export interface ChatCompletion {
   mcp_server_errors?: { [key: string]: unknown } | null;
 
   /**
+   * Detailed results of MCP tool executions including inputs, outputs, and timing.
+   * Provides full visibility into server-side tool execution for debugging and audit
+   * purposes.
+   */
+  mcp_tool_executions?: Array<Shared.MCPToolExecution> | null;
+
+  /**
    * Specifies the processing type used for serving the request.
    *
    * - If set to 'auto', then the request will be processed with the service tier
@@ -812,7 +819,7 @@ export interface ChatCompletionCreateParams {
   /**
    * Parameters for audio output. Required when audio output is requested with `mo...
    */
-  audio?: { [key: string]: unknown } | null;
+  audio?: Shared.JSONObjectInput | null;
 
   /**
    * Execute tools server-side. If false, returns raw tool calls for manual handling.
@@ -853,7 +860,7 @@ export interface ChatCompletionCreateParams {
   /**
    * Generation parameters wrapper (Google-specific)
    */
-  generation_config?: { [key: string]: unknown } | null;
+  generation_config?: Shared.JSONObjectInput | null;
 
   /**
    * Content filtering and safety policy configuration.
@@ -911,7 +918,7 @@ export interface ChatCompletionCreateParams {
   /**
    * Set of 16 key-value pairs that can be attached to an object. This can be usef...
    */
-  metadata?: { [key: string]: unknown } | null;
+  metadata?: Shared.JSONObjectInput | null;
 
   /**
    * Output types that you would like the model to generate. Most models are capab...
@@ -999,7 +1006,7 @@ export interface ChatCompletionCreateParams {
   /**
    * Set the parameters to be used for searched data. If not set, no data will be ...
    */
-  search_parameters?: { [key: string]: unknown } | null;
+  search_parameters?: Shared.JSONObjectInput | null;
 
   /**
    * Random seed for deterministic output
@@ -1029,12 +1036,12 @@ export interface ChatCompletionCreateParams {
   /**
    * Options for streaming response. Only set this when you set `stream: true`.
    */
-  stream_options?: { [key: string]: unknown } | null;
+  stream_options?: Shared.JSONObjectInput | null;
 
   /**
    * System instruction/prompt
    */
-  system_instruction?: { [key: string]: unknown } | string | null;
+  system_instruction?: Shared.JSONObjectInput | string | null;
 
   /**
    * Sampling temperature (0-2 for most providers)
@@ -1054,7 +1061,7 @@ export interface ChatCompletionCreateParams {
   /**
    * Tool calling configuration (Google-specific)
    */
-  tool_config?: { [key: string]: unknown } | null;
+  tool_config?: Shared.JSONObjectInput | null;
 
   /**
    * Available tools/functions for the model
@@ -1089,7 +1096,7 @@ export interface ChatCompletionCreateParams {
   /**
    * This tool searches the web for relevant results to use in a response. Learn m...
    */
-  web_search_options?: { [key: string]: unknown } | null;
+  web_search_options?: Shared.JSONObjectInput | null;
 
   [k: string]: unknown;
 }
@@ -2161,7 +2168,7 @@ export interface CompletionCreateParamsBase {
   /**
    * Parameters for audio output. Required when audio output is requested with `mo...
    */
-  audio?: { [key: string]: unknown } | null;
+  audio?: Shared.JSONObjectInput | null;
 
   /**
    * Execute tools server-side. If false, returns raw tool calls for manual handling.
@@ -2202,7 +2209,7 @@ export interface CompletionCreateParamsBase {
   /**
    * Generation parameters wrapper (Google-specific)
    */
-  generation_config?: { [key: string]: unknown } | null;
+  generation_config?: Shared.JSONObjectInput | null;
 
   /**
    * Content filtering and safety policy configuration.
@@ -2260,7 +2267,7 @@ export interface CompletionCreateParamsBase {
   /**
    * Set of 16 key-value pairs that can be attached to an object. This can be usef...
    */
-  metadata?: { [key: string]: unknown } | null;
+  metadata?: Shared.JSONObjectInput | null;
 
   /**
    * Output types that you would like the model to generate. Most models are capab...
@@ -2348,7 +2355,7 @@ export interface CompletionCreateParamsBase {
   /**
    * Set the parameters to be used for searched data. If not set, no data will be ...
    */
-  search_parameters?: { [key: string]: unknown } | null;
+  search_parameters?: Shared.JSONObjectInput | null;
 
   /**
    * Random seed for deterministic output
@@ -2378,12 +2385,12 @@ export interface CompletionCreateParamsBase {
   /**
    * Options for streaming response. Only set this when you set `stream: true`.
    */
-  stream_options?: { [key: string]: unknown } | null;
+  stream_options?: Shared.JSONObjectInput | null;
 
   /**
    * System instruction/prompt
    */
-  system_instruction?: { [key: string]: unknown } | string | null;
+  system_instruction?: Shared.JSONObjectInput | string | null;
 
   /**
    * Sampling temperature (0-2 for most providers)
@@ -2403,7 +2410,7 @@ export interface CompletionCreateParamsBase {
   /**
    * Tool calling configuration (Google-specific)
    */
-  tool_config?: { [key: string]: unknown } | null;
+  tool_config?: Shared.JSONObjectInput | null;
 
   /**
    * Available tools/functions for the model
@@ -2438,7 +2445,7 @@ export interface CompletionCreateParamsBase {
   /**
    * This tool searches the web for relevant results to use in a response. Learn m...
    */
-  web_search_options?: { [key: string]: unknown } | null;
+  web_search_options?: Shared.JSONObjectInput | null;
 
   [k: string]: unknown;
 }
