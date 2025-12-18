@@ -153,7 +153,7 @@ export interface ChatCompletion {
    * Provides full visibility into server-side tool execution for debugging and audit
    * purposes.
    */
-  mcp_tool_executions?: Array<Shared.MCPToolExecution> | null;
+  mcp_tool_results?: Array<Shared.MCPToolResult> | null;
 
   /**
    * Specifies the processing type used for serving the request.
@@ -1994,16 +1994,6 @@ export interface PromptTokensDetails {
   cached_tokens?: number;
 }
 
-export interface Reasoning {
-  effort?: 'minimal' | 'low' | 'medium' | 'high' | null;
-
-  generate_summary?: 'auto' | 'concise' | 'detailed' | null;
-
-  summary?: 'auto' | 'concise' | 'detailed' | null;
-
-  [k: string]: unknown;
-}
-
 /**
  * Schema for ThinkingConfigDisabled.
  *
@@ -2038,22 +2028,6 @@ export interface ThinkingConfigEnabled {
   budget_tokens: number;
 
   type: 'enabled';
-}
-
-export type ToolChoice =
-  | 'auto'
-  | 'required'
-  | 'none'
-  | string
-  | { [key: string]: unknown }
-  | ToolChoice.MCPToolChoice;
-
-export namespace ToolChoice {
-  export interface MCPToolChoice {
-    name: string;
-
-    server_label: string;
-  }
 }
 
 /**
@@ -2762,10 +2736,8 @@ export declare namespace Completions {
     type InputTokenDetails as InputTokenDetails,
     type PredictionContent as PredictionContent,
     type PromptTokensDetails as PromptTokensDetails,
-    type Reasoning as Reasoning,
     type ThinkingConfigDisabled as ThinkingConfigDisabled,
     type ThinkingConfigEnabled as ThinkingConfigEnabled,
-    type ToolChoice as ToolChoice,
     type ToolChoiceAny as ToolChoiceAny,
     type ToolChoiceAuto as ToolChoiceAuto,
     type ToolChoiceNone as ToolChoiceNone,

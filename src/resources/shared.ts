@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as CompletionsAPI from './chat/completions';
-
 /**
  * Credential for MCP server authentication.
  *
@@ -171,12 +169,22 @@ export interface MCPServerSpec {
 export type MCPServers = Array<string | MCPServerSpec>;
 
 /**
- * Details of a single MCP tool execution.
+ * Result of a single MCP tool execution.
  *
  * Provides visibility into MCP tool calls including the full input arguments and
  * structured output, enabling debugging and audit trails.
  */
-export interface MCPToolExecution {
+export interface MCPToolResult {
+  /**
+   * Input arguments passed to the tool
+   */
+  arguments: JSONObjectOutput;
+
+  /**
+   * Whether the tool execution resulted in an error
+   */
+  is_error: boolean;
+
   /**
    * Name of the MCP server that handled the tool
    */
@@ -188,22 +196,12 @@ export interface MCPToolExecution {
   tool_name: string;
 
   /**
-   * Input arguments passed to the tool
-   */
-  arguments?: JSONObjectOutput;
-
-  /**
    * Execution time in milliseconds
    */
   duration_ms?: number | null;
 
   /**
-   * Whether the tool execution resulted in an error
-   */
-  is_error?: boolean;
-
-  /**
-   * Structured result from the tool (parsed from structuredContent or content)
+   * Recursive JSON value: primitive, object, or array.
    */
   result?: JSONValueOutput | null;
 }
@@ -255,7 +253,7 @@ export interface ModelSettings {
 
   prompt_cache_key?: string | null;
 
-  reasoning?: CompletionsAPI.Reasoning | null;
+  reasoning?: Reasoning | null;
 
   reasoning_effort?: string | null;
 
@@ -289,7 +287,7 @@ export interface ModelSettings {
 
   timeout?: number | null;
 
-  tool_choice?: CompletionsAPI.ToolChoice | null;
+  tool_choice?: ToolChoice | null;
 
   tool_config?: JSONObjectInput | null;
 
@@ -310,6 +308,16 @@ export interface ModelSettings {
   voice?: string | null;
 
   web_search_options?: JSONObjectInput | null;
+}
+
+export interface Reasoning {
+  effort?: 'minimal' | 'low' | 'medium' | 'high' | null;
+
+  generate_summary?: 'auto' | 'concise' | 'detailed' | null;
+
+  summary?: 'auto' | 'concise' | 'detailed' | null;
+
+  [k: string]: unknown;
 }
 
 /**
@@ -396,4 +404,20 @@ export interface ResponseFormatText {
    * The type of response format being defined. Always `text`.
    */
   type: 'text';
+}
+
+export type ToolChoice =
+  | 'auto'
+  | 'required'
+  | 'none'
+  | string
+  | { [key: string]: unknown }
+  | ToolChoice.MCPToolChoice;
+
+export namespace ToolChoice {
+  export interface MCPToolChoice {
+    name: string;
+
+    server_label: string;
+  }
 }
