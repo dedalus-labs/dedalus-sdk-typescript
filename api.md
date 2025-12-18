@@ -14,11 +14,13 @@ Types:
 - <code><a href="./src/resources/shared.ts">MCPCredentials</a></code>
 - <code><a href="./src/resources/shared.ts">MCPServerSpec</a></code>
 - <code><a href="./src/resources/shared.ts">MCPServers</a></code>
-- <code><a href="./src/resources/shared.ts">MCPToolExecution</a></code>
+- <code><a href="./src/resources/shared.ts">MCPToolResult</a></code>
 - <code><a href="./src/resources/shared.ts">ModelSettings</a></code>
+- <code><a href="./src/resources/shared.ts">Reasoning</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONObject</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONSchema</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatText</a></code>
+- <code><a href="./src/resources/shared.ts">ToolChoice</a></code>
 
 # Models
 
@@ -127,10 +129,8 @@ Types:
 - <code><a href="./src/resources/chat/completions.ts">InputTokenDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">PredictionContent</a></code>
 - <code><a href="./src/resources/chat/completions.ts">PromptTokensDetails</a></code>
-- <code><a href="./src/resources/chat/completions.ts">Reasoning</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ThinkingConfigDisabled</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ThinkingConfigEnabled</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ToolChoice</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoiceAny</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoiceAuto</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoiceNone</a></code>

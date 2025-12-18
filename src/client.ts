@@ -910,9 +910,11 @@ export declare namespace Dedalus {
   export type MCPCredentials = API.MCPCredentials;
   export type MCPServerSpec = API.MCPServerSpec;
   export type MCPServers = API.MCPServers;
-  export type MCPToolExecution = API.MCPToolExecution;
+  export type MCPToolResult = API.MCPToolResult;
   export type ModelSettings = API.ModelSettings;
+  export type Reasoning = API.Reasoning;
   export type ResponseFormatJSONObject = API.ResponseFormatJSONObject;
   export type ResponseFormatJSONSchema = API.ResponseFormatJSONSchema;
   export type ResponseFormatText = API.ResponseFormatText;
+  export type ToolChoice = API.ToolChoice;
 }
