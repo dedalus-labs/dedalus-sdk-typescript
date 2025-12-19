@@ -902,11 +902,8 @@ export declare namespace Dedalus {
   export type DedalusModel = API.DedalusModel;
   export type DedalusModelChoice = API.DedalusModelChoice;
   export type FunctionDefinition = API.FunctionDefinition;
-  export type FunctionParameters = API.FunctionParameters;
   export type JSONObjectInput = API.JSONObjectInput;
-  export type JSONObjectOutput = API.JSONObjectOutput;
   export type JSONValueInput = API.JSONValueInput;
-  export type JSONValueOutput = API.JSONValueOutput;
   export type MCPCredentials = API.MCPCredentials;
   export type MCPServerSpec = API.MCPServerSpec;
   export type MCPServers = API.MCPServers;

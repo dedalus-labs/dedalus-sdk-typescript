@@ -6,11 +6,8 @@ Types:
 - <code><a href="./src/resources/shared.ts">DedalusModel</a></code>
 - <code><a href="./src/resources/shared.ts">DedalusModelChoice</a></code>
 - <code><a href="./src/resources/shared.ts">FunctionDefinition</a></code>
-- <code><a href="./src/resources/shared.ts">FunctionParameters</a></code>
 - <code><a href="./src/resources/shared.ts">JSONObjectInput</a></code>
-- <code><a href="./src/resources/shared.ts">JSONObjectOutput</a></code>
 - <code><a href="./src/resources/shared.ts">JSONValueInput</a></code>
-- <code><a href="./src/resources/shared.ts">JSONValueOutput</a></code>
 - <code><a href="./src/resources/shared.ts">MCPCredentials</a></code>
 - <code><a href="./src/resources/shared.ts">MCPServerSpec</a></code>
 - <code><a href="./src/resources/shared.ts">MCPServers</a></code>
@@ -93,15 +90,12 @@ Methods:
 
 Types:
 
-- <code><a href="./src/resources/chat/completions.ts">Annotation</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletion</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionAssistantMessageParam</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ChatCompletionAudio</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ChatCompletionAudioParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionChunk</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartAudioParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartFileParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartImageParam</a></code>
+- <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartInputAudioParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartRefusalParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartTextParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionCreateParams</a></code>
@@ -116,27 +110,17 @@ Types:
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionToolMessageParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionToolParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionUserMessageParam</a></code>
-- <code><a href="./src/resources/chat/completions.ts">Choice</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChoiceDelta</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChoiceDeltaToolCall</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ChoiceDeltaToolCallFunction</a></code>
-- <code><a href="./src/resources/chat/completions.ts">ChoiceLogprobs</a></code>
-- <code><a href="./src/resources/chat/completions.ts">CompletionTokensDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">CompletionUsage</a></code>
-- <code><a href="./src/resources/chat/completions.ts">Custom</a></code>
-- <code><a href="./src/resources/chat/completions.ts">Function</a></code>
-- <code><a href="./src/resources/chat/completions.ts">FunctionCall</a></code>
 - <code><a href="./src/resources/chat/completions.ts">InputTokenDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">PredictionContent</a></code>
-- <code><a href="./src/resources/chat/completions.ts">PromptTokensDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ThinkingConfigDisabled</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ThinkingConfigEnabled</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoiceAny</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoiceAuto</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoiceNone</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoiceTool</a></code>
-- <code><a href="./src/resources/chat/completions.ts">TopLogprob</a></code>
-- <code><a href="./src/resources/chat/completions.ts">URLCitation</a></code>
 
 Methods:
 
