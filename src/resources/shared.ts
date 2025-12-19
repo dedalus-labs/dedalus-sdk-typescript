@@ -1,5 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+import * as Shared from './shared';
+
 /**
  * Credential for MCP server authentication.
  *
@@ -76,7 +78,7 @@ export interface FunctionDefinition {
    *
    * Omitting `parameters` defines a function with an empty parameter list.
    */
-  parameters?: FunctionParameters;
+  parameters?: JSONObjectInput;
 
   /**
    * Whether to enable strict schema adherence when generating the function call. If
@@ -88,20 +90,7 @@ export interface FunctionDefinition {
   strict?: boolean | null;
 }
 
-/**
- * The parameters the functions accepts, described as a JSON Schema object. See the
- * [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
- * and the
- * [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for
- * documentation about the format.
- *
- * Omitting `parameters` defines a function with an empty parameter list.
- */
-export type FunctionParameters = { [key: string]: unknown };
-
 export type JSONObjectInput = { [key: string]: JSONValueInput | null };
-
-export type JSONObjectOutput = { [key: string]: JSONValueOutput | null };
 
 export type JSONValueInput =
   | string
@@ -109,13 +98,6 @@ export type JSONValueInput =
   | boolean
   | { [key: string]: JSONValueInput | null }
   | Array<JSONValueInput | null>;
-
-export type JSONValueOutput =
-  | string
-  | number
-  | boolean
-  | { [key: string]: JSONValueOutput | null }
-  | Array<JSONValueOutput | null>;
 
 /**
  * List of credentials for MCP server authentication.
@@ -172,7 +154,7 @@ export interface MCPToolResult {
   /**
    * Input arguments passed to the tool
    */
-  arguments: JSONObjectOutput;
+  arguments: JSONObjectInput;
 
   /**
    * Whether the tool execution resulted in an error
@@ -197,7 +179,7 @@ export interface MCPToolResult {
   /**
    * Structured result from the tool (parsed from structuredContent or content)
    */
-  result?: JSONValueOutput | null;
+  result?: JSONValueInput | null;
 }
 
 export interface ModelSettings {
@@ -385,7 +367,7 @@ export namespace ResponseFormatJSONSchema {
      * The schema for the response format, described as a JSON Schema object. Learn how
      * to build JSON schemas [here](https://json-schema.org/).
      */
-    schema?: { [key: string]: unknown };
+    schema?: Shared.JSONObjectInput;
 
     /**
      * Whether to enable strict schema adherence when generating the output. If set to

@@ -25,14 +25,14 @@ describe('resource completions', () => {
     const response = await client.chat.completions.create({
       model: 'openai/gpt-5',
       agent_attributes: { accuracy: 0.9, complexity: 0.8 },
-      audio: { foo: 'string' },
+      audio: { format: 'mp3', voice: 'alloy' },
       automatic_tool_execution: true,
       cached_content: 'cached_content',
       credentials: { connection_name: 'external-service', values: { api_key: 'sk-...' } },
       deferred: true,
       frequency_penalty: -2,
       function_call: 'function_call',
-      functions: [{ name: 'name', description: 'description', parameters: { foo: 'bar' } }],
+      functions: [{ name: 'name', description: 'description', parameters: { foo: 'string' } }],
       generation_config: { foo: 'string' },
       guardrails: [{ foo: 'bar' }],
       handoff_config: { foo: 'bar' },
@@ -74,7 +74,7 @@ describe('resource completions', () => {
       tool_config: { foo: 'string' },
       tools: [
         {
-          function: { name: 'name', description: 'description', parameters: { foo: 'bar' }, strict: true },
+          function: { name: 'name', description: 'description', parameters: { foo: 'string' }, strict: true },
           type: 'function',
         },
       ],
