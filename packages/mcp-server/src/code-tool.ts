@@ -1,9 +1,9 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { McpTool, Metadata, ToolCallResult, asTextContentResult } from './types';
+import { McpTool, Metadata, ToolCallResult, asErrorResult, asTextContentResult } from './types';
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { readEnv } from './server';
-import { WorkerSuccess } from './code-tool-types';
+import { WorkerInput, WorkerOutput } from './code-tool-types';
 /**
  * A tool that runs code against a copy of the SDK.
  *
@@ -48,9 +48,9 @@ export function codeTool(): McpTool {
       },
       body: JSON.stringify({
         project_name: 'dedalus-sdk',
-        client_opts: { environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any },
         code,
-      }),
+        client_opts: { environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any },
+      } satisfies WorkerInput),
     });
 
     if (!res.ok) {
@@ -61,7 +61,17 @@ export function codeTool(): McpTool {
       );
     }
 
-    return asTextContentResult((await res.json()) as WorkerSuccess);
+    const { is_error, result, log_lines, err_lines } = (await res.json()) as WorkerOutput;
+    const hasLogs = log_lines.length > 0 || err_lines.length > 0;
+    const output = {
+      result,
+      ...(log_lines.length > 0 && { log_lines }),
+      ...(err_lines.length > 0 && { err_lines }),
+    };
+    if (is_error) {
+      return asErrorResult(typeof result === 'string' && !hasLogs ? result : JSON.stringify(output, null, 2));
+    }
+    return asTextContentResult(output);
   };
 
   return { metadata, tool, handler };
