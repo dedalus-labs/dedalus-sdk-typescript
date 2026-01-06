@@ -28,11 +28,20 @@ describe('resource completions', () => {
       audio: { format: 'mp3', voice: 'alloy' },
       automatic_tool_execution: true,
       cached_content: 'cached_content',
-      credentials: { connection_name: 'external-service', values: { api_key: 'sk-...' } },
+      credentials: {
+        connection_name: 'external-service',
+        values: { api_key: 'sk-...' },
+      },
       deferred: true,
       frequency_penalty: -2,
       function_call: 'function_call',
-      functions: [{ name: 'name', description: 'description', parameters: { foo: 'string' } }],
+      functions: [
+        {
+          name: 'name',
+          description: 'description',
+          parameters: { foo: 'string' },
+        },
+      ],
       generation_config: { foo: 'string' },
       guardrails: [{ foo: 'bar' }],
       handoff_config: { foo: 'bar' },
@@ -42,7 +51,13 @@ describe('resource completions', () => {
       max_tokens: 1,
       max_turns: 5,
       mcp_servers: 'dedalus-labs/example-server',
-      messages: [{ content: 'string', role: 'developer', name: 'name' }],
+      messages: [
+        {
+          content: 'string',
+          role: 'developer',
+          name: 'name',
+        },
+      ],
       metadata: { foo: 'string' },
       modalities: ['string'],
       model_attributes: { 'gpt-5': { accuracy: 0.95, speed: 0.6 } },
@@ -74,7 +89,12 @@ describe('resource completions', () => {
       tool_config: { foo: 'string' },
       tools: [
         {
-          function: { name: 'name', description: 'description', parameters: { foo: 'string' }, strict: true },
+          function: {
+            name: 'name',
+            description: 'description',
+            parameters: { foo: 'string' },
+            strict: true,
+          },
           type: 'function',
         },
       ],

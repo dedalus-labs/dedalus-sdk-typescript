@@ -113,13 +113,19 @@ import Dedalus, { toFile } from 'dedalus-labs';
 const client = new Dedalus();
 
 // If you have access to Node `fs` we recommend using `fs.createReadStream()`:
-await client.audio.transcriptions.create({ file: fs.createReadStream('/path/to/file'), model: 'model' });
+await client.audio.transcriptions.create({
+  file: fs.createReadStream('/path/to/file'),
+  model: 'model',
+});
 
 // Or if you have the web `File` API you can pass a `File` instance:
 await client.audio.transcriptions.create({ file: new File(['my bytes'], 'file'), model: 'model' });
 
 // You can also pass a `fetch` `Response`:
-await client.audio.transcriptions.create({ file: await fetch('https://somesite/file'), model: 'model' });
+await client.audio.transcriptions.create({
+  file: await fetch('https://somesite/file'),
+  model: 'model',
+});
 
 // Finally, if none of the above are convenient, you can use our `toFile` helper:
 await client.audio.transcriptions.create({
