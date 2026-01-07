@@ -10,12 +10,12 @@ const client = new Dedalus({
 describe('resource speech', () => {
   test('create: required and optional params', async () => {
     const response = await client.audio.speech.create({
-      input: 'Hello, how are you today?',
-      model: 'openai/tts-1',
-      voice: 'alloy',
+      input: 'input',
+      model: 'string',
+      voice: 'string',
       instructions: 'instructions',
       response_format: 'mp3',
-      speed: 1,
+      speed: 0.25,
       stream_format: 'sse',
     });
   });

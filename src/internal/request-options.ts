@@ -41,7 +41,7 @@ export type RequestOptions = {
    * The maximum number of times that the client will retry a request in case of a
    * temporary failure, like a network error or a 5XX error from the server.
    *
-   * @default 2
+   * @default 0
    */
   maxRetries?: number;
 
