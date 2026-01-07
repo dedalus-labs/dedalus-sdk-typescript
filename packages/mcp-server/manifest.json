@@ -5,7 +5,7 @@
   "description": "The official MCP Server for the Dedalus API",
   "author": {
     "name": "Dedalus",
-    "email": "founders@dedaluslabs.ai"
+    "email": "oss@dedaluslabs.ai"
   },
   "repository": {
     "type": "git",
@@ -57,7 +57,7 @@
     },
     "DEDALUS_PROVIDER": {
       "title": "provider",
-      "description": "Provider name for BYOK mode (e.g., 'openai', 'anthropic').",
+      "description": "Provider name for BYOK mode (e.g., 'google', 'openai', 'anthropic').",
       "required": false,
       "type": "string"
     },

@@ -33,9 +33,9 @@ export interface SpeechCreateParams {
 
   /**
    * One of the available [TTS models](https://platform.openai.com/docs/models#tts):
-   * `openai/tts-1`, `openai/tts-1-hd` or `openai/gpt-4o-mini-tts`.
+   * `tts-1`, `tts-1-hd` or `gpt-4o-mini-tts`.
    */
-  model: string;
+  model: (string & {}) | 'tts-1' | 'tts-1-hd' | 'gpt-4o-mini-tts';
 
   /**
    * The voice to use when generating the audio. Supported voices are `alloy`, `ash`,
@@ -44,41 +44,41 @@ export interface SpeechCreateParams {
    * [Text to speech guide](https://platform.openai.com/docs/guides/text-to-speech#voice-options).
    */
   voice:
+    | (string & {})
     | 'alloy'
     | 'ash'
     | 'ballad'
     | 'coral'
     | 'echo'
-    | 'fable'
-    | 'onyx'
-    | 'nova'
     | 'sage'
     | 'shimmer'
-    | 'verse';
+    | 'verse'
+    | 'marin'
+    | 'cedar';
 
   /**
    * Control the voice of your generated audio with additional instructions. Does not
    * work with `tts-1` or `tts-1-hd`.
    */
-  instructions?: string | null;
+  instructions?: string;
 
   /**
    * The format to audio in. Supported formats are `mp3`, `opus`, `aac`, `flac`,
    * `wav`, and `pcm`.
    */
-  response_format?: 'mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm' | null;
+  response_format?: 'mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm';
 
   /**
    * The speed of the generated audio. Select a value from `0.25` to `4.0`. `1.0` is
    * the default.
    */
-  speed?: number | null;
+  speed?: number;
 
   /**
    * The format to stream the audio in. Supported formats are `sse` and `audio`.
    * `sse` is not supported for `tts-1` or `tts-1-hd`.
    */
-  stream_format?: 'sse' | 'audio' | null;
+  stream_format?: 'sse' | 'audio';
 }
 
 export declare namespace Speech {

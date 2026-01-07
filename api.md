@@ -90,8 +90,10 @@ Methods:
 
 Types:
 
+- <code><a href="./src/resources/chat/completions.ts">Audio</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletion</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionAssistantMessageParam</a></code>
+- <code><a href="./src/resources/chat/completions.ts">ChatCompletionAudioParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionChunk</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartFileParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionContentPartImageParam</a></code>
@@ -110,11 +112,17 @@ Types:
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionToolMessageParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionToolParam</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChatCompletionUserMessageParam</a></code>
+- <code><a href="./src/resources/chat/completions.ts">Choice</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChoiceDelta</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ChoiceDeltaToolCall</a></code>
+- <code><a href="./src/resources/chat/completions.ts">ChoiceLogprobs</a></code>
+- <code><a href="./src/resources/chat/completions.ts">CompletionTokensDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">CompletionUsage</a></code>
 - <code><a href="./src/resources/chat/completions.ts">InputTokenDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">PredictionContent</a></code>
+- <code><a href="./src/resources/chat/completions.ts">PromptTokensDetails</a></code>
+- <code><a href="./src/resources/chat/completions.ts">StreamChoice</a></code>
+- <code><a href="./src/resources/chat/completions.ts">StreamChoiceLogprobs</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ThinkingConfigDisabled</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ThinkingConfigEnabled</a></code>
 - <code><a href="./src/resources/chat/completions.ts">ToolChoiceAny</a></code>

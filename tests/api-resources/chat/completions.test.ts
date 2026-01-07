@@ -25,7 +25,7 @@ describe('resource completions', () => {
     const response = await client.chat.completions.create({
       model: 'openai/gpt-5',
       agent_attributes: { accuracy: 0.9, complexity: 0.8 },
-      audio: { format: 'mp3', voice: 'alloy' },
+      audio: { format: 'wav', voice: 'string' },
       automatic_tool_execution: true,
       cached_content: 'cached_content',
       credentials: {
