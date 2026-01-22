@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Shared from './shared';
-
 /**
  * Credential for MCP server authentication.
  *
@@ -78,7 +76,7 @@ export interface FunctionDefinition {
    *
    * Omitting `parameters` defines a function with an empty parameter list.
    */
-  parameters?: JSONObjectInput;
+  parameters?: { [key: string]: unknown };
 
   /**
    * Whether to enable strict schema adherence when generating the function call. If
@@ -367,7 +365,7 @@ export namespace ResponseFormatJSONSchema {
      * The schema for the response format, described as a JSON Schema object. Learn how
      * to build JSON schemas [here](https://json-schema.org/).
      */
-    schema?: Shared.JSONObjectInput;
+    schema?: { [key: string]: unknown };
 
     /**
      * Whether to enable strict schema adherence when generating the output. If set to

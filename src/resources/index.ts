@@ -19,3 +19,11 @@ export {
   type ImageGenerateParams,
 } from './images';
 export { Models, type ListModelsResponse, type Model } from './models';
+export {
+  Ocr,
+  type OcrDocument,
+  type OcrPage,
+  type OcrRequest,
+  type OcrResponse,
+  type OcrProcessParams,
+} from './ocr';
