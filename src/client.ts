@@ -32,6 +32,7 @@ import {
   ImagesResponse,
 } from './resources/images';
 import { ListModelsResponse, Model, Models } from './resources/models';
+import { Ocr, OcrDocument, OcrPage, OcrProcessParams, OcrRequest, OcrResponse } from './resources/ocr';
 import { Audio } from './resources/audio/audio';
 import { Chat } from './resources/chat/chat';
 import { type Fetch } from './internal/builtin-types';
@@ -133,7 +134,7 @@ export interface ClientOptions {
    * The maximum number of times that the client will retry a request in case of a
    * temporary failure, like a network error or a 5XX error from the server.
    *
-   * @default 0
+   * @default 2
    */
   maxRetries?: number | undefined;
 
@@ -197,7 +198,7 @@ export class Dedalus {
    *
    * @param {string | null | undefined} [opts.apiKey=process.env['DEDALUS_API_KEY'] ?? null]
    * @param {string | null | undefined} [opts.xAPIKey=process.env['DEDALUS_X_API_KEY'] ?? null]
-   * @param {string | null | undefined} [opts.asBaseURL=process.env['DEDALUS_AS_URL'] ?? null]
+   * @param {string | null | undefined} [opts.asBaseURL=process.env['DEDALUS_AS_URL'] ?? https://as.dedaluslabs.ai]
    * @param {string | null | undefined} [opts.dedalusOrgID=process.env['DEDALUS_ORG_ID'] ?? null]
    * @param {string | null | undefined} [opts.provider=process.env['DEDALUS_PROVIDER'] ?? null]
    * @param {string | null | undefined} [opts.providerKey=process.env['DEDALUS_PROVIDER_KEY'] ?? null]
@@ -207,7 +208,7 @@ export class Dedalus {
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
    * @param {Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
-   * @param {number} [opts.maxRetries=0] - The maximum number of times the client will retry a request.
+   * @param {number} [opts.maxRetries=2] - The maximum number of times the client will retry a request.
    * @param {HeadersLike} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Record<string, string | undefined>} opts.defaultQuery - Default query parameters to include with every request to the API.
    */
@@ -215,7 +216,7 @@ export class Dedalus {
     baseURL = readEnv('DEDALUS_BASE_URL'),
     apiKey = readEnv('DEDALUS_API_KEY') ?? null,
     xAPIKey = readEnv('DEDALUS_X_API_KEY') ?? null,
-    asBaseURL = readEnv('DEDALUS_AS_URL') ?? null,
+    asBaseURL = readEnv('DEDALUS_AS_URL') ?? 'https://as.dedaluslabs.ai',
     dedalusOrgID = readEnv('DEDALUS_ORG_ID') ?? null,
     provider = readEnv('DEDALUS_PROVIDER') ?? null,
     providerKey = readEnv('DEDALUS_PROVIDER_KEY') ?? null,
@@ -252,7 +253,7 @@ export class Dedalus {
       parseLogLevel(readEnv('DEDALUS_LOG'), "process.env['DEDALUS_LOG']", this) ??
       defaultLogLevel;
     this.fetchOptions = options.fetchOptions;
-    this.maxRetries = options.maxRetries ?? 0;
+    this.maxRetries = options.maxRetries ?? 2;
     this.fetch = options.fetch ?? Shims.getDefaultFetch();
     this.#encoder = Opts.FallbackEncoder;
 
@@ -722,8 +723,8 @@ export class Dedalus {
   }
 
   private calculateDefaultRetryTimeoutMillis(retriesRemaining: number, maxRetries: number): number {
-    const initialRetryDelay = 0.1;
-    const maxRetryDelay = 3.0;
+    const initialRetryDelay = 0.5;
+    const maxRetryDelay = 8.0;
 
     const numRetries = maxRetries - retriesRemaining;
 
@@ -863,6 +864,7 @@ export class Dedalus {
   embeddings: API.Embeddings = new API.Embeddings(this);
   audio: API.Audio = new API.Audio(this);
   images: API.Images = new API.Images(this);
+  ocr: API.Ocr = new API.Ocr(this);
   chat: API.Chat = new API.Chat(this);
 }
 
@@ -870,6 +872,7 @@ Dedalus.Models = Models;
 Dedalus.Embeddings = Embeddings;
 Dedalus.Audio = Audio;
 Dedalus.Images = Images;
+Dedalus.Ocr = Ocr;
 Dedalus.Chat = Chat;
 
 export declare namespace Dedalus {
@@ -894,6 +897,15 @@ export declare namespace Dedalus {
     type ImageCreateVariationParams as ImageCreateVariationParams,
     type ImageEditParams as ImageEditParams,
     type ImageGenerateParams as ImageGenerateParams,
+  };
+
+  export {
+    Ocr as Ocr,
+    type OcrDocument as OcrDocument,
+    type OcrPage as OcrPage,
+    type OcrRequest as OcrRequest,
+    type OcrResponse as OcrResponse,
+    type OcrProcessParams as OcrProcessParams,
   };
 
   export { Chat as Chat };

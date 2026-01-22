@@ -39,7 +39,7 @@ describe('resource completions', () => {
         {
           name: 'name',
           description: 'description',
-          parameters: { foo: 'string' },
+          parameters: { foo: 'bar' },
         },
       ],
       generation_config: { foo: 'string' },
@@ -92,7 +92,7 @@ describe('resource completions', () => {
           function: {
             name: 'name',
             description: 'description',
-            parameters: { foo: 'string' },
+            parameters: { foo: 'bar' },
             strict: true,
           },
           type: 'function',

@@ -1250,7 +1250,7 @@ export interface ChatCompletionFunctions {
    *
    * Omitting `parameters` defines a function with an empty parameter list.
    */
-  parameters?: Shared.JSONObjectInput;
+  parameters?: { [key: string]: unknown };
 }
 
 /**
