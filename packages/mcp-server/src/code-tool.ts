@@ -4,6 +4,7 @@ import { McpTool, Metadata, ToolCallResult, asErrorResult, asTextContentResult }
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { readEnv } from './server';
 import { WorkerInput, WorkerOutput } from './code-tool-types';
+import { Dedalus } from 'dedalus-labs';
 
 const prompt = `Runs JavaScript code to interact with the Dedalus API.
 
@@ -54,7 +55,7 @@ export function codeTool(): McpTool {
       required: ['code'],
     },
   };
-  const handler = async (_: unknown, args: any): Promise<ToolCallResult> => {
+  const handler = async (client: Dedalus, args: any): Promise<ToolCallResult> => {
     const code = args.code as string;
     const intent = args.intent as string | undefined;
 
@@ -70,14 +71,14 @@ export function codeTool(): McpTool {
         ...(stainlessAPIKey && { Authorization: stainlessAPIKey }),
         'Content-Type': 'application/json',
         client_envs: JSON.stringify({
-          DEDALUS_API_KEY: readEnv('DEDALUS_API_KEY'),
-          DEDALUS_X_API_KEY: readEnv('DEDALUS_X_API_KEY'),
-          DEDALUS_AS_URL: readEnv('DEDALUS_AS_URL'),
-          DEDALUS_ORG_ID: readEnv('DEDALUS_ORG_ID'),
-          DEDALUS_PROVIDER: readEnv('DEDALUS_PROVIDER'),
-          DEDALUS_PROVIDER_KEY: readEnv('DEDALUS_PROVIDER_KEY'),
-          DEDALUS_PROVIDER_MODEL: readEnv('DEDALUS_PROVIDER_MODEL'),
-          DEDALUS_BASE_URL: readEnv('DEDALUS_BASE_URL'),
+          DEDALUS_API_KEY: readEnv('DEDALUS_API_KEY') ?? client.apiKey ?? undefined,
+          DEDALUS_X_API_KEY: readEnv('DEDALUS_X_API_KEY') ?? client.xAPIKey ?? undefined,
+          DEDALUS_AS_URL: readEnv('DEDALUS_AS_URL') ?? client.asBaseURL ?? undefined,
+          DEDALUS_ORG_ID: readEnv('DEDALUS_ORG_ID') ?? client.dedalusOrgID ?? undefined,
+          DEDALUS_PROVIDER: readEnv('DEDALUS_PROVIDER') ?? client.provider ?? undefined,
+          DEDALUS_PROVIDER_KEY: readEnv('DEDALUS_PROVIDER_KEY') ?? client.providerKey ?? undefined,
+          DEDALUS_PROVIDER_MODEL: readEnv('DEDALUS_PROVIDER_MODEL') ?? client.providerModel ?? undefined,
+          DEDALUS_BASE_URL: readEnv('DEDALUS_BASE_URL') ?? client.baseURL ?? undefined,
         }),
       },
       body: JSON.stringify({
