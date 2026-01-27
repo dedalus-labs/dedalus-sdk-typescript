@@ -146,3 +146,10 @@ export const readEnvOrError = (env: string): string => {
   }
   return envValue;
 };
+
+export const requireValue = <T>(value: T | undefined, description: string): T => {
+  if (value === undefined) {
+    throw new Error(`Missing required value: ${description}`);
+  }
+  return value;
+};
