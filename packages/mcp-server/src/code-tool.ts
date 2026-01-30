@@ -78,7 +78,10 @@ export function codeTool(): McpTool {
           DEDALUS_PROVIDER: readEnv('DEDALUS_PROVIDER') ?? client.provider ?? undefined,
           DEDALUS_PROVIDER_KEY: readEnv('DEDALUS_PROVIDER_KEY') ?? client.providerKey ?? undefined,
           DEDALUS_PROVIDER_MODEL: readEnv('DEDALUS_PROVIDER_MODEL') ?? client.providerModel ?? undefined,
-          DEDALUS_BASE_URL: readEnv('DEDALUS_BASE_URL') ?? client.baseURL ?? undefined,
+          DEDALUS_BASE_URL:
+            readEnv('DEDALUS_BASE_URL') ?? readEnv('DEDALUS_ENVIRONMENT') ?
+              undefined
+            : client.baseURL ?? undefined,
         }),
       },
       body: JSON.stringify({
