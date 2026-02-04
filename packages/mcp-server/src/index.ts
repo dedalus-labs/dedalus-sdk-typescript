@@ -21,7 +21,7 @@ async function main() {
       await launchStdioServer();
       break;
     case 'http':
-      await launchStreamableHTTPServer(options, options.port ?? options.socket);
+      await launchStreamableHTTPServer(options, options.port ?? options.socket ?? 3000);
       break;
   }
 }

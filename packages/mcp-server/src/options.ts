@@ -35,7 +35,6 @@ export function parseCLIOptions(): CLIOptions {
     })
     .option('port', {
       type: 'number',
-      default: 3000,
       description: 'Port to serve on if using http transport',
     })
     .option('socket', {
