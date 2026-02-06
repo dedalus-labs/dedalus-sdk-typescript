@@ -17,7 +17,13 @@ import { HandlerFunction, McpTool } from './types';
 export { McpOptions } from './options';
 export { ClientOptions } from 'dedalus-labs';
 
+let cachedInstructions: string | undefined;
+
 async function getInstructions() {
+  if (cachedInstructions !== undefined) {
+    return cachedInstructions;
+  }
+
   // This API key is optional; providing it allows the server to fetch instructions for unreleased versions.
   const stainlessAPIKey = readEnv('STAINLESS_API_KEY');
   const response = await fetch(
@@ -50,6 +56,7 @@ async function getInstructions() {
     ${instructions}
   `;
 
+  cachedInstructions = instructions;
   return instructions;
 }
 

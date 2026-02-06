@@ -11,10 +11,12 @@ import { parseAuthHeaders } from './headers';
 
 const newServer = async ({
   clientOptions,
+  mcpOptions,
   req,
   res,
 }: {
   clientOptions: ClientOptions;
+  mcpOptions: McpOptions;
   req: express.Request;
   res: express.Response;
 }): Promise<McpServer | null> => {
@@ -28,6 +30,7 @@ const newServer = async ({
         ...clientOptions,
         ...authOptions,
       },
+      mcpOptions,
     });
   } catch (error) {
     res.status(401).json({
