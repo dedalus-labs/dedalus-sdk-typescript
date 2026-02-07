@@ -4,13 +4,13 @@ import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
-export class Ocr extends APIResource {
+export class OCR extends APIResource {
   /**
    * Process a document through Mistral OCR.
    *
    * Extracts text from PDFs and images, returning markdown-formatted content.
    */
-  process(body: OcrProcessParams, options?: RequestOptions): APIPromise<OcrResponse> {
+  process(body: OCRProcessParams, options?: RequestOptions): APIPromise<OCRResponse> {
     return this._client.post('/v1/ocr', { body, ...options });
   }
 }
@@ -18,7 +18,7 @@ export class Ocr extends APIResource {
 /**
  * Document input for OCR.
  */
-export interface OcrDocument {
+export interface OCRDocument {
   /**
    * Data URI with base64-encoded document
    */
@@ -30,7 +30,7 @@ export interface OcrDocument {
 /**
  * Single page OCR result.
  */
-export interface OcrPage {
+export interface OCRPage {
   index: number;
 
   markdown: string;
@@ -39,11 +39,11 @@ export interface OcrPage {
 /**
  * OCR request schema.
  */
-export interface OcrRequest {
+export interface OCRRequest {
   /**
    * Document input for OCR.
    */
-  document: OcrDocument;
+  document: OCRDocument;
 
   model?: string;
 }
@@ -51,29 +51,29 @@ export interface OcrRequest {
 /**
  * OCR response schema.
  */
-export interface OcrResponse {
+export interface OCRResponse {
   model: string;
 
-  pages: Array<OcrPage>;
+  pages: Array<OCRPage>;
 
   usage?: { [key: string]: unknown } | null;
 }
 
-export interface OcrProcessParams {
+export interface OCRProcessParams {
   /**
    * Document input for OCR.
    */
-  document: OcrDocument;
+  document: OCRDocument;
 
   model?: string;
 }
 
-export declare namespace Ocr {
+export declare namespace OCR {
   export {
-    type OcrDocument as OcrDocument,
-    type OcrPage as OcrPage,
-    type OcrRequest as OcrRequest,
-    type OcrResponse as OcrResponse,
-    type OcrProcessParams as OcrProcessParams,
+    type OCRDocument as OCRDocument,
+    type OCRPage as OCRPage,
+    type OCRRequest as OCRRequest,
+    type OCRResponse as OCRResponse,
+    type OCRProcessParams as OCRProcessParams,
   };
 }
