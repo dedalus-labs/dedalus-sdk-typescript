@@ -32,7 +32,7 @@ import {
   ImagesResponse,
 } from './resources/images';
 import { ListModelsResponse, Model, Models } from './resources/models';
-import { Ocr, OcrDocument, OcrPage, OcrProcessParams, OcrRequest, OcrResponse } from './resources/ocr';
+import { OCR, OCRDocument, OCRPage, OCRProcessParams, OCRRequest, OCRResponse } from './resources/ocr';
 import { Audio } from './resources/audio/audio';
 import { Chat } from './resources/chat/chat';
 import { type Fetch } from './internal/builtin-types';
@@ -793,6 +793,7 @@ export class Dedalus {
         'X-SDK-Version': '1.0.0',
         'X-Provider': this.provider,
         'X-Provider-Key': this.providerKey,
+        'X-Provider-Model': this.providerModel,
       },
       await this.authHeaders(options),
       this._options.defaultHeaders,
@@ -871,7 +872,7 @@ export class Dedalus {
   embeddings: API.Embeddings = new API.Embeddings(this);
   audio: API.Audio = new API.Audio(this);
   images: API.Images = new API.Images(this);
-  ocr: API.Ocr = new API.Ocr(this);
+  ocr: API.OCR = new API.OCR(this);
   chat: API.Chat = new API.Chat(this);
 }
 
@@ -879,7 +880,7 @@ Dedalus.Models = Models;
 Dedalus.Embeddings = Embeddings;
 Dedalus.Audio = Audio;
 Dedalus.Images = Images;
-Dedalus.Ocr = Ocr;
+Dedalus.OCR = OCR;
 Dedalus.Chat = Chat;
 
 export declare namespace Dedalus {
@@ -907,12 +908,12 @@ export declare namespace Dedalus {
   };
 
   export {
-    Ocr as Ocr,
-    type OcrDocument as OcrDocument,
-    type OcrPage as OcrPage,
-    type OcrRequest as OcrRequest,
-    type OcrResponse as OcrResponse,
-    type OcrProcessParams as OcrProcessParams,
+    OCR as OCR,
+    type OCRDocument as OCRDocument,
+    type OCRPage as OCRPage,
+    type OCRRequest as OCRRequest,
+    type OCRResponse as OCRResponse,
+    type OCRProcessParams as OCRProcessParams,
   };
 
   export { Chat as Chat };

@@ -84,18 +84,18 @@ Methods:
 - <code title="post /v1/images/edits">client.images.<a href="./src/resources/images.ts">edit</a>({ ...params }) -> ImagesResponse</code>
 - <code title="post /v1/images/generations">client.images.<a href="./src/resources/images.ts">generate</a>({ ...params }) -> ImagesResponse</code>
 
-# Ocr
+# OCR
 
 Types:
 
-- <code><a href="./src/resources/ocr.ts">OcrDocument</a></code>
-- <code><a href="./src/resources/ocr.ts">OcrPage</a></code>
-- <code><a href="./src/resources/ocr.ts">OcrRequest</a></code>
-- <code><a href="./src/resources/ocr.ts">OcrResponse</a></code>
+- <code><a href="./src/resources/ocr.ts">OCRDocument</a></code>
+- <code><a href="./src/resources/ocr.ts">OCRPage</a></code>
+- <code><a href="./src/resources/ocr.ts">OCRRequest</a></code>
+- <code><a href="./src/resources/ocr.ts">OCRResponse</a></code>
 
 Methods:
 
-- <code title="post /v1/ocr">client.ocr.<a href="./src/resources/ocr.ts">process</a>({ ...params }) -> OcrResponse</code>
+- <code title="post /v1/ocr">client.ocr.<a href="./src/resources/ocr.ts">process</a>({ ...params }) -> OCRResponse</code>
 
 # Chat
 
