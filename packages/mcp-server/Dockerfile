@@ -22,7 +22,7 @@
 # enables interactive mode, allowing the container to communicate over stdin/stdout.
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Install bash for build script
 RUN apk add --no-cache bash openssl
@@ -38,7 +38,7 @@ RUN yarn install --frozen-lockfile && \
     yarn build
 
 # Production stage
-FROM node:20-alpine
+FROM node:24-alpine
 
 # Add non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
