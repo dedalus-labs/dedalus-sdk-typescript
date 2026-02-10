@@ -34,7 +34,16 @@ describe('resource completions', () => {
         values: { api_key: 'sk-...' },
       },
       deferred: true,
-      deferred_calls: [{ foo: 'bar' }],
+      deferred_calls: [
+        {
+          id: 'id',
+          name: 'name',
+          arguments: { foo: 'string' },
+          blocked_by: ['string'],
+          dependencies: ['string'],
+          venue: 'venue',
+        },
+      ],
       frequency_penalty: -2,
       function_call: 'function_call',
       functions: [
@@ -91,7 +100,7 @@ describe('resource completions', () => {
       system_instruction: { foo: 'string' },
       temperature: 0,
       thinking: { budget_tokens: 1024, type: 'enabled' },
-      tool_choice: { type: 'auto', disable_parallel_tool_use: true },
+      tool_choice: 'string',
       tool_config: { foo: 'string' },
       tools: [
         {

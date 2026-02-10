@@ -31,6 +31,7 @@ export {
   type ChoiceLogprobs,
   type CompletionTokensDetails,
   type CompletionUsage,
+  type DeferredCallResponse,
   type InputTokenDetails,
   type PredictionContent,
   type PromptTokensDetails,
