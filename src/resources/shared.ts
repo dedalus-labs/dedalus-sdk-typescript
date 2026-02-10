@@ -45,47 +45,17 @@ export interface DedalusModel {
 export type DedalusModelChoice = string | DedalusModel;
 
 /**
- * Schema for FunctionObject.
+ * Schema for Function.
  *
  * Fields:
  *
- * - description (optional): str
  * - name (required): str
- * - parameters (optional): FunctionParameters
- * - strict (optional): bool | None
  */
 export interface FunctionDefinition {
   /**
-   * The name of the function to be called. Must be a-z, A-Z, 0-9, or contain
-   * underscores and dashes, with a maximum length of 64.
+   * The name of the function to call.
    */
   name: string;
-
-  /**
-   * A description of what the function does, used by the model to choose when and
-   * how to call the function.
-   */
-  description?: string;
-
-  /**
-   * The parameters the functions accepts, described as a JSON Schema object. See the
-   * [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
-   * and the
-   * [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for
-   * documentation about the format.
-   *
-   * Omitting `parameters` defines a function with an empty parameter list.
-   */
-  parameters?: { [key: string]: unknown };
-
-  /**
-   * Whether to enable strict schema adherence when generating the function call. If
-   * set to true, the model will follow the exact schema defined in the `parameters`
-   * field. Only a subset of JSON Schema is supported when `strict` is `true`. Learn
-   * more about Structured Outputs in the
-   * [function calling guide](https://platform.openai.com/docs/guides/function-calling).
-   */
-  strict?: boolean | null;
 }
 
 export type JSONObjectInput = { [key: string]: JSONValueInput | null };
@@ -150,32 +120,32 @@ export type MCPServers = Array<string | MCPServerSpec>;
  */
 export interface MCPToolResult {
   /**
-   * Input arguments passed to the tool
+   * Input arguments passed to the tool.
    */
   arguments: JSONObjectInput;
 
   /**
-   * Whether the tool execution resulted in an error
+   * Whether the tool execution resulted in an error.
    */
   is_error: boolean;
 
   /**
-   * Name of the MCP server that handled the tool
+   * Name of the MCP server that handled the tool.
    */
   server_name: string;
 
   /**
-   * Name of the MCP tool that was executed
+   * Name of the MCP tool that was executed.
    */
   tool_name: string;
 
   /**
-   * Execution time in milliseconds
+   * Execution time in milliseconds.
    */
   duration_ms?: number | null;
 
   /**
-   * Structured result from the tool (parsed from structuredContent or content)
+   * Structured result from the tool (parsed from structuredContent or content).
    */
   result?: JSONValueInput | null;
 }
@@ -324,8 +294,7 @@ export interface ResponseFormatJSONObject {
 
 /**
  * JSON Schema response format. Used to generate structured JSON responses. Learn
- * more about
- * [Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs).
+ * more about [Structured Outputs](/docs/guides/structured-outputs).
  *
  * Fields:
  *
@@ -372,7 +341,7 @@ export namespace ResponseFormatJSONSchema {
      * true, the model will always follow the exact schema defined in the `schema`
      * field. Only a subset of JSON Schema is supported when `strict` is `true`. To
      * learn more, read the
-     * [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs).
+     * [Structured Outputs guide](/docs/guides/structured-outputs).
      */
     strict?: boolean | null;
   }
@@ -406,4 +375,18 @@ export namespace ToolChoice {
 
     server_label: string;
   }
+}
+
+/**
+ * Custom voice reference.
+ *
+ * Fields:
+ *
+ * - id (required): str
+ */
+export interface VoiceIDsOrCustomVoice {
+  /**
+   * The custom voice ID, e.g. `voice_1234`.
+   */
+  id: string;
 }
