@@ -18,7 +18,15 @@ import { HandlerFunction, McpTool } from './types';
 export { McpOptions } from './options';
 export { ClientOptions } from 'dedalus-labs';
 
-async function getInstructions() {
+// Cache for the base instructions fetched from the API.
+// This avoids making a remote HTTP fetch on every request in HTTP transport mode.
+let cachedBaseInstructions: string | null = null;
+
+async function getBaseInstructions(): Promise<string> {
+  if (cachedBaseInstructions !== null) {
+    return cachedBaseInstructions;
+  }
+
   // This API key is optional; providing it allows the server to fetch instructions for unreleased versions.
   const stainlessAPIKey = readEnv('STAINLESS_API_KEY');
   const response = await fetch(
@@ -29,29 +37,32 @@ async function getInstructions() {
     },
   );
 
-  let instructions: string | undefined;
   if (!response.ok) {
     console.warn(
       'Warning: failed to retrieve MCP server instructions. Proceeding with default instructions...',
     );
 
-    instructions = `
+    cachedBaseInstructions = `
       This is the dedalus-sdk MCP server. You will use Code Mode to help the user perform
       actions. You can use search_docs tool to learn about how to take action with this server. Then,
       you will write TypeScript code using the execute tool take action. It is CRITICAL that you be
       thoughtful and deliberate when executing code. Always try to entirely solve the problem in code
       block: it can be as long as you need to get the job done!
     `;
+  } else {
+    cachedBaseInstructions = ((await response.json()) as { instructions: string }).instructions;
   }
 
-  instructions ??= ((await response.json()) as { instructions: string }).instructions;
-  instructions = `
+  return cachedBaseInstructions;
+}
+
+async function getInstructions() {
+  const baseInstructions = await getBaseInstructions();
+  return `
     The current time in Unix timestamps is ${Date.now()}.
 
-    ${instructions}
+    ${baseInstructions}
   `;
-
-  return instructions;
 }
 
 export const newMcpServer = async () =>
