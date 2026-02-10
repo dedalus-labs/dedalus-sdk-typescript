@@ -21,16 +21,21 @@ export { ClientOptions } from 'dedalus-labs';
 async function getInstructions() {
   // This API key is optional; providing it allows the server to fetch instructions for unreleased versions.
   const stainlessAPIKey = readEnv('STAINLESS_API_KEY');
-  const response = await fetch(
-    readEnv('CODE_MODE_INSTRUCTIONS_URL') ?? 'https://api.stainless.com/api/ai/instructions/dedalus-sdk',
-    {
-      method: 'GET',
-      headers: { ...(stainlessAPIKey && { Authorization: stainlessAPIKey }) },
-    },
-  );
+  let response: Response | undefined;
+  try {
+    response = await fetch(
+      readEnv('CODE_MODE_INSTRUCTIONS_URL') ?? 'https://api.stainless.com/api/ai/instructions/dedalus-sdk',
+      {
+        method: 'GET',
+        headers: { ...(stainlessAPIKey && { Authorization: stainlessAPIKey }) },
+      },
+    );
+  } catch {
+    // Network-level errors (DNS failure, timeout, connection refused, etc.)
+  }
 
   let instructions: string | undefined;
-  if (!response.ok) {
+  if (!response?.ok) {
     console.warn(
       'Warning: failed to retrieve MCP server instructions. Proceeding with default instructions...',
     );
@@ -44,7 +49,7 @@ async function getInstructions() {
     `;
   }
 
-  instructions ??= ((await response.json()) as { instructions: string }).instructions;
+  instructions ??= ((await response!.json()) as { instructions: string }).instructions;
   instructions = `
     The current time in Unix timestamps is ${Date.now()}.
 
