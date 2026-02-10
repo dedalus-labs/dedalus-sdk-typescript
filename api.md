@@ -143,6 +143,7 @@ Types:
 - <code><a href="./src/resources/chat/completions.ts">ChoiceLogprobs</a></code>
 - <code><a href="./src/resources/chat/completions.ts">CompletionTokensDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">CompletionUsage</a></code>
+- <code><a href="./src/resources/chat/completions.ts">DeferredCallResponse</a></code>
 - <code><a href="./src/resources/chat/completions.ts">InputTokenDetails</a></code>
 - <code><a href="./src/resources/chat/completions.ts">PredictionContent</a></code>
 - <code><a href="./src/resources/chat/completions.ts">PromptTokensDetails</a></code>

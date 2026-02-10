@@ -146,7 +146,7 @@ export interface ChatCompletion {
   /**
    * Server tools blocked on client results.
    */
-  deferred?: Array<ChatCompletion.Deferred> | null;
+  deferred?: Array<DeferredCallResponse> | null;
 
   /**
    * MCP server failures keyed by server name.
@@ -218,43 +218,6 @@ export interface ChatCompletion {
 }
 
 export namespace ChatCompletion {
-  /**
-   * Server-side call blocked until pending client calls complete.
-   *
-   * Carries full spec for stateless resumption on subsequent turns.
-   */
-  export interface Deferred {
-    /**
-     * Unique identifier for this deferred call.
-     */
-    id: string;
-
-    /**
-     * Name of the tool.
-     */
-    name: string;
-
-    /**
-     * Input arguments for the tool call.
-     */
-    arguments?: Shared.JSONObjectInput;
-
-    /**
-     * IDs of pending client calls blocking this call.
-     */
-    blocked_by?: Array<string>;
-
-    /**
-     * IDs of calls this depends on.
-     */
-    dependencies?: Array<string>;
-
-    /**
-     * Execution venue (server or client).
-     */
-    venue?: string;
-  }
-
   /**
    * Error details for a single MCP server failure.
    */
@@ -767,7 +730,7 @@ export interface ChatCompletionCreateParams {
    * Tier 2 stateless resumption. Deferred tool specs from a previous handoff
    * response, sent back verbatim so the server can resume without Redis.
    */
-  deferred_calls?: Array<{ [key: string]: unknown }> | null;
+  deferred_calls?: Array<DeferredCallResponse> | null;
 
   /**
    * Number between -2.0 and 2.0. Positive values penalize new tokens based on their
@@ -1070,7 +1033,7 @@ export interface ChatCompletionCreateParams {
    * call that tool. `none` is the default when no tools are present. `auto` is the
    * default if tools are present.
    */
-  tool_choice?: ToolChoiceAuto | ToolChoiceAny | ToolChoiceTool | ToolChoiceNone | null;
+  tool_choice?: string | ToolChoiceAuto | ToolChoiceAny | ToolChoiceTool | ToolChoiceNone | null;
 
   /**
    * Tool calling configuration (Google-specific)
@@ -1998,6 +1961,43 @@ export interface CompletionUsage {
 }
 
 /**
+ * Server-side call blocked until pending client calls complete.
+ *
+ * Carries full spec for stateless resumption on subsequent turns.
+ */
+export interface DeferredCallResponse {
+  /**
+   * Unique identifier for this deferred call.
+   */
+  id: string;
+
+  /**
+   * Name of the tool.
+   */
+  name: string;
+
+  /**
+   * Input arguments for the tool call.
+   */
+  arguments?: Shared.JSONObjectInput;
+
+  /**
+   * IDs of pending client calls blocking this call.
+   */
+  blocked_by?: Array<string>;
+
+  /**
+   * IDs of calls this depends on.
+   */
+  dependencies?: Array<string>;
+
+  /**
+   * Execution venue (server or client).
+   */
+  venue?: string;
+}
+
+/**
  * Details about the input tokens billed for this request.
  *
  * Fields:
@@ -2298,7 +2298,7 @@ export interface CompletionCreateParamsBase {
    * Tier 2 stateless resumption. Deferred tool specs from a previous handoff
    * response, sent back verbatim so the server can resume without Redis.
    */
-  deferred_calls?: Array<{ [key: string]: unknown }> | null;
+  deferred_calls?: Array<DeferredCallResponse> | null;
 
   /**
    * Number between -2.0 and 2.0. Positive values penalize new tokens based on their
@@ -2601,7 +2601,7 @@ export interface CompletionCreateParamsBase {
    * call that tool. `none` is the default when no tools are present. `auto` is the
    * default if tools are present.
    */
-  tool_choice?: ToolChoiceAuto | ToolChoiceAny | ToolChoiceTool | ToolChoiceNone | null;
+  tool_choice?: string | ToolChoiceAuto | ToolChoiceAny | ToolChoiceTool | ToolChoiceNone | null;
 
   /**
    * Tool calling configuration (Google-specific)
@@ -2762,6 +2762,7 @@ export declare namespace Completions {
     type ChoiceLogprobs as ChoiceLogprobs,
     type CompletionTokensDetails as CompletionTokensDetails,
     type CompletionUsage as CompletionUsage,
+    type DeferredCallResponse as DeferredCallResponse,
     type InputTokenDetails as InputTokenDetails,
     type PredictionContent as PredictionContent,
     type PromptTokensDetails as PromptTokensDetails,
