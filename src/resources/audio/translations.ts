@@ -30,7 +30,7 @@ export class Translations extends APIResource {
 }
 
 /**
- * Fields:
+ * Fields: # noqa: D415.
  *
  * - language (required): str
  * - duration (required): float
@@ -43,7 +43,7 @@ export type TranslationCreateResponse =
 
 export namespace TranslationCreateResponse {
   /**
-   * Fields:
+   * Fields: # noqa: D415.
    *
    * - language (required): str
    * - duration (required): float
@@ -74,7 +74,7 @@ export namespace TranslationCreateResponse {
 
   export namespace CreateTranslationResponseVerboseJSON {
     /**
-     * Fields:
+     * Fields: # noqa: D415.
      *
      * - id (required): int
      * - seek (required): int
@@ -144,7 +144,7 @@ export namespace TranslationCreateResponse {
   }
 
   /**
-   * Fields:
+   * Fields: # noqa: D415.
    *
    * - text (required): str
    */

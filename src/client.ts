@@ -33,6 +33,7 @@ import {
 } from './resources/images';
 import { ListModelsResponse, Model, Models } from './resources/models';
 import { OCR, OCRDocument, OCRPage, OCRProcessParams, OCRRequest, OCRResponse } from './resources/ocr';
+import { Response, ResponseCreateParams, Responses } from './resources/responses';
 import { Audio } from './resources/audio/audio';
 import { Chat } from './resources/chat/chat';
 import { type Fetch } from './internal/builtin-types';
@@ -864,6 +865,7 @@ export class Dedalus {
   audio: API.Audio = new API.Audio(this);
   images: API.Images = new API.Images(this);
   ocr: API.OCR = new API.OCR(this);
+  responses: API.Responses = new API.Responses(this);
   chat: API.Chat = new API.Chat(this);
 }
 
@@ -872,6 +874,7 @@ Dedalus.Embeddings = Embeddings;
 Dedalus.Audio = Audio;
 Dedalus.Images = Images;
 Dedalus.OCR = OCR;
+Dedalus.Responses = Responses;
 Dedalus.Chat = Chat;
 
 export declare namespace Dedalus {
@@ -907,6 +910,12 @@ export declare namespace Dedalus {
     type OCRProcessParams as OCRProcessParams,
   };
 
+  export {
+    Responses as Responses,
+    type Response as Response,
+    type ResponseCreateParams as ResponseCreateParams,
+  };
+
   export { Chat as Chat };
 
   export type Credential = API.Credential;
@@ -925,4 +934,5 @@ export declare namespace Dedalus {
   export type ResponseFormatJSONSchema = API.ResponseFormatJSONSchema;
   export type ResponseFormatText = API.ResponseFormatText;
   export type ToolChoice = API.ToolChoice;
+  export type VoiceIDsOrCustomVoice = API.VoiceIDsOrCustomVoice;
 }

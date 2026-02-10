@@ -17,7 +17,8 @@ export class Completions extends APIResource {
    * Headers:
    *
    * - Authorization: bearer key for the calling account.
-   * - Optional BYOK or provider headers if applicable.
+   * - X-Provider / X-Provider-Key: optional headers for using your own provider API
+   *   key.
    *
    * Behavior:
    *
@@ -89,7 +90,7 @@ export class Completions extends APIResource {
 
 /**
  * Data about a previous audio response from the model.
- * [Learn more](https://platform.openai.com/docs/guides/audio).
+ * [Learn more](/docs/guides/audio).
  *
  * Fields:
  *
@@ -137,11 +138,20 @@ export interface ChatCompletion {
   object: 'chat.completion';
 
   /**
-   * Information about MCP server failures, if any occurred during the request.
-   * Contains details about which servers failed and why, along with recommendations
-   * for the user. Only present when MCP server failures occurred.
+   * Stable session ID for cross-turn handoff state. Echo this on the next request to
+   * resume server-side execution.
    */
-  mcp_server_errors?: { [key: string]: unknown } | null;
+  correlation_id?: string | null;
+
+  /**
+   * Server tools blocked on client results.
+   */
+  deferred?: Array<ChatCompletion.Deferred> | null;
+
+  /**
+   * MCP server failures keyed by server name.
+   */
+  mcp_server_errors?: { [key: string]: ChatCompletion.MCPServerErrors } | null;
 
   /**
    * Detailed results of MCP tool executions including inputs, outputs, and timing.
@@ -151,6 +161,16 @@ export interface ChatCompletion {
   mcp_tool_results?: Array<Shared.MCPToolResult> | null;
 
   /**
+   * Client tools to execute, with dependency ordering.
+   */
+  pending_tools?: Array<ChatCompletion.PendingTool> | null;
+
+  /**
+   * Completed server tool outputs keyed by call ID.
+   */
+  server_results?: { [key: string]: Shared.JSONValueInput | null } | null;
+
+  /**
    * Specifies the processing type used for serving the request.
    *
    * - If set to 'auto', then the request will be processed with the service tier
@@ -158,7 +178,7 @@ export interface ChatCompletion {
    *   will use 'default'.
    * - If set to 'default', then the request will be processed with the standard
    *   pricing and performance for the selected model.
-   * - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+   * - If set to '[flex](/docs/guides/flex-processing)' or
    *   '[priority](https://openai.com/api-priority-processing/)', then the request
    *   will be processed with the corresponding service tier.
    * - When not set, the default behavior is 'auto'.
@@ -186,9 +206,99 @@ export interface ChatCompletion {
   tools_executed?: Array<string> | null;
 
   /**
+   * Number of internal LLM calls made during this request. SDKs can sum this across
+   * their outer loop to track total LLM calls.
+   */
+  turns_consumed?: number | null;
+
+  /**
    * Usage statistics for the completion request.
    */
   usage?: CompletionUsage;
+}
+
+export namespace ChatCompletion {
+  /**
+   * Server-side call blocked until pending client calls complete.
+   *
+   * Carries full spec for stateless resumption on subsequent turns.
+   */
+  export interface Deferred {
+    /**
+     * Unique identifier for this deferred call.
+     */
+    id: string;
+
+    /**
+     * Name of the tool.
+     */
+    name: string;
+
+    /**
+     * Input arguments for the tool call.
+     */
+    arguments?: Shared.JSONObjectInput;
+
+    /**
+     * IDs of pending client calls blocking this call.
+     */
+    blocked_by?: Array<string>;
+
+    /**
+     * IDs of calls this depends on.
+     */
+    dependencies?: Array<string>;
+
+    /**
+     * Execution venue (server or client).
+     */
+    venue?: string;
+  }
+
+  /**
+   * Error details for a single MCP server failure.
+   */
+  export interface MCPServerErrors {
+    /**
+     * Human-readable error message.
+     */
+    message: string;
+
+    /**
+     * Machine-readable error code.
+     */
+    code?: string | null;
+
+    /**
+     * Suggested action for the user.
+     */
+    recommendation?: string | null;
+  }
+
+  /**
+   * Client-side tool call the SDK must execute.
+   */
+  export interface PendingTool {
+    /**
+     * Unique identifier for this tool call.
+     */
+    id: string;
+
+    /**
+     * Input arguments for the tool call.
+     */
+    arguments: Shared.JSONObjectInput;
+
+    /**
+     * Name of the tool to execute.
+     */
+    name: string;
+
+    /**
+     * IDs of other pending calls that must complete first.
+     */
+    dependencies?: Array<string>;
+  }
 }
 
 /**
@@ -214,7 +324,7 @@ export interface ChatCompletionAssistantMessageParam {
 
   /**
    * Data about a previous audio response from the model.
-   * [Learn more](https://platform.openai.com/docs/guides/audio).
+   * [Learn more](/docs/guides/audio).
    *
    * Fields:
    *
@@ -284,12 +394,11 @@ export namespace ChatCompletionAssistantMessageParam {
 
 /**
  * Parameters for audio output. Required when audio output is requested with
- * `modalities: ["audio"]`.
- * [Learn more](https://platform.openai.com/docs/guides/audio).
+ * `modalities: ["audio"]`. [Learn more](/docs/guides/audio).
  *
  * Fields:
  *
- * - voice (required): VoiceIdsShared
+ * - voice (required): VoiceIdsOrCustomVoice
  * - format (required): Literal["wav", "aac", "mp3", "flac", "opus", "pcm16"]
  */
 export interface ChatCompletionAudioParam {
@@ -300,11 +409,13 @@ export interface ChatCompletionAudioParam {
   format: 'wav' | 'aac' | 'mp3' | 'flac' | 'opus' | 'pcm16';
 
   /**
-   * The voice the model uses to respond. Supported voices are `alloy`, `ash`,
-   * `ballad`, `coral`, `echo`, `fable`, `nova`, `onyx`, `sage`, and `shimmer`.
+   * The voice the model uses to respond. Supported built-in voices are `alloy`,
+   * `ash`, `ballad`, `coral`, `echo`, `fable`, `nova`, `onyx`, `sage`, `shimmer`,
+   * `marin`, and `cedar`. You may also provide a custom voice object with an `id`,
+   * for example `{ "id": "voice_1234" }`.
    */
   voice:
-    | (string & {})
+    | string
     | 'alloy'
     | 'ash'
     | 'ballad'
@@ -314,13 +425,13 @@ export interface ChatCompletionAudioParam {
     | 'shimmer'
     | 'verse'
     | 'marin'
-    | 'cedar';
+    | 'cedar'
+    | Shared.VoiceIDsOrCustomVoice;
 }
 
 /**
  * Represents a streamed chunk of a chat completion response returned by the model,
- * based on the provided input.
- * [Learn more](https://platform.openai.com/docs/guides/streaming-responses).
+ * based on the provided input. [Learn more](/docs/guides/streaming-responses).
  *
  * Fields:
  *
@@ -370,7 +481,7 @@ export interface ChatCompletionChunk {
    *   will use 'default'.
    * - If set to 'default', then the request will be processed with the standard
    *   pricing and performance for the selected model.
-   * - If set to '[flex](https://platform.openai.com/docs/guides/flex-processing)' or
+   * - If set to '[flex](/docs/guides/flex-processing)' or
    *   '[priority](https://openai.com/api-priority-processing/)', then the request
    *   will be processed with the corresponding service tier.
    * - When not set, the default behavior is 'auto'.
@@ -404,8 +515,7 @@ export interface ChatCompletionChunk {
 }
 
 /**
- * Learn about [file inputs](https://platform.openai.com/docs/guides/text) for text
- * generation.
+ * Learn about [file inputs](/docs/guides/text) for text generation.
  *
  * Fields:
  *
@@ -460,7 +570,7 @@ export namespace ChatCompletionContentPartFileParam {
 }
 
 /**
- * Learn about [image inputs](https://platform.openai.com/docs/guides/vision).
+ * Learn about [image inputs](/docs/guides/vision).
  *
  * Fields:
  *
@@ -501,14 +611,14 @@ export namespace ChatCompletionContentPartImageParam {
 
     /**
      * Specifies the detail level of the image. Learn more in the
-     * [Vision guide](https://platform.openai.com/docs/guides/vision#low-or-high-fidelity-image-understanding).
+     * [Vision guide](/docs/guides/vision#low-or-high-fidelity-image-understanding).
      */
     detail?: 'auto' | 'low' | 'high';
   }
 }
 
 /**
- * Learn about [audio inputs](https://platform.openai.com/docs/guides/audio).
+ * Learn about [audio inputs](/docs/guides/audio).
  *
  * Fields:
  *
@@ -575,8 +685,7 @@ export interface ChatCompletionContentPartRefusalParam {
 }
 
 /**
- * Learn about
- * [text inputs](https://platform.openai.com/docs/guides/text-generation).
+ * Learn about [text inputs](/docs/guides/text-generation).
  *
  * Fields:
  *
@@ -615,12 +724,11 @@ export interface ChatCompletionCreateParams {
 
   /**
    * Parameters for audio output. Required when audio output is requested with
-   * `modalities: ["audio"]`.
-   * [Learn more](https://platform.openai.com/docs/guides/audio).
+   * `modalities: ["audio"]`. [Learn more](/docs/guides/audio).
    *
    * Fields:
    *
-   * - voice (required): VoiceIdsShared
+   * - voice (required): VoiceIdsOrCustomVoice
    * - format (required): Literal["wav", "aac", "mp3", "flac", "opus", "pcm16"]
    */
   audio?: ChatCompletionAudioParam | null;
@@ -638,6 +746,12 @@ export interface ChatCompletionCreateParams {
   cached_content?: string | null;
 
   /**
+   * Stable session ID for resuming a previous handoff. Returned by the server on
+   * handoff; echo it on the next request to resume.
+   */
+  correlation_id?: string | null;
+
+  /**
    * Credentials for MCP server authentication. Each credential is matched to servers
    * by connection name.
    */
@@ -650,6 +764,12 @@ export interface ChatCompletionCreateParams {
   deferred?: boolean | null;
 
   /**
+   * Tier 2 stateless resumption. Deferred tool specs from a previous handoff
+   * response, sent back verbatim so the server can resume without Redis.
+   */
+  deferred_calls?: Array<{ [key: string]: unknown }> | null;
+
+  /**
    * Number between -2.0 and 2.0. Positive values penalize new tokens based on their
    * existing frequency in the text so far, decreasing the model's likelihood to
    * repeat the same line verbatim.
@@ -657,7 +777,13 @@ export interface ChatCompletionCreateParams {
   frequency_penalty?: number | null;
 
   /**
-   * Wrapper for union variant: function call mode.
+   * Deprecated in favor of `tool_choice`. Controls which (if any) function is called
+   * by the model. `none` means the model will not call a function and instead
+   * generates a message. `auto` means the model can pick between generating a
+   * message or calling a function. Specifying a particular function via
+   * `{"name": "my_function"}` forces the model to call that function. `none` is the
+   * default when no functions are present. `auto` is the default if functions are
+   * present.
    */
   function_call?: string | null;
 
@@ -681,6 +807,18 @@ export interface ChatCompletionCreateParams {
    * Configuration for multi-model handoffs.
    */
   handoff_config?: { [key: string]: unknown } | null;
+
+  /**
+   * Handoff control. None or omitted: auto-detect. true: structured handoff (SDK).
+   * false: drop-in (LLM re-run for mixed turns).
+   */
+  handoff_mode?: boolean | null;
+
+  /**
+   * Specifies the geographic region for inference processing. If not specified, the
+   * workspace's `default_inference_geo` is used.
+   */
+  inference_geo?: string | null;
 
   /**
    * Modify the likelihood of specified tokens appearing in the completion. Accepts a
@@ -745,8 +883,7 @@ export interface ChatCompletionCreateParams {
   /**
    * Output types that you would like the model to generate. Most models are capable
    * of generating text, which is the default: `["text"]` The `gpt-4o-audio-preview`
-   * model can also be used to
-   * [generate audio](https://platform.openai.com/docs/guides/audio). To request that
+   * model can also be used to [generate audio](/docs/guides/audio). To request that
    * this model generate both text and audio responses, you can use:
    * `["text", "audio"]`
    */
@@ -765,8 +902,10 @@ export interface ChatCompletionCreateParams {
    */
   n?: number | null;
 
+  output_config?: Shared.JSONObjectInput | null;
+
   /**
-   * Whether to enable parallel tool calls (Anthropic uses inverted polarity)
+   * Whether to enable parallel tool calls (Anthropic uses inverted polarity).
    */
   parallel_tool_calls?: boolean | null;
 
@@ -792,16 +931,14 @@ export interface ChatCompletionCreateParams {
 
   /**
    * Used by OpenAI to cache responses for similar requests to optimize your cache
-   * hit rates. Replaces the `user` field.
-   * [Learn more](https://platform.openai.com/docs/guides/prompt-caching).
+   * hit rates. Replaces the `user` field. [Learn more](/docs/guides/prompt-caching).
    */
   prompt_cache_key?: string | null;
 
   /**
    * The retention policy for the prompt cache. Set to `24h` to enable extended
    * prompt caching, which keeps cached prefixes active for longer, up to a maximum
-   * of 24 hours.
-   * [Learn more](https://platform.openai.com/docs/guides/prompt-caching#prompt-cache-retention).
+   * of 24 hours. [Learn more](/docs/guides/prompt-caching#prompt-cache-retention).
    */
   prompt_cache_retention?: string | null;
 
@@ -814,14 +951,15 @@ export interface ChatCompletionCreateParams {
   /**
    * Constrains effort on reasoning for
    * [reasoning models](https://platform.openai.com/docs/guides/reasoning). Currently
-   * supported values are `none`, `minimal`, `low`, `medium`, and `high`. Reducing
-   * reasoning effort can result in faster responses and fewer tokens used on
-   * reasoning in a response. - `gpt-5.1` defaults to `none`, which does not perform
-   * reasoning. The supported reasoning values for `gpt-5.1` are `none`, `low`,
-   * `medium`, and `high`. Tool calls are supported for all reasoning values in
-   * gpt-5.1. - All models before `gpt-5.1` default to `medium` reasoning effort, and
-   * do not support `none`. - The `gpt-5-pro` model defaults to (and only supports)
-   * `high` reasoning effort.
+   * supported values are `none`, `minimal`, `low`, `medium`, `high`, and `xhigh`.
+   * Reducing reasoning effort can result in faster responses and fewer tokens used
+   * on reasoning in a response. - `gpt-5.1` defaults to `none`, which does not
+   * perform reasoning. The supported reasoning values for `gpt-5.1` are `none`,
+   * `low`, `medium`, and `high`. Tool calls are supported for all reasoning values
+   * in gpt-5.1. - All models before `gpt-5.1` default to `medium` reasoning effort,
+   * and do not support `none`. - The `gpt-5-pro` model defaults to (and only
+   * supports) `high` reasoning effort. - `xhigh` is supported for all models after
+   * `gpt-5.1-codex-max`.
    */
   reasoning_effort?: string | null;
 
@@ -829,10 +967,10 @@ export interface ChatCompletionCreateParams {
    * An object specifying the format that the model must output. Setting to
    * `{ "type": "json_schema", "json_schema": {...} }` enables Structured Outputs
    * which ensures the model will match your supplied JSON schema. Learn more in the
-   * [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs).
-   * Setting to `{ "type": "json_object" }` enables the older JSON mode, which
-   * ensures the message the model generates is valid JSON. Using `json_schema` is
-   * preferred for models that support it.
+   * [Structured Outputs guide](/docs/guides/structured-outputs). Setting to
+   * `{ "type": "json_object" }` enables the older JSON mode, which ensures the
+   * message the model generates is valid JSON. Using `json_schema` is preferred for
+   * models that support it.
    */
   response_format?:
     | Shared.ResponseFormatText
@@ -850,7 +988,7 @@ export interface ChatCompletionCreateParams {
    * violating OpenAI's usage policies. The IDs should be a string that uniquely
    * identifies each user. We recommend hashing their username or email address, in
    * order to avoid sending us any identifying information.
-   * [Learn more](https://platform.openai.com/docs/guides/safety-best-practices#safety-identifiers).
+   * [Learn more](/docs/guides/safety-best-practices#safety-identifiers).
    */
   safety_identifier?: string | null;
 
@@ -876,15 +1014,21 @@ export interface ChatCompletionCreateParams {
   service_tier?: string | null;
 
   /**
+   * The inference speed mode for this request. `"fast"` enables high
+   * output-tokens-per-second inference.
+   */
+  speed?: 'standard' | 'fast' | null;
+
+  /**
    * Sequences that stop generation
    */
   stop?: Array<string> | string | null;
 
   /**
    * Whether or not to store the output of this chat completion request for use in
-   * our [model distillation](https://platform.openai.com/docs/guides/distillation)
-   * or [evals](https://platform.openai.com/docs/guides/evals) products. Supports
-   * text and image inputs. Note: image inputs over 8MB will be dropped.
+   * our [model distillation](/docs/guides/distillation) or
+   * [evals](/docs/guides/evals) products. Supports text and image inputs. Note:
+   * image inputs over 8MB will be dropped.
    */
   store?: boolean | null;
 
@@ -911,7 +1055,11 @@ export interface ChatCompletionCreateParams {
   /**
    * Extended thinking configuration (Anthropic-specific)
    */
-  thinking?: ThinkingConfigEnabled | ThinkingConfigDisabled | null;
+  thinking?:
+    | ThinkingConfigEnabled
+    | ThinkingConfigDisabled
+    | ChatCompletionCreateParams.ThinkingConfigAdaptive
+    | null;
 
   /**
    * Controls which (if any) tool is called by the model. `none` means the model will
@@ -932,7 +1080,7 @@ export interface ChatCompletionCreateParams {
   /**
    * Available tools/functions for the model
    */
-  tools?: Array<ChatCompletionToolParam | ChatCompletionCreateParams.CustomToolChatCompletions> | null;
+  tools?: Array<ChatCompletionToolParam> | null;
 
   /**
    * Top-k sampling parameter
@@ -956,7 +1104,7 @@ export interface ChatCompletionCreateParams {
    * `prompt_cache_key` instead to maintain caching optimizations. A stable
    * identifier for your end-users. Used to boost cache hit rates by better bucketing
    * similar requests and to help OpenAI detect and prevent abuse.
-   * [Learn more](https://platform.openai.com/docs/guides/safety-best-practices#safety-identifiers).
+   * [Learn more](/docs/guides/safety-best-practices#safety-identifiers).
    */
   user?: string | null;
 
@@ -969,8 +1117,7 @@ export interface ChatCompletionCreateParams {
 
   /**
    * This tool searches the web for relevant results to use in a response. Learn more
-   * about the
-   * [web search tool](https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat).
+   * about the [web search tool](/docs/guides/tools-web-search?api-mode=chat).
    */
   web_search_options?: Shared.JSONObjectInput | null;
 
@@ -986,10 +1133,10 @@ export namespace ChatCompletionCreateParams {
    *
    * Fields:
    *
-   * - category (required): HarmCategory
    * - threshold (required): Literal["HARM_BLOCK_THRESHOLD_UNSPECIFIED",
    *   "BLOCK_LOW_AND_ABOVE", "BLOCK_MEDIUM_AND_ABOVE", "BLOCK_ONLY_HIGH",
    *   "BLOCK_NONE", "OFF"]
+   * - category (required): HarmCategory
    */
   export interface SafetySetting {
     /**
@@ -1022,108 +1169,14 @@ export namespace ChatCompletionCreateParams {
   }
 
   /**
-   * A custom tool that processes input using a specified format.
+   * Schema for ThinkingConfigAdaptive.
    *
    * Fields:
    *
-   * - type (required): Literal["custom"]
-   * - custom (required): CustomToolProperties
+   * - type (required): Literal["adaptive"]
    */
-  export interface CustomToolChatCompletions {
-    /**
-     * Properties of the custom tool.
-     */
-    custom: CustomToolChatCompletions.Custom;
-
-    /**
-     * The type of the custom tool. Always `custom`.
-     */
-    type: 'custom';
-  }
-
-  export namespace CustomToolChatCompletions {
-    /**
-     * Properties of the custom tool.
-     */
-    export interface Custom {
-      /**
-       * The name of the custom tool, used to identify it in tool calls.
-       */
-      name: string;
-
-      /**
-       * Optional description of the custom tool, used to provide more context.
-       */
-      description?: string;
-
-      /**
-       * The input format for the custom tool. Default is unconstrained text.
-       */
-      format?: Custom.TextFormat | Custom.GrammarFormat;
-    }
-
-    export namespace Custom {
-      /**
-       * Unconstrained free-form text.
-       *
-       * Fields:
-       *
-       * - type (required): Literal["text"]
-       */
-      export interface TextFormat {
-        /**
-         * Unconstrained text format. Always `text`.
-         */
-        type: 'text';
-      }
-
-      /**
-       * A grammar defined by the user.
-       *
-       * Fields:
-       *
-       * - type (required): Literal["grammar"]
-       * - grammar (required): GrammarFormatGrammarFormat
-       */
-      export interface GrammarFormat {
-        /**
-         * Your chosen grammar.
-         *
-         * Fields:
-         *
-         * - definition (required): str
-         * - syntax (required): Literal["lark", "regex"]
-         */
-        grammar: GrammarFormat.Grammar;
-
-        /**
-         * Grammar format. Always `grammar`.
-         */
-        type: 'grammar';
-      }
-
-      export namespace GrammarFormat {
-        /**
-         * Your chosen grammar.
-         *
-         * Fields:
-         *
-         * - definition (required): str
-         * - syntax (required): Literal["lark", "regex"]
-         */
-        export interface Grammar {
-          /**
-           * The grammar definition.
-           */
-          definition: string;
-
-          /**
-           * The syntax of the grammar definition. One of `lark` or `regex`.
-           */
-          syntax: 'lark' | 'regex';
-        }
-      }
-    }
+  export interface ThinkingConfigAdaptive {
+    type: 'adaptive';
   }
 }
 
@@ -1208,8 +1261,7 @@ export interface ChatCompletionFunctions {
 
   /**
    * The parameters the functions accepts, described as a JSON Schema object. See the
-   * [guide](https://platform.openai.com/docs/guides/function-calling) for examples,
-   * and the
+   * [guide](/docs/guides/function-calling) for examples, and the
    * [JSON Schema reference](https://json-schema.org/understanding-json-schema/) for
    * documentation about the format.
    *
@@ -1249,14 +1301,13 @@ export interface ChatCompletionMessage {
 
   /**
    * Annotations for the message, when applicable, as when using the
-   * [web search tool](https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat).
+   * [web search tool](/docs/guides/tools-web-search?api-mode=chat).
    */
   annotations?: Array<ChatCompletionMessage.Annotation>;
 
   /**
    * If the audio output modality is requested, this object contains data about the
-   * audio response from the model.
-   * [Learn more](https://platform.openai.com/docs/guides/audio).
+   * audio response from the model. [Learn more](/docs/guides/audio).
    *
    * Fields:
    *
@@ -1348,8 +1399,7 @@ export namespace ChatCompletionMessage {
 
   /**
    * If the audio output modality is requested, this object contains data about the
-   * audio response from the model.
-   * [Learn more](https://platform.openai.com/docs/guides/audio).
+   * audio response from the model. [Learn more](/docs/guides/audio).
    *
    * Fields:
    *
@@ -1642,30 +1692,24 @@ export interface ChatCompletionToolMessageParam {
 }
 
 /**
- * A function tool that can be used to generate a response.
+ * Schema for Tool.
  *
  * Fields:
  *
- * - type (required): Literal["function"]
- * - function (required): FunctionObject
+ * - type (optional): ToolTypes
+ * - function (required): Function
  */
 export interface ChatCompletionToolParam {
   /**
-   * Schema for FunctionObject.
+   * Schema for Function.
    *
    * Fields:
    *
-   * - description (optional): str
    * - name (required): str
-   * - parameters (optional): FunctionParameters
-   * - strict (optional): bool | None
    */
   function: Shared.FunctionDefinition;
 
-  /**
-   * The type of the tool. Currently, only `function` is supported.
-   */
-  type: 'function';
+  type?: 'function';
 }
 
 /**
@@ -2211,12 +2255,11 @@ export interface CompletionCreateParamsBase {
 
   /**
    * Parameters for audio output. Required when audio output is requested with
-   * `modalities: ["audio"]`.
-   * [Learn more](https://platform.openai.com/docs/guides/audio).
+   * `modalities: ["audio"]`. [Learn more](/docs/guides/audio).
    *
    * Fields:
    *
-   * - voice (required): VoiceIdsShared
+   * - voice (required): VoiceIdsOrCustomVoice
    * - format (required): Literal["wav", "aac", "mp3", "flac", "opus", "pcm16"]
    */
   audio?: ChatCompletionAudioParam | null;
@@ -2234,6 +2277,12 @@ export interface CompletionCreateParamsBase {
   cached_content?: string | null;
 
   /**
+   * Stable session ID for resuming a previous handoff. Returned by the server on
+   * handoff; echo it on the next request to resume.
+   */
+  correlation_id?: string | null;
+
+  /**
    * Credentials for MCP server authentication. Each credential is matched to servers
    * by connection name.
    */
@@ -2246,6 +2295,12 @@ export interface CompletionCreateParamsBase {
   deferred?: boolean | null;
 
   /**
+   * Tier 2 stateless resumption. Deferred tool specs from a previous handoff
+   * response, sent back verbatim so the server can resume without Redis.
+   */
+  deferred_calls?: Array<{ [key: string]: unknown }> | null;
+
+  /**
    * Number between -2.0 and 2.0. Positive values penalize new tokens based on their
    * existing frequency in the text so far, decreasing the model's likelihood to
    * repeat the same line verbatim.
@@ -2253,7 +2308,13 @@ export interface CompletionCreateParamsBase {
   frequency_penalty?: number | null;
 
   /**
-   * Wrapper for union variant: function call mode.
+   * Deprecated in favor of `tool_choice`. Controls which (if any) function is called
+   * by the model. `none` means the model will not call a function and instead
+   * generates a message. `auto` means the model can pick between generating a
+   * message or calling a function. Specifying a particular function via
+   * `{"name": "my_function"}` forces the model to call that function. `none` is the
+   * default when no functions are present. `auto` is the default if functions are
+   * present.
    */
   function_call?: string | null;
 
@@ -2277,6 +2338,18 @@ export interface CompletionCreateParamsBase {
    * Configuration for multi-model handoffs.
    */
   handoff_config?: { [key: string]: unknown } | null;
+
+  /**
+   * Handoff control. None or omitted: auto-detect. true: structured handoff (SDK).
+   * false: drop-in (LLM re-run for mixed turns).
+   */
+  handoff_mode?: boolean | null;
+
+  /**
+   * Specifies the geographic region for inference processing. If not specified, the
+   * workspace's `default_inference_geo` is used.
+   */
+  inference_geo?: string | null;
 
   /**
    * Modify the likelihood of specified tokens appearing in the completion. Accepts a
@@ -2341,8 +2414,7 @@ export interface CompletionCreateParamsBase {
   /**
    * Output types that you would like the model to generate. Most models are capable
    * of generating text, which is the default: `["text"]` The `gpt-4o-audio-preview`
-   * model can also be used to
-   * [generate audio](https://platform.openai.com/docs/guides/audio). To request that
+   * model can also be used to [generate audio](/docs/guides/audio). To request that
    * this model generate both text and audio responses, you can use:
    * `["text", "audio"]`
    */
@@ -2361,8 +2433,10 @@ export interface CompletionCreateParamsBase {
    */
   n?: number | null;
 
+  output_config?: Shared.JSONObjectInput | null;
+
   /**
-   * Whether to enable parallel tool calls (Anthropic uses inverted polarity)
+   * Whether to enable parallel tool calls (Anthropic uses inverted polarity).
    */
   parallel_tool_calls?: boolean | null;
 
@@ -2388,16 +2462,14 @@ export interface CompletionCreateParamsBase {
 
   /**
    * Used by OpenAI to cache responses for similar requests to optimize your cache
-   * hit rates. Replaces the `user` field.
-   * [Learn more](https://platform.openai.com/docs/guides/prompt-caching).
+   * hit rates. Replaces the `user` field. [Learn more](/docs/guides/prompt-caching).
    */
   prompt_cache_key?: string | null;
 
   /**
    * The retention policy for the prompt cache. Set to `24h` to enable extended
    * prompt caching, which keeps cached prefixes active for longer, up to a maximum
-   * of 24 hours.
-   * [Learn more](https://platform.openai.com/docs/guides/prompt-caching#prompt-cache-retention).
+   * of 24 hours. [Learn more](/docs/guides/prompt-caching#prompt-cache-retention).
    */
   prompt_cache_retention?: string | null;
 
@@ -2410,14 +2482,15 @@ export interface CompletionCreateParamsBase {
   /**
    * Constrains effort on reasoning for
    * [reasoning models](https://platform.openai.com/docs/guides/reasoning). Currently
-   * supported values are `none`, `minimal`, `low`, `medium`, and `high`. Reducing
-   * reasoning effort can result in faster responses and fewer tokens used on
-   * reasoning in a response. - `gpt-5.1` defaults to `none`, which does not perform
-   * reasoning. The supported reasoning values for `gpt-5.1` are `none`, `low`,
-   * `medium`, and `high`. Tool calls are supported for all reasoning values in
-   * gpt-5.1. - All models before `gpt-5.1` default to `medium` reasoning effort, and
-   * do not support `none`. - The `gpt-5-pro` model defaults to (and only supports)
-   * `high` reasoning effort.
+   * supported values are `none`, `minimal`, `low`, `medium`, `high`, and `xhigh`.
+   * Reducing reasoning effort can result in faster responses and fewer tokens used
+   * on reasoning in a response. - `gpt-5.1` defaults to `none`, which does not
+   * perform reasoning. The supported reasoning values for `gpt-5.1` are `none`,
+   * `low`, `medium`, and `high`. Tool calls are supported for all reasoning values
+   * in gpt-5.1. - All models before `gpt-5.1` default to `medium` reasoning effort,
+   * and do not support `none`. - The `gpt-5-pro` model defaults to (and only
+   * supports) `high` reasoning effort. - `xhigh` is supported for all models after
+   * `gpt-5.1-codex-max`.
    */
   reasoning_effort?: string | null;
 
@@ -2425,10 +2498,10 @@ export interface CompletionCreateParamsBase {
    * An object specifying the format that the model must output. Setting to
    * `{ "type": "json_schema", "json_schema": {...} }` enables Structured Outputs
    * which ensures the model will match your supplied JSON schema. Learn more in the
-   * [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs).
-   * Setting to `{ "type": "json_object" }` enables the older JSON mode, which
-   * ensures the message the model generates is valid JSON. Using `json_schema` is
-   * preferred for models that support it.
+   * [Structured Outputs guide](/docs/guides/structured-outputs). Setting to
+   * `{ "type": "json_object" }` enables the older JSON mode, which ensures the
+   * message the model generates is valid JSON. Using `json_schema` is preferred for
+   * models that support it.
    */
   response_format?:
     | Shared.ResponseFormatText
@@ -2446,7 +2519,7 @@ export interface CompletionCreateParamsBase {
    * violating OpenAI's usage policies. The IDs should be a string that uniquely
    * identifies each user. We recommend hashing their username or email address, in
    * order to avoid sending us any identifying information.
-   * [Learn more](https://platform.openai.com/docs/guides/safety-best-practices#safety-identifiers).
+   * [Learn more](/docs/guides/safety-best-practices#safety-identifiers).
    */
   safety_identifier?: string | null;
 
@@ -2472,15 +2545,21 @@ export interface CompletionCreateParamsBase {
   service_tier?: string | null;
 
   /**
+   * The inference speed mode for this request. `"fast"` enables high
+   * output-tokens-per-second inference.
+   */
+  speed?: 'standard' | 'fast' | null;
+
+  /**
    * Sequences that stop generation
    */
   stop?: Array<string> | string | null;
 
   /**
    * Whether or not to store the output of this chat completion request for use in
-   * our [model distillation](https://platform.openai.com/docs/guides/distillation)
-   * or [evals](https://platform.openai.com/docs/guides/evals) products. Supports
-   * text and image inputs. Note: image inputs over 8MB will be dropped.
+   * our [model distillation](/docs/guides/distillation) or
+   * [evals](/docs/guides/evals) products. Supports text and image inputs. Note:
+   * image inputs over 8MB will be dropped.
    */
   store?: boolean | null;
 
@@ -2507,7 +2586,11 @@ export interface CompletionCreateParamsBase {
   /**
    * Extended thinking configuration (Anthropic-specific)
    */
-  thinking?: ThinkingConfigEnabled | ThinkingConfigDisabled | null;
+  thinking?:
+    | ThinkingConfigEnabled
+    | ThinkingConfigDisabled
+    | CompletionCreateParams.ThinkingConfigAdaptive
+    | null;
 
   /**
    * Controls which (if any) tool is called by the model. `none` means the model will
@@ -2528,7 +2611,7 @@ export interface CompletionCreateParamsBase {
   /**
    * Available tools/functions for the model
    */
-  tools?: Array<ChatCompletionToolParam | CompletionCreateParams.CustomToolChatCompletions> | null;
+  tools?: Array<ChatCompletionToolParam> | null;
 
   /**
    * Top-k sampling parameter
@@ -2552,7 +2635,7 @@ export interface CompletionCreateParamsBase {
    * `prompt_cache_key` instead to maintain caching optimizations. A stable
    * identifier for your end-users. Used to boost cache hit rates by better bucketing
    * similar requests and to help OpenAI detect and prevent abuse.
-   * [Learn more](https://platform.openai.com/docs/guides/safety-best-practices#safety-identifiers).
+   * [Learn more](/docs/guides/safety-best-practices#safety-identifiers).
    */
   user?: string | null;
 
@@ -2565,8 +2648,7 @@ export interface CompletionCreateParamsBase {
 
   /**
    * This tool searches the web for relevant results to use in a response. Learn more
-   * about the
-   * [web search tool](https://platform.openai.com/docs/guides/tools-web-search?api-mode=chat).
+   * about the [web search tool](/docs/guides/tools-web-search?api-mode=chat).
    */
   web_search_options?: Shared.JSONObjectInput | null;
 
@@ -2582,10 +2664,10 @@ export namespace CompletionCreateParams {
    *
    * Fields:
    *
-   * - category (required): HarmCategory
    * - threshold (required): Literal["HARM_BLOCK_THRESHOLD_UNSPECIFIED",
    *   "BLOCK_LOW_AND_ABOVE", "BLOCK_MEDIUM_AND_ABOVE", "BLOCK_ONLY_HIGH",
    *   "BLOCK_NONE", "OFF"]
+   * - category (required): HarmCategory
    */
   export interface SafetySetting {
     /**
@@ -2618,108 +2700,14 @@ export namespace CompletionCreateParams {
   }
 
   /**
-   * A custom tool that processes input using a specified format.
+   * Schema for ThinkingConfigAdaptive.
    *
    * Fields:
    *
-   * - type (required): Literal["custom"]
-   * - custom (required): CustomToolProperties
+   * - type (required): Literal["adaptive"]
    */
-  export interface CustomToolChatCompletions {
-    /**
-     * Properties of the custom tool.
-     */
-    custom: CustomToolChatCompletions.Custom;
-
-    /**
-     * The type of the custom tool. Always `custom`.
-     */
-    type: 'custom';
-  }
-
-  export namespace CustomToolChatCompletions {
-    /**
-     * Properties of the custom tool.
-     */
-    export interface Custom {
-      /**
-       * The name of the custom tool, used to identify it in tool calls.
-       */
-      name: string;
-
-      /**
-       * Optional description of the custom tool, used to provide more context.
-       */
-      description?: string;
-
-      /**
-       * The input format for the custom tool. Default is unconstrained text.
-       */
-      format?: Custom.TextFormat | Custom.GrammarFormat;
-    }
-
-    export namespace Custom {
-      /**
-       * Unconstrained free-form text.
-       *
-       * Fields:
-       *
-       * - type (required): Literal["text"]
-       */
-      export interface TextFormat {
-        /**
-         * Unconstrained text format. Always `text`.
-         */
-        type: 'text';
-      }
-
-      /**
-       * A grammar defined by the user.
-       *
-       * Fields:
-       *
-       * - type (required): Literal["grammar"]
-       * - grammar (required): GrammarFormatGrammarFormat
-       */
-      export interface GrammarFormat {
-        /**
-         * Your chosen grammar.
-         *
-         * Fields:
-         *
-         * - definition (required): str
-         * - syntax (required): Literal["lark", "regex"]
-         */
-        grammar: GrammarFormat.Grammar;
-
-        /**
-         * Grammar format. Always `grammar`.
-         */
-        type: 'grammar';
-      }
-
-      export namespace GrammarFormat {
-        /**
-         * Your chosen grammar.
-         *
-         * Fields:
-         *
-         * - definition (required): str
-         * - syntax (required): Literal["lark", "regex"]
-         */
-        export interface Grammar {
-          /**
-           * The grammar definition.
-           */
-          definition: string;
-
-          /**
-           * The syntax of the grammar definition. One of `lark` or `regex`.
-           */
-          syntax: 'lark' | 'regex';
-        }
-      }
-    }
+  export interface ThinkingConfigAdaptive {
+    type: 'adaptive';
   }
 
   export type CompletionCreateParamsNonStreaming = CompletionsAPI.CompletionCreateParamsNonStreaming;

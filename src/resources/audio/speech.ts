@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../core/resource';
+import * as Shared from '../shared';
 import { APIPromise } from '../../core/api-promise';
 import { buildHeaders } from '../../internal/headers';
 import { RequestOptions } from '../../internal/request-options';
@@ -32,19 +33,21 @@ export interface SpeechCreateParams {
   input: string;
 
   /**
-   * One of the available [TTS models](https://platform.openai.com/docs/models#tts):
-   * `tts-1`, `tts-1-hd` or `gpt-4o-mini-tts`.
+   * One of the available [TTS models](/docs/models#tts): `tts-1`, `tts-1-hd`,
+   * `gpt-4o-mini-tts`, or `gpt-4o-mini-tts-2025-12-15`.
    */
-  model: (string & {}) | 'tts-1' | 'tts-1-hd' | 'gpt-4o-mini-tts';
+  model: (string & {}) | 'tts-1' | 'tts-1-hd' | 'gpt-4o-mini-tts' | 'gpt-4o-mini-tts-2025-12-15';
 
   /**
-   * The voice to use when generating the audio. Supported voices are `alloy`, `ash`,
-   * `ballad`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`, `shimmer`, and
-   * `verse`. Previews of the voices are available in the
-   * [Text to speech guide](https://platform.openai.com/docs/guides/text-to-speech#voice-options).
+   * The voice to use when generating the audio. Supported built-in voices are
+   * `alloy`, `ash`, `ballad`, `coral`, `echo`, `fable`, `onyx`, `nova`, `sage`,
+   * `shimmer`, `verse`, `marin`, and `cedar`. You may also provide a custom voice
+   * object with an `id`, for example `{ "id": "voice_1234" }`. Previews of the
+   * voices are available in the
+   * [Text to speech guide](/docs/guides/text-to-speech#voice-options).
    */
   voice:
-    | (string & {})
+    | string
     | 'alloy'
     | 'ash'
     | 'ballad'
@@ -54,7 +57,8 @@ export interface SpeechCreateParams {
     | 'shimmer'
     | 'verse'
     | 'marin'
-    | 'cedar';
+    | 'cedar'
+    | Shared.VoiceIDsOrCustomVoice;
 
   /**
    * Control the voice of your generated audio with additional instructions. Does not

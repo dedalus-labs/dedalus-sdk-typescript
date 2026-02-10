@@ -69,6 +69,12 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v1/ocr',
   },
   {
+    clientCallName: 'client.responses.create',
+    fullyQualifiedName: 'responses.create',
+    httpMethod: 'post',
+    httpPath: '/v1/responses',
+  },
+  {
     clientCallName: 'client.chat.completions.create',
     fullyQualifiedName: 'chat.completions.create',
     httpMethod: 'post',

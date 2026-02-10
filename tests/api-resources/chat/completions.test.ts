@@ -28,11 +28,13 @@ describe('resource completions', () => {
       audio: { format: 'wav', voice: 'string' },
       automatic_tool_execution: true,
       cached_content: 'cached_content',
+      correlation_id: 'correlation_id',
       credentials: {
         connection_name: 'external-service',
         values: { api_key: 'sk-...' },
       },
       deferred: true,
+      deferred_calls: [{ foo: 'bar' }],
       frequency_penalty: -2,
       function_call: 'function_call',
       functions: [
@@ -45,6 +47,8 @@ describe('resource completions', () => {
       generation_config: { foo: 'string' },
       guardrails: [{ foo: 'bar' }],
       handoff_config: { foo: 'bar' },
+      handoff_mode: true,
+      inference_geo: 'inference_geo',
       logit_bias: { foo: 0 },
       logprobs: true,
       max_completion_tokens: 0,
@@ -62,6 +66,7 @@ describe('resource completions', () => {
       modalities: ['string'],
       model_attributes: { 'gpt-5': { accuracy: 0.95, speed: 0.6 } },
       n: 1,
+      output_config: { foo: 'string' },
       parallel_tool_calls: true,
       prediction: { content: 'string', type: 'content' },
       presence_penalty: -2,
@@ -78,6 +83,7 @@ describe('resource completions', () => {
       search_parameters: { foo: 'string' },
       seed: 0,
       service_tier: 'service_tier',
+      speed: 'standard',
       stop: ['string'],
       store: true,
       stream: false,
@@ -89,12 +95,7 @@ describe('resource completions', () => {
       tool_config: { foo: 'string' },
       tools: [
         {
-          function: {
-            name: 'name',
-            description: 'description',
-            parameters: { foo: 'bar' },
-            strict: true,
-          },
+          function: { name: 'name' },
           type: 'function',
         },
       ],

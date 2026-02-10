@@ -27,3 +27,4 @@ export {
   type OCRResponse,
   type OCRProcessParams,
 } from './ocr';
+export { Responses, type Response, type ResponseCreateParams } from './responses';

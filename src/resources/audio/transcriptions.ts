@@ -96,7 +96,7 @@ export namespace TranscriptionCreateResponse {
 
   export namespace CreateTranscriptionResponseVerboseJSON {
     /**
-     * Fields:
+     * Fields: # noqa: D415.
      *
      * - id (required): int
      * - seek (required): int
@@ -180,7 +180,7 @@ export namespace TranscriptionCreateResponse {
     }
 
     /**
-     * Fields:
+     * Fields: # noqa: D415.
      *
      * - word (required): str
      * - start (required): float
@@ -237,7 +237,7 @@ export namespace TranscriptionCreateResponse {
 
   export namespace CreateTranscriptionResponseJSON {
     /**
-     * Fields:
+     * Fields: # noqa: D415.
      *
      * - token (optional): str
      * - logprob (optional): float

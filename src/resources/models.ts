@@ -95,7 +95,17 @@ export interface Model {
   /**
    * Provider that hosts this model
    */
-  provider: 'openai' | 'anthropic' | 'google' | 'xai' | 'mistral' | 'groq' | 'fireworks' | 'deepseek';
+  provider:
+    | 'openai'
+    | 'anthropic'
+    | 'google'
+    | 'xai'
+    | 'mistral'
+    | 'groq'
+    | 'fireworks'
+    | 'deepseek'
+    | 'moonshot'
+    | 'cerebras';
 
   /**
    * Normalized model capabilities across all providers.

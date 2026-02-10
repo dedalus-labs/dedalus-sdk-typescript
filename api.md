@@ -18,6 +18,7 @@ Types:
 - <code><a href="./src/resources/shared.ts">ResponseFormatJSONSchema</a></code>
 - <code><a href="./src/resources/shared.ts">ResponseFormatText</a></code>
 - <code><a href="./src/resources/shared.ts">ToolChoice</a></code>
+- <code><a href="./src/resources/shared.ts">VoiceIDsOrCustomVoice</a></code>
 
 # Models
 
@@ -96,6 +97,17 @@ Types:
 Methods:
 
 - <code title="post /v1/ocr">client.ocr.<a href="./src/resources/ocr.ts">process</a>({ ...params }) -> OCRResponse</code>
+
+# Responses
+
+Types:
+
+- <code><a href="./src/resources/responses.ts">Response</a></code>
+- <code><a href="./src/resources/responses.ts">ResponseCreateParams</a></code>
+
+Methods:
+
+- <code title="post /v1/responses">client.responses.<a href="./src/resources/responses.ts">create</a>({ ...params }) -> Response</code>
 
 # Chat
 
