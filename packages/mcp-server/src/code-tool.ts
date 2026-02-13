@@ -2,7 +2,7 @@
 
 import { McpTool, Metadata, ToolCallResult, asErrorResult, asTextContentResult } from './types';
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { readEnv } from './server';
+import { readEnv } from './util';
 import { WorkerInput, WorkerOutput } from './code-tool-types';
 import { SdkMethod } from './methods';
 import { Dedalus } from 'dedalus-labs';
