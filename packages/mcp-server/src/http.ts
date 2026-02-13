@@ -6,13 +6,14 @@ import { ClientOptions } from 'dedalus-labs';
 import express from 'express';
 import morgan from 'morgan';
 import morganBody from 'morgan-body';
+import { fromError } from 'zod-validation-error/v3';
 import { parseAuthHeaders } from './auth';
-import { McpOptions } from './options';
+import { McpOptions, parseQueryOptions } from './options';
 import { initMcpServer, newMcpServer } from './server';
 
 const newServer = async ({
   clientOptions,
-  mcpOptions,
+  mcpOptions: defaultMcpOptions,
   req,
   res,
 }: {
@@ -22,6 +23,20 @@ const newServer = async ({
   res: express.Response;
 }): Promise<McpServer | null> => {
   const server = await newMcpServer();
+
+  let mcpOptions: McpOptions;
+  try {
+    mcpOptions = parseQueryOptions(defaultMcpOptions, req.query);
+  } catch (error) {
+    res.status(400).json({
+      jsonrpc: '2.0',
+      error: {
+        code: -32000,
+        message: `Invalid request: ${fromError(error)}`,
+      },
+    });
+    return null;
+  }
 
   try {
     const authOptions = parseAuthHeaders(req, false);
