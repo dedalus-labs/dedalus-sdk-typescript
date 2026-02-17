@@ -57,7 +57,10 @@ export function codeTool(params: { blockedMethods: SdkMethod[] | undefined }): M
     },
   };
   const handler = async (client: Dedalus, args: any): Promise<ToolCallResult> => {
-    const code = args.code as string;
+    const code = args.code;
+    if (typeof code !== 'string') {
+      return asErrorResult('The "code" field is required and must be a string.');
+    }
     const intent = args.intent as string | undefined;
 
     // Do very basic blocking of code that includes forbidden method names.

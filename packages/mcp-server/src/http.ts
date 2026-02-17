@@ -53,7 +53,10 @@ const post =
     const server = await newServer({ ...options, req, res });
     // If we return null, we already set the authorization error.
     if (server === null) return;
-    const transport = new StreamableHTTPServerTransport();
+    const transport = new StreamableHTTPServerTransport({
+      // Stateless server
+      sessionIdGenerator: undefined,
+    });
     await server.connect(transport as any);
     await transport.handleRequest(req, res, req.body);
   };
