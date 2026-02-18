@@ -37,33 +37,43 @@ export async function getInstructions(stainlessApiKey: string | undefined): Prom
   return fetchedInstructions;
 }
 
-async function fetchLatestInstructions(stainlessApiKey: string | undefined): Promise<string> {
-  // Setting the stainless API key is optional, but may be required
-  // to authenticate requests to the Stainless API.
-  const response = await fetch(
-    readEnv('CODE_MODE_INSTRUCTIONS_URL') ?? 'https://api.stainless.com/api/ai/instructions/dedalus-sdk',
-    {
-      method: 'GET',
-      headers: { ...(stainlessApiKey && { Authorization: stainlessApiKey }) },
-    },
-  );
+const DEFAULT_INSTRUCTIONS = `
+  This is the dedalus-sdk MCP server. You will use Code Mode to help the user perform
+  actions. You can use search_docs tool to learn about how to take action with this server. Then,
+  you will write TypeScript code using the execute tool take action. It is CRITICAL that you be
+  thoughtful and deliberate when executing code. Always try to entirely solve the problem in code
+  block: it can be as long as you need to get the job done!
+`;
 
+async function fetchLatestInstructions(stainlessApiKey: string | undefined): Promise<string> {
   let instructions: string | undefined;
-  if (!response.ok) {
-    console.warn(
-      'Warning: failed to retrieve MCP server instructions. Proceeding with default instructions...',
+
+  try {
+    // Setting the stainless API key is optional, but may be required
+    // to authenticate requests to the Stainless API.
+    const response = await fetch(
+      readEnv('CODE_MODE_INSTRUCTIONS_URL') ?? 'https://api.stainless.com/api/ai/instructions/dedalus-sdk',
+      {
+        method: 'GET',
+        headers: { ...(stainlessApiKey && { Authorization: stainlessApiKey }) },
+      },
     );
 
-    instructions = `
-      This is the dedalus-sdk MCP server. You will use Code Mode to help the user perform
-      actions. You can use search_docs tool to learn about how to take action with this server. Then,
-      you will write TypeScript code using the execute tool take action. It is CRITICAL that you be
-      thoughtful and deliberate when executing code. Always try to entirely solve the problem in code
-      block: it can be as long as you need to get the job done!
-    `;
+    if (!response.ok) {
+      console.warn(
+        'Warning: failed to retrieve MCP server instructions. Proceeding with default instructions...',
+      );
+      instructions = DEFAULT_INSTRUCTIONS;
+    } else {
+      instructions = ((await response.json()) as { instructions: string }).instructions;
+    }
+  } catch (error) {
+    console.warn(
+      'Warning: network error while fetching MCP server instructions. Proceeding with default instructions...',
+      error,
+    );
+    instructions = DEFAULT_INSTRUCTIONS;
   }
-
-  instructions ??= ((await response.json()) as { instructions: string }).instructions;
   instructions = `
     If needed, you can get the current time by executing Date.now().
 
