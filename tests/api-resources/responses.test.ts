@@ -8,7 +8,7 @@ const client = new Dedalus({
 });
 
 describe('resource responses', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create', async () => {
     const responsePromise = client.responses.create({});
     const rawResponse = await responsePromise.asResponse();

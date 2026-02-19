@@ -8,7 +8,7 @@ const client = new Dedalus({
 });
 
 describe('resource translations', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create: only required params', async () => {
     const responsePromise = client.audio.translations.create({
       file: await toFile(Buffer.from('# my file contents'), 'README.md'),
@@ -23,7 +23,7 @@ describe('resource translations', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create: required and optional params', async () => {
     const response = await client.audio.translations.create({
       file: await toFile(Buffer.from('# my file contents'), 'README.md'),
