@@ -8,7 +8,7 @@ const client = new Dedalus({
 });
 
 describe('resource completions', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create: only required params', async () => {
     const responsePromise = client.chat.completions.create({ model: 'openai/gpt-5' });
     const rawResponse = await responsePromise.asResponse();
@@ -20,7 +20,7 @@ describe('resource completions', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('create: required and optional params', async () => {
     const response = await client.chat.completions.create({
       model: 'openai/gpt-5',

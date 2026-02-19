@@ -8,7 +8,7 @@ const client = new Dedalus({
 });
 
 describe('resource ocr', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('process: only required params', async () => {
     const responsePromise = client.ocr.process({ document: { document_url: 'document_url' } });
     const rawResponse = await responsePromise.asResponse();
@@ -20,7 +20,7 @@ describe('resource ocr', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('process: required and optional params', async () => {
     const response = await client.ocr.process({
       document: { document_url: 'document_url', type: 'type' },

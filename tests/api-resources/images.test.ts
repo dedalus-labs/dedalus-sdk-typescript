@@ -8,7 +8,7 @@ const client = new Dedalus({
 });
 
 describe('resource images', () => {
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('createVariation: only required params', async () => {
     const responsePromise = client.images.createVariation({
       image: await toFile(Buffer.from('# my file contents'), 'README.md'),
@@ -22,7 +22,7 @@ describe('resource images', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('createVariation: required and optional params', async () => {
     const response = await client.images.createVariation({
       image: await toFile(Buffer.from('# my file contents'), 'README.md'),
@@ -34,7 +34,7 @@ describe('resource images', () => {
     });
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('edit: only required params', async () => {
     const responsePromise = client.images.edit({
       image: await toFile(Buffer.from('# my file contents'), 'README.md'),
@@ -49,7 +49,7 @@ describe('resource images', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('edit: required and optional params', async () => {
     const response = await client.images.edit({
       image: await toFile(Buffer.from('# my file contents'), 'README.md'),
@@ -63,7 +63,7 @@ describe('resource images', () => {
     });
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('generate: only required params', async () => {
     const responsePromise = client.images.generate({ prompt: 'A white siamese cat' });
     const rawResponse = await responsePromise.asResponse();
@@ -75,7 +75,7 @@ describe('resource images', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Prism tests are disabled
+  // Mock server tests are disabled
   test.skip('generate: required and optional params', async () => {
     const response = await client.images.generate({
       prompt: 'A white siamese cat',
