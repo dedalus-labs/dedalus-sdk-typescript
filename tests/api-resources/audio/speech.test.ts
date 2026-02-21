@@ -8,7 +8,8 @@ const client = new Dedalus({
 });
 
 describe('resource speech', () => {
-  test('create: required and optional params', async () => {
+  // Mock server tests are disabled
+  test.skip('create: required and optional params', async () => {
     const response = await client.audio.speech.create({
       input: 'input',
       model: 'string',
