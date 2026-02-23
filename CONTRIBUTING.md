@@ -60,7 +60,7 @@ $ yarn link dedalus-labs
 # With pnpm
 $ pnpm link --global
 $ cd ../my-package
-$ pnpm link -—global dedalus-labs
+$ pnpm link --global dedalus-labs
 ```
 
 ## Running tests
