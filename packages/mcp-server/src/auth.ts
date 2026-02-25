@@ -10,7 +10,7 @@ export const parseClientAuthHeaders = (req: IncomingMessage, required?: boolean)
     const value = req.headers.authorization.slice(scheme.length + 1);
     switch (scheme) {
       case 'Bearer':
-        return { apiKey: req.headers.authorization.slice('Bearer '.length) };
+        return { apiKey: value };
       default:
         throw new Error(
           'Unsupported authorization scheme. Expected the "Authorization" header to be a supported scheme (Bearer).',
