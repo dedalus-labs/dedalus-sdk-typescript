@@ -6,7 +6,12 @@
  */
 
 import { type JsonObject } from '../utils/json';
-import { type MCPServerProtocol, type CredentialProtocol, isMcpServer } from './protocols';
+import {
+  type MCPServerProtocol,
+  type MCPServerWithCredsProtocol,
+  type CredentialProtocol,
+  isMcpServer,
+} from './protocols';
 
 // --- Type Aliases ---
 
@@ -170,16 +175,16 @@ export function serializeToolSpecs(toolsService: unknown): Record<string, JsonOb
 }
 
 /** Serialize MCPServer with credentials for connection provisioning. */
-export function serializeMcpServerWithCreds(server: MCPServerProtocol): JsonObject {
+export function serializeMcpServerWithCreds(server: MCPServerWithCredsProtocol): JsonObject {
   const result: JsonObject = { name: server.name ?? 'unknown' };
 
-  const creds = (server as JsonObject)['credentials'];
+  const creds = server.credentials;
   if (creds != null) {
     const credsDict = serializeCredentials(creds);
     if (credsDict) result['credentials'] = credsDict;
   }
 
-  const connection = (server as JsonObject)['connection'];
+  const connection = server.connection;
   if (connection) result['connection'] = connection;
 
   return result;
