@@ -184,3 +184,134 @@ export function serializeMcpServerWithCreds(server: MCPServerProtocol): JsonObje
 
   return result;
 }
+
+// --- Connection Serialization ---
+
+/** Serialize a Connection object to wire format. */
+export function serializeConnection(connection: unknown): JsonObject {
+  if (connection != null && typeof connection === 'object') {
+    if ('toDict' in connection && typeof (connection as JsonObject)['toDict'] === 'function') {
+      return (connection as { toDict(): JsonObject }).toDict();
+    }
+    if (connection instanceof Object && !Array.isArray(connection) && 'name' in connection) {
+      // Check if it's a plain dict
+      const proto = Object.getPrototypeOf(connection);
+      if (proto === Object.prototype || proto === null) {
+        return connection as JsonObject;
+      }
+    }
+  }
+  // Duck-type extraction
+  const obj = connection as JsonObject;
+  return {
+    name: obj?.['name'] ?? 'unknown',
+    base_url: obj?.['base_url'] ?? obj?.['baseUrl'] ?? null,
+    timeout_ms: obj?.['timeout_ms'] ?? obj?.['timeoutMs'] ?? 30000,
+  };
+}
+
+/** Collect unique connections from multiple MCPServer instances. */
+export function collectUniqueConnections(servers: unknown[]): unknown[] {
+  const seenNames = new Set<string>();
+  const unique: unknown[] = [];
+
+  for (const server of servers) {
+    const serverObj = server as JsonObject;
+    const connections = serverObj['connections'];
+    if (connections == null) continue;
+
+    const connList: unknown[] =
+      Array.isArray(connections) ? connections
+      : typeof connections === 'object' ? Object.values(connections as JsonObject)
+      : [];
+
+    for (const conn of connList) {
+      let name: string | null = null;
+      if (conn != null && typeof conn === 'object') {
+        name = (conn as JsonObject)['name'] as string | null;
+      }
+      if (name && !seenNames.has(name)) {
+        seenNames.add(name);
+        unique.push(conn);
+      }
+    }
+  }
+
+  return unique;
+}
+
+// --- Credential Matching ---
+
+/** Match Credential objects to their Connection definitions. */
+export function matchCredentialsToConnections(
+  connections: unknown[],
+  credentials: unknown[],
+): ConnectionCredentialPair[] {
+  // Build lookup by connection name
+  const credsByName = new Map<string, unknown>();
+  for (const cred of credentials) {
+    let name: string | null = null;
+    if (cred != null && typeof cred === 'object') {
+      const c = cred as JsonObject;
+      if ('connection' in c && c['connection'] != null && typeof c['connection'] === 'object') {
+        name = (c['connection'] as JsonObject)['name'] as string | null;
+      } else if ('connection_name' in c) {
+        name = c['connection_name'] as string | null;
+      }
+    }
+    if (name) credsByName.set(name, cred);
+  }
+
+  const pairs: ConnectionCredentialPair[] = [];
+  const missing: string[] = [];
+
+  for (const conn of connections) {
+    let name: string | null = null;
+    if (conn != null && typeof conn === 'object') {
+      name = (conn as JsonObject)['name'] as string | null;
+    }
+    if (name && credsByName.has(name)) {
+      pairs.push([conn, credsByName.get(name) as CredentialProtocol]);
+    } else if (name) {
+      missing.push(name);
+    }
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing credentials for connections: ${JSON.stringify(missing.sort())}. ` +
+        'Each Connection declared in mcp_servers must have a corresponding Credential.',
+    );
+  }
+
+  return pairs;
+}
+
+/** Validate that all connections across servers have credentials. */
+export function validateCredentialsForServers(
+  servers: unknown[],
+  credentials: unknown[],
+): ConnectionCredentialPair[] {
+  const connections = collectUniqueConnections(servers);
+  return matchCredentialsToConnections(connections, credentials);
+}
+
+/** Build a connection record. */
+export function buildConnectionRecord(
+  server: MCPServerProtocol,
+  credentials: Record<string, JsonObject>,
+  orgId: string,
+): JsonObject {
+  const connection = (server as JsonObject)['connection'] as string | null;
+  let matchedCreds: JsonObject | null = null;
+  if (connection && connection in credentials) {
+    matchedCreds = credentials[connection]!;
+  }
+
+  return {
+    org_id: orgId,
+    connection,
+    credentials: serializeCredentials((server as JsonObject)['credentials']),
+    credential_values: matchedCreds,
+  };
+}
