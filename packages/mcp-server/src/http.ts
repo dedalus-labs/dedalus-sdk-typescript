@@ -25,7 +25,19 @@ const newServer = async ({
   const stainlessApiKey = getStainlessApiKey(req, mcpOptions);
   const server = await newMcpServer(stainlessApiKey);
 
-  const authOptions = parseClientAuthHeaders(req, false);
+  let authOptions: Partial<ClientOptions>;
+  try {
+    authOptions = parseClientAuthHeaders(req, false);
+  } catch (error) {
+    res.status(401).json({
+      jsonrpc: '2.0',
+      error: {
+        code: -32000,
+        message: `Unauthorized: ${error instanceof Error ? error.message : error}`,
+      },
+    });
+    return null;
+  }
 
   await initMcpServer({
     server: server,
