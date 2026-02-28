@@ -11,6 +11,7 @@ import {
   ENVELOPE_VERSION,
   NONCE_LEN,
 } from '../../../src/lib/crypto/encryption';
+import type { CryptoKey, JsonWebKey } from '../../../src/lib/crypto/types';
 
 const TAG_LEN = 16;
 
@@ -24,7 +25,11 @@ let jwk2048: JsonWebKey;
 let privateKey3072: CryptoKey;
 let publicKey3072: CryptoKey;
 
-async function decryptEnvelopeV1(privKey: CryptoKey, envelope: Uint8Array, keySize: number): Promise<Uint8Array> {
+async function decryptEnvelopeV1(
+  privKey: CryptoKey,
+  envelope: Uint8Array,
+  keySize: number,
+): Promise<Uint8Array> {
   const keySizeBytes = keySize / 8;
 
   expect(envelope[0]).toBe(ENVELOPE_VERSION);

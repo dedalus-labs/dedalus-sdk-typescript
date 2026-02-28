@@ -7,6 +7,8 @@
  * Uses the Web Crypto API (built-in to Node.js 15+ and browsers).
  */
 
+import type { CryptoKey, JsonWebKey } from './types';
+
 // Envelope constants
 export const ENVELOPE_VERSION = 0x01;
 export const NONCE_LEN = 12;
@@ -64,13 +66,9 @@ export async function jwkToPublicKey(jwk: JsonWebKey, minKeySize: number = 2048)
     throw new Error(`key size ${keySizeBits} bits below minimum ${minKeySize}`);
   }
 
-  return crypto.subtle.importKey(
-    'jwk',
-    { kty: 'RSA', n: jwk.n, e: jwk.e },
-    RSA_ALGORITHM,
-    false,
-    ['encrypt'],
-  );
+  return crypto.subtle.importKey('jwk', { kty: 'RSA', n: jwk.n, e: jwk.e }, RSA_ALGORITHM, false, [
+    'encrypt',
+  ]);
 }
 
 /**

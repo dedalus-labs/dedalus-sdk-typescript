@@ -34,7 +34,7 @@ import {
 } from './resources/images';
 import { ListModelsResponse, Model, Models } from './resources/models';
 import { OCR, OCRDocument, OCRPage, OCRProcessParams, OCRRequest, OCRResponse } from './resources/ocr';
-import { Response, ResponseCreateParams, Responses } from './resources/responses';
+import { Response as APIResponse, ResponseCreateParams, Responses } from './resources/responses';
 import { Audio } from './resources/audio/audio';
 import { Chat } from './resources/chat/chat';
 import { type Fetch } from './internal/builtin-types';
@@ -917,7 +917,7 @@ export declare namespace Dedalus {
 
   export {
     Responses as Responses,
-    type Response as Response,
+    type APIResponse as Response,
     type ResponseCreateParams as ResponseCreateParams,
   };
 
