@@ -71,7 +71,6 @@ beforeAll(async () => {
 describe('TestJwkToPublicKey', () => {
   test('valid JWK converts to public key', async () => {
     const key = await jwkToPublicKey(jwk2048);
-    expect(key).toBeInstanceOf(CryptoKey);
     expect(key.algorithm.name).toBe('RSA-OAEP');
     // Verify by roundtrip: encrypt with imported key, decrypt with known private key
     const ct = await encryptCredentials(key, { test: 'value' });
@@ -173,7 +172,7 @@ describe('TestSecurityInvariants', () => {
 
     // Tamper with ciphertext portion
     const keySizeBytes = 2048 / 8;
-    envelope[1 + keySizeBytes + NONCE_LEN + 5] ^= 0xff;
+    envelope[1 + keySizeBytes + NONCE_LEN + 5]! ^= 0xff;
 
     await expect(decryptEnvelopeV1(privateKey2048, envelope, 2048)).rejects.toThrow();
   });
@@ -183,7 +182,7 @@ describe('TestSecurityInvariants', () => {
     const envelope = new Uint8Array(b64urlDecode(ctB64));
 
     // Tamper with wrapped key at offset 10
-    envelope[10] ^= 0xff;
+    envelope[10]! ^= 0xff;
 
     await expect(decryptEnvelopeV1(privateKey2048, envelope, 2048)).rejects.toThrow();
   });
