@@ -300,23 +300,3 @@ export function validateCredentialsForServers(
   const connections = collectUniqueConnections(servers);
   return matchCredentialsToConnections(connections, credentials);
 }
-
-/** Build a connection record. */
-export function buildConnectionRecord(
-  server: MCPServerProtocol,
-  credentials: Record<string, JsonObject>,
-  orgId: string,
-): JsonObject {
-  const connection = (server as JsonObject)['connection'] as string | null;
-  let matchedCreds: JsonObject | null = null;
-  if (connection && connection in credentials) {
-    matchedCreds = credentials[connection]!;
-  }
-
-  return {
-    org_id: orgId,
-    connection,
-    credentials: serializeCredentials((server as JsonObject)['credentials']),
-    credential_values: matchedCreds,
-  };
-}

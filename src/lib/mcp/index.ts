@@ -27,7 +27,6 @@ export {
   collectUniqueConnections,
   matchCredentialsToConnections,
   validateCredentialsForServers,
-  buildConnectionRecord,
 } from './wire';
 
 export {
