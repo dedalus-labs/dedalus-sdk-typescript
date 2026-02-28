@@ -21,6 +21,11 @@ export type ConnectionCredentialPair = [connection: unknown, credential: Credent
 
 // --- Wire Format ---
 
+/** Derive canonical connection name from a server slug (org/server → org-server). */
+export function slugToConnectionName(slug: string): string {
+  return slug.replace(/\//g, '-');
+}
+
 const SLUG_PATTERN = /^[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+$/;
 
 export interface MCPServerWireSpecFields {
