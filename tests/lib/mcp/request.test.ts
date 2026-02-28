@@ -147,6 +147,14 @@ describe('TestPrepareMcpRequest', () => {
     expect(result['mcp_servers']).toEqual(['org/server']);
   });
 
+  test('serializing mcp_servers does not mutate input object', async () => {
+    const data: Record<string, unknown> = { mcp_servers: ['org/server@v2'] };
+    const result = await prepareMcpRequest(data, null);
+
+    expect(data['mcp_servers']).toEqual(['org/server@v2']);
+    expect(result['mcp_servers']).toEqual([{ slug: 'org/server', version: 'v2' }]);
+  });
+
   test('no mcp_servers → passthrough', async () => {
     const data = {
       model: 'openai/gpt-4o-mini',

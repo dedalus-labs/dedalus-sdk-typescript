@@ -503,6 +503,26 @@ describe('request building', () => {
   });
 });
 
+describe('MCP request preparation', () => {
+  test('serializes mcp_servers when credentials are absent', async () => {
+    let capturedBody: Record<string, unknown> | null = null;
+    const client = new Dedalus({
+      baseURL: 'http://localhost:5000/',
+      apiKey: 'My API Key',
+      fetch: async (_url, init) => {
+        capturedBody = JSON.parse(String(init?.body ?? '{}')) as Record<string, unknown>;
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { 'Content-Type': 'application/json' },
+        });
+      },
+    });
+
+    await client.post('/foo', { body: { mcp_servers: ['MyOrg/Server@v2'] } });
+
+    expect(capturedBody?.['mcp_servers']).toEqual([{ slug: 'MyOrg/Server', version: 'v2' }]);
+  });
+});
+
 describe('default encoder', () => {
   const client = new Dedalus({ apiKey: 'My API Key' });
 

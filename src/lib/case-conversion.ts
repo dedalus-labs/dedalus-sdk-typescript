@@ -34,21 +34,40 @@ const toSnake = (s: string): string =>
     .toLowerCase()
     .replace(/^_+/, '');
 
+const IDENTITY_KEY = (k: string): string => k;
+
+function isMcpServerCredentialsPath(path: readonly string[]): boolean {
+  return path[path.length - 1] === 'credentials' && path.includes('mcp_servers');
+}
+
 /**
  * Recursively transform object keys using the provided function.
  * Skips prototype pollution keys before and after transformation.
  */
-const transformKeysDeep = (val: unknown, xf: (k: string) => string): unknown => {
+const transformKeysDeep = (
+  val: unknown,
+  xf: (k: string) => string,
+  path: readonly string[] = [],
+): unknown => {
   if (Array.isArray(val)) {
-    return val.map((v) => transformKeysDeep(v, xf));
+    return val.map((v) => transformKeysDeep(v, xf, path));
   }
   if (isPlainObject(val)) {
     const out: Record<string, unknown> = Object.create(null);
+    // Credentials under mcp_servers are semantic connection-name keys, not API parameter names.
+    if (isMcpServerCredentialsPath(path)) {
+      for (const [k, v] of Object.entries(val)) {
+        if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+        out[k] = transformKeysDeep(v, IDENTITY_KEY, [...path, k]);
+      }
+      return out;
+    }
+
     for (const [k, v] of Object.entries(val)) {
       if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
       const nk = xf(k);
       if (nk === '__proto__' || nk === 'constructor' || nk === 'prototype') continue;
-      out[nk] = transformKeysDeep(v, xf);
+      out[nk] = transformKeysDeep(v, xf, [...path, nk]);
     }
     return out;
   }
