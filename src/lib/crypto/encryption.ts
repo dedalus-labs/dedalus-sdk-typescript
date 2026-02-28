@@ -8,6 +8,7 @@
  */
 
 import type { CryptoKey, JsonWebKey } from './types';
+import { type JsonObject } from '../utils/json';
 
 // Envelope constants
 export const ENVELOPE_VERSION = 0x01;
@@ -78,10 +79,7 @@ export async function jwkToPublicKey(jwk: JsonWebKey, minKeySize: number = 2048)
  * @param credentials - Credential values to encrypt.
  * @returns Base64url-encoded encrypted envelope.
  */
-export async function encryptCredentials(
-  publicKey: CryptoKey,
-  credentials: Record<string, unknown>,
-): Promise<string> {
+export async function encryptCredentials(publicKey: CryptoKey, credentials: JsonObject): Promise<string> {
   const plaintext = new TextEncoder().encode(JSON.stringify(credentials));
 
   // Generate ephemeral AES key and nonce
