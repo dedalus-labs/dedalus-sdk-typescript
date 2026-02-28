@@ -22,4 +22,9 @@ export {
   serializeCredentials,
   serializeToolSpecs,
   serializeMcpServerWithCreds,
+  serializeConnection,
+  collectUniqueConnections,
+  matchCredentialsToConnections,
+  validateCredentialsForServers,
+  buildConnectionRecord,
 } from './wire';
