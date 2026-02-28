@@ -77,6 +77,9 @@ export function wireSpecFromSlug(slug: string, version?: string | null): MCPServ
     const atIdx = slug.lastIndexOf('@');
     const parsedSlug = slug.slice(0, atIdx);
     const parsedVersion = slug.slice(atIdx + 1);
+    if (parsedVersion === '') {
+      throw new Error('version in slug cannot be empty');
+    }
     return { slug: parsedSlug, version: parsedVersion };
   }
   return { slug, version: version ?? null };

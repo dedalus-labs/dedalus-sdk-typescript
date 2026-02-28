@@ -50,6 +50,10 @@ describe('TestMCPServerWireSpecConstruction', () => {
     expect(spec.version).toBe('v2');
   });
 
+  test('from slug with trailing @ throws', () => {
+    expect(() => wireSpecFromSlug('dedalus-labs/example-server@')).toThrow('version in slug cannot be empty');
+  });
+
   test('from url', () => {
     const spec = wireSpecFromUrl('http://127.0.0.1:8000/mcp');
     expect(spec.url).toBe('http://127.0.0.1:8000/mcp');
