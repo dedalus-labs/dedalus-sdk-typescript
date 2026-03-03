@@ -1,9 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import qs from 'qs';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import z from 'zod';
 import { readEnv } from './util';
 
 export type CLIOptions = McpOptions & {
@@ -124,38 +122,3 @@ export function parseCLIOptions(): CLIOptions {
   };
 }
 
-const coerceArray = <T extends z.ZodTypeAny>(zodType: T) =>
-  z.preprocess(
-    (val) =>
-      Array.isArray(val) ? val
-      : val ? [val]
-      : val,
-    z.array(zodType).optional(),
-  );
-
-const QueryOptions = z.object({
-  tools: coerceArray(z.enum(['code', 'docs'])).describe('Specify which MCP tools to use'),
-  no_tools: coerceArray(z.enum(['code', 'docs'])).describe('Specify which MCP tools to not use.'),
-  tool: coerceArray(z.string()).describe('Include tools matching the specified names'),
-});
-
-export function parseQueryOptions(defaultOptions: McpOptions, query: unknown): McpOptions {
-  const queryObject = typeof query === 'string' ? qs.parse(query) : query;
-  const queryOptions = QueryOptions.parse(queryObject);
-
-  let codeTool: boolean | undefined =
-    queryOptions.no_tools && queryOptions.no_tools?.includes('code') ? false
-    : queryOptions.tools?.includes('code') ? true
-    : defaultOptions.includeCodeTool;
-
-  let docsTools: boolean | undefined =
-    queryOptions.no_tools && queryOptions.no_tools?.includes('docs') ? false
-    : queryOptions.tools?.includes('docs') ? true
-    : defaultOptions.includeDocsTools;
-
-  return {
-    ...(codeTool !== undefined && { includeCodeTool: codeTool }),
-    ...(docsTools !== undefined && { includeDocsTools: docsTools }),
-    codeExecutionMode: defaultOptions.codeExecutionMode,
-  };
-}
