@@ -5,6 +5,8 @@
 
 import { prepareMcpRequest, embedCredentials, slugToConnectionName } from '../../../src/lib/mcp';
 import { b64urlDecode, NONCE_LEN } from '../../../src/lib/crypto/encryption';
+import { type CryptoKey, type JsonWebKey } from '../../../src/lib/crypto/types';
+import { type JsonObject } from '../../../src/lib/utils/json';
 
 const RSA_ALGORITHM = { name: 'RSA-OAEP', hash: 'SHA-256' } as const;
 
@@ -22,11 +24,7 @@ function createMockFetch(jwkKey: JsonWebKey): typeof fetch {
   }) as typeof fetch;
 }
 
-async function decryptEnvelope(
-  privKey: CryptoKey,
-  b64: string,
-  keySize: number,
-): Promise<Record<string, unknown>> {
+async function decryptEnvelope(privKey: CryptoKey, b64: string, keySize: number): Promise<JsonObject> {
   const envelope = b64urlDecode(b64);
   const keySizeBytes = keySize / 8;
   const wrappedKey = envelope.slice(1, 1 + keySizeBytes);
@@ -62,12 +60,16 @@ describe('TestPrepareMcpRequest', () => {
       ],
     };
 
-    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+    const result = await prepareMcpRequest(
+      data as unknown as JsonObject,
+      'https://as.example.com',
+      mockFetch,
+    );
 
     // credentials field removed
     expect(result['credentials']).toBeUndefined();
     // mcp_servers converted to spec dicts with scoped credentials
-    const servers = result['mcp_servers'] as Record<string, unknown>[];
+    const servers = result['mcp_servers'] as JsonObject[];
     expect(servers).toHaveLength(1);
     expect(servers[0]!['slug']).toBe('org/server');
     expect(servers[0]!['credentials']).toBeDefined();
@@ -86,10 +88,14 @@ describe('TestPrepareMcpRequest', () => {
       credentials: { connection: { name: 'org-server' }, valuesForEncryption: () => ({ key: 'sk_xxx' }) },
     };
 
-    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+    const result = await prepareMcpRequest(
+      data as unknown as JsonObject,
+      'https://as.example.com',
+      mockFetch,
+    );
 
     expect(result['credentials']).toBeUndefined();
-    const servers = result['mcp_servers'] as Record<string, unknown>[];
+    const servers = result['mcp_servers'] as JsonObject[];
     const creds = servers[0]!['credentials'] as Record<string, string>;
     expect(creds['org-server']).toBeDefined();
   });
@@ -107,9 +113,13 @@ describe('TestPrepareMcpRequest', () => {
       ],
     };
 
-    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+    const result = await prepareMcpRequest(
+      data as unknown as JsonObject,
+      'https://as.example.com',
+      mockFetch,
+    );
 
-    const servers = result['mcp_servers'] as Record<string, unknown>[];
+    const servers = result['mcp_servers'] as JsonObject[];
     expect(servers).toHaveLength(2);
 
     // First server gets only github credential
@@ -132,9 +142,13 @@ describe('TestPrepareMcpRequest', () => {
       credentials: [{ connection_name: 'org-server', values: { key: 'sk_test' } }],
     };
 
-    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+    const result = await prepareMcpRequest(
+      data as unknown as JsonObject,
+      'https://as.example.com',
+      mockFetch,
+    );
 
-    const servers = result['mcp_servers'] as Record<string, unknown>[];
+    const servers = result['mcp_servers'] as JsonObject[];
     const creds = servers[0]!['credentials'] as Record<string, string>;
     const decrypted = await decryptEnvelope(privateKey, creds['org-server']!, 2048);
     expect(decrypted).toEqual({ key: 'sk_test' });
@@ -147,9 +161,13 @@ describe('TestPrepareMcpRequest', () => {
       credentials: [{ connection_name: 'org/server', values: { key: 'sk_test' } }],
     };
 
-    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+    const result = await prepareMcpRequest(
+      data as unknown as JsonObject,
+      'https://as.example.com',
+      mockFetch,
+    );
 
-    const servers = result['mcp_servers'] as Record<string, unknown>[];
+    const servers = result['mcp_servers'] as JsonObject[];
     const creds = servers[0]!['credentials'] as Record<string, string>;
     expect(Object.keys(creds)).toEqual(['org-server']);
     const decrypted = await decryptEnvelope(privateKey, creds['org-server']!, 2048);
@@ -163,7 +181,11 @@ describe('TestPrepareMcpRequest', () => {
       credentials: [{ connection_name: 'org-server' }],
     };
 
-    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+    const result = await prepareMcpRequest(
+      data as unknown as JsonObject,
+      'https://as.example.com',
+      mockFetch,
+    );
 
     expect(result['credentials']).toBeUndefined();
     expect(result['mcp_servers']).toEqual(['org/server']);
@@ -171,7 +193,7 @@ describe('TestPrepareMcpRequest', () => {
 
   test('no credentials → passthrough', async () => {
     const data = { model: 'openai/gpt-4o-mini', mcp_servers: ['org/server'] };
-    const result = await prepareMcpRequest(data, 'https://as.example.com');
+    const result = await prepareMcpRequest(data as unknown as JsonObject, 'https://as.example.com');
 
     expect(result['mcp_servers']).toEqual(['org/server']);
   });
@@ -181,7 +203,7 @@ describe('TestPrepareMcpRequest', () => {
       model: 'openai/gpt-4o-mini',
       credentials: [{ connection_name: 'api', values: { key: 'x' } }],
     };
-    const result = await prepareMcpRequest(data, 'https://as.example.com');
+    const result = await prepareMcpRequest(data as unknown as JsonObject, 'https://as.example.com');
 
     expect(result['credentials']).toBeDefined(); // Not stripped since no servers
   });
@@ -191,7 +213,7 @@ describe('TestPrepareMcpRequest', () => {
       mcp_servers: ['org/server'],
       credentials: [{ connection_name: 'api', values: { key: 'x' } }],
     };
-    const result = await prepareMcpRequest(data, null);
+    const result = await prepareMcpRequest(data as unknown as JsonObject, null);
 
     expect(result['credentials']).toBeDefined();
   });
@@ -204,13 +226,17 @@ describe('TestPrepareMcpRequest', () => {
       extra: { nested: 'value' },
     };
 
-    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+    const result = await prepareMcpRequest(
+      data as unknown as JsonObject,
+      'https://as.example.com',
+      mockFetch,
+    );
 
     // Result is a separate object
     expect(result).not.toBe(data);
     // Mutation of result doesn't affect original nested objects
-    (result['extra'] as Record<string, unknown>)['nested'] = 'mutated';
-    expect((data['extra'] as Record<string, unknown>)['nested']).toBe('value');
+    (result['extra'] as JsonObject)['nested'] = 'mutated';
+    expect((data['extra'] as JsonObject)['nested']).toBe('value');
   });
 
   test('encryption path does not mutate input mcp_servers', async () => {
@@ -221,7 +247,7 @@ describe('TestPrepareMcpRequest', () => {
     };
     const originalServers = data['mcp_servers'];
 
-    await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+    await prepareMcpRequest(data as unknown as JsonObject, 'https://as.example.com', mockFetch);
 
     expect(data['mcp_servers']).toBe(originalServers);
     expect(data['mcp_servers']).toEqual(['org/server@v2']);
@@ -234,9 +260,9 @@ describe('TestPrepareMcpRequest', () => {
       credentials: [{ connection_name: 'api', values: { key: 'x' } }],
     };
 
-    await expect(prepareMcpRequest(data, 'https://as.example.com', failFetch)).rejects.toThrow(
-      'failed to fetch JWKS',
-    );
+    await expect(
+      prepareMcpRequest(data as unknown as JsonObject, 'https://as.example.com', failFetch),
+    ).rejects.toThrow('failed to fetch JWKS');
   });
 
   test('no suitable RSA enc key throws', async () => {
@@ -249,9 +275,9 @@ describe('TestPrepareMcpRequest', () => {
       credentials: [{ connection_name: 'api', values: { key: 'x' } }],
     };
 
-    await expect(prepareMcpRequest(data, 'https://as.example.com', noKeyFetch)).rejects.toThrow(
-      'no RSA encryption key found',
-    );
+    await expect(
+      prepareMcpRequest(data as unknown as JsonObject, 'https://as.example.com', noKeyFetch),
+    ).rejects.toThrow('no RSA encryption key found');
   });
 });
 

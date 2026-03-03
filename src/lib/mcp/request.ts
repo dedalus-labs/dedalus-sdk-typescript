@@ -10,7 +10,7 @@
 
 import { type JsonObject } from '../utils/json';
 import { encryptCredentials, fetchEncryptionKey } from '../crypto/encryption';
-import { type CredentialProtocol } from './protocols';
+import { type CryptoKey } from '../crypto/types';
 import { serializeMcpServers, slugToConnectionName, type MCPServerWireOutput } from './wire';
 
 /** Map of connection names to encrypted envelopes (base64url). */
@@ -79,12 +79,15 @@ export async function encryptCredentialsList(
 
   for (const cred of credentials) {
     if (cred == null || typeof cred !== 'object') continue;
-    const c = cred as JsonObject;
+    const c = cred as Record<string, unknown>;
 
     // Extract connection name
     let connectionName: string | null = null;
     if (c['connection'] != null && typeof c['connection'] === 'object') {
-      connectionName = (c['connection'] as JsonObject)['name'] as string | null;
+      const conn = c['connection'] as Record<string, unknown>;
+      if (typeof conn['name'] === 'string') {
+        connectionName = conn['name'];
+      }
     } else if (typeof c['connection_name'] === 'string') {
       connectionName = c['connection_name'];
     }
@@ -92,7 +95,7 @@ export async function encryptCredentialsList(
     // Extract values
     let values: JsonObject | null = null;
     if (typeof c['valuesForEncryption'] === 'function') {
-      values = (c as CredentialProtocol).valuesForEncryption();
+      values = (c['valuesForEncryption'] as () => JsonObject).call(c);
     } else if (c['values'] != null && typeof c['values'] === 'object') {
       values = c['values'] as JsonObject;
     }

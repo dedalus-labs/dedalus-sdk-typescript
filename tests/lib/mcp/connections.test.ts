@@ -146,7 +146,7 @@ describe('TestMatchCredentialsToConnections', () => {
 
     expect(pairs).toHaveLength(1);
     expect((pairs[0]![0] as Record<string, unknown>)['name']).toBe('api');
-    expect((pairs[0]![1] as Record<string, unknown>)['values']).toEqual({ key: 'xxx' });
+    expect((pairs[0]![1] as unknown as Record<string, unknown>)['values']).toEqual({ key: 'xxx' });
   });
 
   test('missing multiple secrets lists all', () => {
