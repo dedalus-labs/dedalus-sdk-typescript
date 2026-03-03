@@ -35,12 +35,16 @@ export async function prepareMcpRequest(
 ): Promise<JsonObject> {
   // Serialize MCP servers, if provided.
   const servers = data['mcp_servers'];
-  if (servers != null) {
-    data['mcp_servers'] = serializeMcpServers(servers as Parameters<typeof serializeMcpServers>[0]);
-  }
+  const serializedServers =
+    servers != null ? serializeMcpServers(servers as Parameters<typeof serializeMcpServers>[0]) : null;
 
   // Read credentials from original data BEFORE deep clone (functions survive)
   const credentials = data['credentials'];
+  // Deep copy to avoid mutation side effects
+  const result = JSON.parse(JSON.stringify(data)) as JsonObject;
+  if (serializedServers != null) {
+    result['mcp_servers'] = serializedServers;
+  }
 
   // If credentials are provided, encrypt them on the client side
   if (credentials && servers && asUrl) {
@@ -48,19 +52,15 @@ export async function prepareMcpRequest(
     const credList = Array.isArray(credentials) ? credentials : [credentials];
     const encrypted = await encryptCredentialsList(credList, publicKey);
 
-    // Deep copy to avoid mutation side effects
-    const result = JSON.parse(JSON.stringify(data)) as JsonObject;
-
     if (Object.keys(encrypted).length > 0) {
       result['mcp_servers'] = embedCredentials(result['mcp_servers'] as MCPServerWireOutput[], encrypted);
-      delete result['credentials'];
     }
+    delete result['credentials'];
 
     return result;
   }
 
-  // No encryption needed — just deep copy
-  return JSON.parse(JSON.stringify(data)) as JsonObject;
+  return result;
 }
 
 // --- Internal Helpers ---
@@ -98,7 +98,8 @@ export async function encryptCredentialsList(
     }
 
     if (connectionName && values) {
-      encrypted[connectionName] = await encryptCredentials(publicKey, values);
+      const normalizedConnectionName = slugToConnectionName(connectionName);
+      encrypted[normalizedConnectionName] = await encryptCredentials(publicKey, values);
     }
   }
 

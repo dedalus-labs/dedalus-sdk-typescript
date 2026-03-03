@@ -140,6 +140,35 @@ describe('TestPrepareMcpRequest', () => {
     expect(decrypted).toEqual({ key: 'sk_test' });
   });
 
+  test('credential connection_name slugs are normalized for lookup', async () => {
+    const mockFetch = createMockFetch(jwk);
+    const data: Record<string, unknown> = {
+      mcp_servers: ['org/server'],
+      credentials: [{ connection_name: 'org/server', values: { key: 'sk_test' } }],
+    };
+
+    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+
+    const servers = result['mcp_servers'] as Record<string, unknown>[];
+    const creds = servers[0]!['credentials'] as Record<string, string>;
+    expect(Object.keys(creds)).toEqual(['org-server']);
+    const decrypted = await decryptEnvelope(privateKey, creds['org-server']!, 2048);
+    expect(decrypted).toEqual({ key: 'sk_test' });
+  });
+
+  test('invalid credential entries are stripped from plaintext payload', async () => {
+    const mockFetch = createMockFetch(jwk);
+    const data: Record<string, unknown> = {
+      mcp_servers: ['org/server'],
+      credentials: [{ connection_name: 'org-server' }],
+    };
+
+    const result = await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+
+    expect(result['credentials']).toBeUndefined();
+    expect(result['mcp_servers']).toEqual(['org/server']);
+  });
+
   test('no credentials → passthrough', async () => {
     const data = { model: 'openai/gpt-4o-mini', mcp_servers: ['org/server'] };
     const result = await prepareMcpRequest(data, 'https://as.example.com');
@@ -182,6 +211,20 @@ describe('TestPrepareMcpRequest', () => {
     // Mutation of result doesn't affect original nested objects
     (result['extra'] as Record<string, unknown>)['nested'] = 'mutated';
     expect((data['extra'] as Record<string, unknown>)['nested']).toBe('value');
+  });
+
+  test('encryption path does not mutate input mcp_servers', async () => {
+    const mockFetch = createMockFetch(jwk);
+    const data: Record<string, unknown> = {
+      mcp_servers: ['org/server@v2'],
+      credentials: [{ connection: { name: 'org-server' }, valuesForEncryption: () => ({ key: 'secret' }) }],
+    };
+    const originalServers = data['mcp_servers'];
+
+    await prepareMcpRequest(data, 'https://as.example.com', mockFetch);
+
+    expect(data['mcp_servers']).toBe(originalServers);
+    expect(data['mcp_servers']).toEqual(['org/server@v2']);
   });
 
   test('JWKS fetch error propagates', async () => {
