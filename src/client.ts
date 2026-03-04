@@ -403,7 +403,7 @@ export class Dedalus {
     // Encrypt MCP credentials before any other transforms
     if (options.body && typeof options.body === 'object' && !Array.isArray(options.body)) {
       const body = options.body as JsonObject;
-      if (body['credentials'] && body['mcp_servers']) {
+      if (body['mcp_servers']) {
         options.body = await prepareMcpRequest(body, this.asBaseURL, this.fetch);
       }
     }
