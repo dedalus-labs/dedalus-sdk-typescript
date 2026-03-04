@@ -155,7 +155,7 @@ const remoteStainlessHandler = async ({
     headers: {
       ...(reqContext.stainlessApiKey && { Authorization: reqContext.stainlessApiKey }),
       'Content-Type': 'application/json',
-      client_envs: JSON.stringify({
+      'x-stainless-mcp-client-envs': JSON.stringify({
         DEDALUS_API_KEY: readEnv('DEDALUS_API_KEY') ?? client.apiKey ?? undefined,
         DEDALUS_X_API_KEY: readEnv('DEDALUS_X_API_KEY') ?? client.xAPIKey ?? undefined,
         DEDALUS_AS_URL: readEnv('DEDALUS_AS_URL') ?? client.asBaseURL ?? undefined,
