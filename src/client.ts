@@ -691,9 +691,9 @@ export class Dedalus {
       }
     }
 
-    // If the API asks us to wait a certain amount of time (and it's a reasonable amount),
-    // just do what it says, but otherwise calculate a default
-    if (!(timeoutMillis && 0 <= timeoutMillis && timeoutMillis < 60 * 1000)) {
+    // If the API asks us to wait a certain amount of time, just do what it
+    // says, but otherwise calculate a default
+    if (timeoutMillis === undefined) {
       const maxRetries = options.maxRetries ?? this.maxRetries;
       timeoutMillis = this.calculateDefaultRetryTimeoutMillis(retriesRemaining, maxRetries);
     }
