@@ -11,7 +11,7 @@ describe('resource images', () => {
   // Mock server tests are disabled
   test.skip('createVariation: only required params', async () => {
     const responsePromise = client.images.createVariation({
-      image: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      image: await toFile(Buffer.from('Example data'), 'README.md'),
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -25,7 +25,7 @@ describe('resource images', () => {
   // Mock server tests are disabled
   test.skip('createVariation: required and optional params', async () => {
     const response = await client.images.createVariation({
-      image: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      image: await toFile(Buffer.from('Example data'), 'README.md'),
       model: 'model',
       n: 0,
       response_format: 'response_format',
@@ -37,7 +37,7 @@ describe('resource images', () => {
   // Mock server tests are disabled
   test.skip('edit: only required params', async () => {
     const responsePromise = client.images.edit({
-      image: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      image: await toFile(Buffer.from('Example data'), 'README.md'),
       prompt: 'prompt',
     });
     const rawResponse = await responsePromise.asResponse();
@@ -52,9 +52,9 @@ describe('resource images', () => {
   // Mock server tests are disabled
   test.skip('edit: required and optional params', async () => {
     const response = await client.images.edit({
-      image: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      image: await toFile(Buffer.from('Example data'), 'README.md'),
       prompt: 'prompt',
-      mask: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      mask: await toFile(Buffer.from('Example data'), 'README.md'),
       model: 'model',
       n: 0,
       response_format: 'response_format',
