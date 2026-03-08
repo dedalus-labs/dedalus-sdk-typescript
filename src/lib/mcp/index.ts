@@ -17,9 +17,22 @@ export {
   wireSpecToWire,
   wireSpecFromSlug,
   wireSpecFromUrl,
+  slugToConnectionName,
   serializeMcpServers,
   serializeSingle,
   serializeCredentials,
   serializeToolSpecs,
   serializeMcpServerWithCreds,
+  serializeConnection,
+  collectUniqueConnections,
+  matchCredentialsToConnections,
+  validateCredentialsForServers,
+  buildConnectionRecord,
 } from './wire';
+
+export {
+  type EncryptedCredentials,
+  prepareMcpRequest,
+  encryptCredentialsList,
+  embedCredentials,
+} from './request';

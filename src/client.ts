@@ -12,6 +12,8 @@ import { getPlatformHeaders } from './internal/detect-platform';
 import * as Shims from './internal/shims';
 import * as Opts from './internal/request-options';
 import { stringifyQuery } from './internal/utils/query';
+import { prepareMcpRequest } from './lib/mcp';
+import type { JsonObject } from './lib/utils/json';
 import { VERSION } from './version';
 import * as Errors from './core/error';
 import * as Uploads from './core/uploads';
@@ -398,6 +400,14 @@ export class Dedalus {
    * We preserve the structured output schemas, which are already in the correct format.
    */
   protected async prepareOptions(options: FinalRequestOptions): Promise<void> {
+    // Encrypt MCP credentials before any other transforms
+    if (options.body && typeof options.body === 'object' && !Array.isArray(options.body)) {
+      const body = options.body as JsonObject;
+      if (body['credentials'] && body['mcp_servers']) {
+        options.body = await prepareMcpRequest(body, this.asBaseURL, this.fetch);
+      }
+    }
+
     if (options.body) {
       options.body = transformRequestBody(options.body);
     }
