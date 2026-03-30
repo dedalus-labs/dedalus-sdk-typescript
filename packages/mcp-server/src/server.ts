@@ -47,6 +47,8 @@ export async function initMcpServer(params: {
   mcpOptions?: McpOptions;
   stainlessApiKey?: string | undefined;
   upstreamClientEnvs?: Record<string, string> | undefined;
+  mcpSessionId?: string | undefined;
+  mcpClientInfo?: { name: string; version: string } | undefined;
 }) {
   const server = params.server instanceof McpServer ? params.server.server : params.server;
 
@@ -136,6 +138,8 @@ export async function initMcpServer(params: {
         client,
         stainlessApiKey: params.stainlessApiKey ?? params.mcpOptions?.stainlessApiKey,
         upstreamClientEnvs: params.upstreamClientEnvs,
+        mcpSessionId: params.mcpSessionId,
+        mcpClientInfo: params.mcpClientInfo,
       },
       args,
     });
