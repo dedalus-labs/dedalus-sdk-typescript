@@ -30,7 +30,7 @@
     "fix": "eslint --fix ."
   },
   "dependencies": {
-    "dedalus-labs": "file:../../dist/",
+    "dedalus-labs": "link:../../dist/",
     "ajv": "^8.18.0",
     "@cloudflare/cabidela": "^0.2.4",
     "@hono/node-server": "^1.19.10",
