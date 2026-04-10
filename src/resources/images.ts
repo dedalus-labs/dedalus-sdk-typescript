@@ -11,6 +11,13 @@ export class Images extends APIResource {
    * Create variations of an image.
    *
    * DALL·E 2 only. Upload an image to generate variations.
+   *
+   * @example
+   * ```ts
+   * const imagesResponse = await client.images.createVariation({
+   *   image: fs.createReadStream('path/to/file'),
+   * });
+   * ```
    */
   createVariation(body: ImageCreateVariationParams, options?: RequestOptions): APIPromise<ImagesResponse> {
     return this._client.post(
@@ -24,6 +31,14 @@ export class Images extends APIResource {
    *
    * Supports dall-e-2 and gpt-image-1. Upload an image and optionally a mask to
    * indicate which areas to regenerate based on the prompt.
+   *
+   * @example
+   * ```ts
+   * const imagesResponse = await client.images.edit({
+   *   image: fs.createReadStream('path/to/file'),
+   *   prompt: 'prompt',
+   * });
+   * ```
    */
   edit(body: ImageEditParams, options?: RequestOptions): APIPromise<ImagesResponse> {
     return this._client.post(
@@ -37,6 +52,13 @@ export class Images extends APIResource {
    *
    * Pure image generation models only (DALL-E, GPT Image). For multimodal models
    * like gemini-2.5-flash-image, use /v1/chat/completions.
+   *
+   * @example
+   * ```ts
+   * const imagesResponse = await client.images.generate({
+   *   prompt: 'A white siamese cat',
+   * });
+   * ```
    */
   generate(body: ImageGenerateParams, options?: RequestOptions): APIPromise<ImagesResponse> {
     return this._client.post('/v1/images/generations', { body, ...options });

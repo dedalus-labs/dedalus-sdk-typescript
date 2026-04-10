@@ -11,6 +11,11 @@ export class Responses extends APIResource {
    *
    * This endpoint routes directly to OpenAI's Responses API. Only OpenAI models are
    * supported.
+   *
+   * @example
+   * ```ts
+   * const response = await client.responses.create();
+   * ```
    */
   create(body: ResponseCreateParams, options?: RequestOptions): APIPromise<Response> {
     return this._client.post('/v1/responses', { body, ...options });
