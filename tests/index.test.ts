@@ -478,7 +478,7 @@ describe('idempotency', () => {
       apiKey: 'My API Key',
     });
     await client.embeddings.create(
-      { input: 'string', model: 'string' },
+      { input: 'string', model: 'text-embedding-ada-002' },
       { idempotencyKey: 'my-idempotency-key' },
     );
   });

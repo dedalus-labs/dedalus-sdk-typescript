@@ -10,7 +10,7 @@ const client = new Dedalus({
 describe('resource embeddings', () => {
   // Mock server tests are disabled
   test.skip('create: only required params', async () => {
-    const responsePromise = client.embeddings.create({ input: 'string', model: 'string' });
+    const responsePromise = client.embeddings.create({ input: 'string', model: 'text-embedding-ada-002' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -24,7 +24,7 @@ describe('resource embeddings', () => {
   test.skip('create: required and optional params', async () => {
     const response = await client.embeddings.create({
       input: 'string',
-      model: 'string',
+      model: 'text-embedding-ada-002',
       dimensions: 1,
       encoding_format: 'float',
       user: 'user',
