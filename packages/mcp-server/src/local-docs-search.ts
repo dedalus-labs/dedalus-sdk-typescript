@@ -244,7 +244,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.audio.transcriptions.create',
         example:
-          "import Dedalus from 'dedalus-labs';\n\nconst client = new Dedalus({\n  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted\n});\n\nconst transcription = await client.audio.transcriptions.create({\n  file: fs.createReadStream('path/to/file'),\n  model: 'model',\n});\n\nconsole.log(transcription);",
+          "import fs from 'fs';\nimport Dedalus from 'dedalus-labs';\n\nconst client = new Dedalus({\n  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted\n});\n\nconst transcription = await client.audio.transcriptions.create({\n  file: fs.createReadStream('path/to/file'),\n  model: 'model',\n});\n\nconsole.log(transcription);",
       },
     },
   },
@@ -286,7 +286,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.audio.translations.create',
         example:
-          "import Dedalus from 'dedalus-labs';\n\nconst client = new Dedalus({\n  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted\n});\n\nconst translation = await client.audio.translations.create({\n  file: fs.createReadStream('path/to/file'),\n  model: 'model',\n});\n\nconsole.log(translation);",
+          "import fs from 'fs';\nimport Dedalus from 'dedalus-labs';\n\nconst client = new Dedalus({\n  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted\n});\n\nconst translation = await client.audio.translations.create({\n  file: fs.createReadStream('path/to/file'),\n  model: 'model',\n});\n\nconsole.log(translation);",
       },
     },
   },
@@ -380,7 +380,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.images.edit',
         example:
-          "import Dedalus from 'dedalus-labs';\n\nconst client = new Dedalus({\n  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted\n});\n\nconst imagesResponse = await client.images.edit({\n  image: fs.createReadStream('path/to/file'),\n  prompt: 'prompt',\n});\n\nconsole.log(imagesResponse.created);",
+          "import fs from 'fs';\nimport Dedalus from 'dedalus-labs';\n\nconst client = new Dedalus({\n  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted\n});\n\nconst imagesResponse = await client.images.edit({\n  image: fs.createReadStream('path/to/file'),\n  prompt: 'prompt',\n});\n\nconsole.log(imagesResponse.created);",
       },
     },
   },
@@ -421,7 +421,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.images.createVariation',
         example:
-          "import Dedalus from 'dedalus-labs';\n\nconst client = new Dedalus({\n  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted\n});\n\nconst imagesResponse = await client.images.createVariation({\n  image: fs.createReadStream('path/to/file'),\n});\n\nconsole.log(imagesResponse.created);",
+          "import fs from 'fs';\nimport Dedalus from 'dedalus-labs';\n\nconst client = new Dedalus({\n  apiKey: process.env['DEDALUS_API_KEY'], // This is the default and can be omitted\n});\n\nconst imagesResponse = await client.images.createVariation({\n  image: fs.createReadStream('path/to/file'),\n});\n\nconsole.log(imagesResponse.created);",
       },
     },
   },
