@@ -1,7 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 import { ClientOptions } from 'dedalus-labs';
 import express from 'express';
 import pino from 'pino';
@@ -24,7 +24,7 @@ const newServer = async ({
 }): Promise<McpServer | null> => {
   const stainlessApiKey = getStainlessApiKey(req, mcpOptions);
   const customInstructionsPath = mcpOptions.customInstructionsPath;
-  const server = await newMcpServer({ stainlessApiKey, customInstructionsPath });
+  const server = await newMcpServer({stainlessApiKey, customInstructionsPath});
 
   const authOptions = parseClientAuthHeaders(req, false);
 
@@ -65,13 +65,15 @@ const newServer = async ({
         );
       }
     } catch (error) {
-      getLogger().warn({ error }, 'Failed to parse x-stainless-mcp-client-permissions header');
+      getLogger().warn(
+        { error },
+        'Failed to parse x-stainless-mcp-client-permissions header',
+      );
     }
   }
 
-  const mcpClientInfo =
-    typeof req.body?.params?.clientInfo?.name === 'string' ?
-      { name: req.body.params.clientInfo.name, version: String(req.body.params.clientInfo.version ?? '') }
+  const mcpClientInfo = typeof req.body?.params?.clientInfo?.name === 'string'
+    ? { name: req.body.params.clientInfo.name, version: String(req.body.params.clientInfo.version ?? '') }
     : undefined;
 
   await initMcpServer({
@@ -88,7 +90,10 @@ const newServer = async ({
   });
 
   if (mcpClientInfo) {
-    getLogger().info({ mcpSessionId: (req as any).mcpSessionId, mcpClientInfo }, 'MCP client connected');
+    getLogger().info(
+      { mcpSessionId: (req as any).mcpSessionId, mcpClientInfo },
+      'MCP client connected',
+    );
   }
 
   return server;
@@ -128,7 +133,7 @@ const del = async (req: express.Request, res: express.Response) => {
 const redactHeaders = (headers: Record<string, any>) => {
   const hiddenHeaders = /auth|cookie|key|token|x-stainless-mcp-client-envs/i;
   const filtered = { ...headers };
-  Object.keys(filtered).forEach((key) => {
+  Object.keys(filtered).forEach(key => {
     if (hiddenHeaders.test(key)) {
       filtered[key] = '[REDACTED]';
     }
@@ -181,17 +186,17 @@ export const streamableHTTPApp = ({
         req: pino.stdSerializers.wrapRequestSerializer((req) => {
           return {
             ...req,
-            headers: redactHeaders(req.raw.headers),
+            headers: redactHeaders(req.raw.headers)
           };
         }),
         res: pino.stdSerializers.wrapResponseSerializer((res) => {
           return {
             ...res,
-            headers: redactHeaders(res.headers),
+            headers: redactHeaders(res.headers)
           };
         }),
-      },
-    }),
+      }
+    })
   );
 
   app.get('/health', async (req: express.Request, res: express.Response) => {
@@ -204,24 +209,23 @@ export const streamableHTTPApp = ({
   return app;
 };
 
-export const launchStreamableHTTPServer = async ({
-  mcpOptions,
-  port,
-}: {
-  mcpOptions: McpOptions;
-  port: number | string | undefined;
-}) => {
-  const app = streamableHTTPApp({ mcpOptions });
-  const server = app.listen(port);
-  const address = server.address();
-
-  const logger = getLogger();
-
-  if (typeof address === 'string') {
-    logger.info(`MCP Server running on streamable HTTP at ${address}`);
-  } else if (address !== null) {
-    logger.info(`MCP Server running on streamable HTTP on port ${address.port}`);
-  } else {
-    logger.info(`MCP Server running on streamable HTTP on port ${port}`);
+export const launchStreamableHTTPServer = async(
+  {mcpOptions, port}: {
+    mcpOptions: McpOptions,
+    port: number | string | undefined,
   }
-};
+) => {
+    const app = streamableHTTPApp({ mcpOptions });
+    const server = app.listen(port);
+    const address = server.address();
+
+    const logger = getLogger();
+
+    if (typeof address === 'string') {
+      logger.info(`MCP Server running on streamable HTTP at ${address}`);
+    } else if (address !== null) {
+      logger.info(`MCP Server running on streamable HTTP on port ${address.port}`);
+    } else {
+      logger.info(`MCP Server running on streamable HTTP on port ${port}`);
+    }
+  }

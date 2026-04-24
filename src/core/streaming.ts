@@ -9,7 +9,7 @@ import { encodeUTF8 } from '../internal/utils/bytes';
 import { loggerFor } from '../internal/utils/log';
 import type { Dedalus } from '../client';
 
-import { APIError } from './error';
+import { APIError } from './error';;
 
 type Bytes = string | ArrayBuffer | Uint8Array | null | undefined;
 
@@ -32,33 +32,33 @@ export class Stream<Item> implements AsyncIterable<Item> {
     this.#client = client;
   }
 
-  static fromSSEResponse<Item>(
-    response: Response,
-    controller: AbortController,
-    client?: Dedalus,
-  ): Stream<Item> {
+  static fromSSEResponse<Item>(response: Response,
+controller: AbortController,
+client?: Dedalus,): Stream<Item> {
     let consumed = false;
     const logger = client ? loggerFor(client) : console;
 
     async function* iterator(): AsyncIterator<Item, any, undefined> {
       if (consumed) {
-        throw new DedalusError('Cannot iterate over a consumed stream, use `.tee()` to split the stream.');
+        throw new DedalusError(
+          'Cannot iterate over a consumed stream, use `.tee()` to split the stream.',
+        );
       }
       consumed = true;
       let done = false;
       try {
         for await (const sse of _iterSSEMessages(response, controller)) {
           if (done) continue;
-
+          
           if (sse.data.startsWith('[DONE]')) {
             done = true;
             continue;
           }
-
+          
           if (sse.event === 'error') {
             throw new APIError(undefined, safeJSON(sse.data) ?? sse.data, undefined, response.headers);
           }
-
+          
           if (sse.event === null) {
             try {
               yield JSON.parse(sse.data) as Item;
@@ -67,7 +67,7 @@ export class Stream<Item> implements AsyncIterable<Item> {
               logger.error(`From chunk:`, sse.raw);
               throw e;
             }
-          }
+          };
         }
         done = true;
       } catch (e) {
@@ -111,7 +111,9 @@ export class Stream<Item> implements AsyncIterable<Item> {
 
     async function* iterator(): AsyncIterator<Item, any, undefined> {
       if (consumed) {
-        throw new DedalusError('Cannot iterate over a consumed stream, use `.tee()` to split the stream.');
+        throw new DedalusError(
+          'Cannot iterate over a consumed stream, use `.tee()` to split the stream.',
+        );
       }
       consumed = true;
       let done = false;

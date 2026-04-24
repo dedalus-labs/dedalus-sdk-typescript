@@ -20,10 +20,7 @@ export class Images extends APIResource {
    * ```
    */
   createVariation(body: ImageCreateVariationParams, options?: RequestOptions): APIPromise<ImagesResponse> {
-    return this._client.post(
-      '/v1/images/variations',
-      multipartFormRequestOptions({ body, ...options }, this._client),
-    );
+    return this._client.post('/v1/images/variations', multipartFormRequestOptions({ body, ...options }, this._client));
   }
 
   /**
@@ -41,10 +38,7 @@ export class Images extends APIResource {
    * ```
    */
   edit(body: ImageEditParams, options?: RequestOptions): APIPromise<ImagesResponse> {
-    return this._client.post(
-      '/v1/images/edits',
-      multipartFormRequestOptions({ body, ...options }, this._client),
-    );
+    return this._client.post('/v1/images/edits', multipartFormRequestOptions({ body, ...options }, this._client));
   }
 
   /**
@@ -154,16 +148,7 @@ export interface CreateImageRequest {
    * `gpt-image-1`, one of `256x256`, `512x512`, or `1024x1024` for `dall-e-2`, and
    * one of `1024x1024`, `1792x1024`, or `1024x1792` for `dall-e-3`.
    */
-  size?:
-    | '256x256'
-    | '512x512'
-    | '1024x1024'
-    | '1536x1024'
-    | '1024x1536'
-    | '1792x1024'
-    | '1024x1792'
-    | 'auto'
-    | null;
+  size?: '256x256' | '512x512' | '1024x1024' | '1536x1024' | '1024x1536' | '1792x1024' | '1024x1792' | 'auto' | null;
 
   /**
    * Generate the image in streaming mode. Defaults to `false`. See the
@@ -341,16 +326,7 @@ export interface ImageGenerateParams {
    * `gpt-image-1`, one of `256x256`, `512x512`, or `1024x1024` for `dall-e-2`, and
    * one of `1024x1024`, `1792x1024`, or `1024x1792` for `dall-e-3`.
    */
-  size?:
-    | '256x256'
-    | '512x512'
-    | '1024x1024'
-    | '1536x1024'
-    | '1024x1536'
-    | '1792x1024'
-    | '1024x1792'
-    | 'auto'
-    | null;
+  size?: '256x256' | '512x512' | '1024x1024' | '1536x1024' | '1024x1536' | '1792x1024' | '1024x1792' | 'auto' | null;
 
   /**
    * Generate the image in streaming mode. Defaults to `false`. See the
@@ -382,6 +358,6 @@ export declare namespace Images {
     type ImagesResponse as ImagesResponse,
     type ImageCreateVariationParams as ImageCreateVariationParams,
     type ImageEditParams as ImageEditParams,
-    type ImageGenerateParams as ImageGenerateParams,
+    type ImageGenerateParams as ImageGenerateParams
   };
 }

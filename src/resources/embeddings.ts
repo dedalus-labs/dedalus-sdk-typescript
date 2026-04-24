@@ -190,6 +190,6 @@ export declare namespace Embeddings {
   export {
     type CreateEmbeddingRequest as CreateEmbeddingRequest,
     type CreateEmbeddingResponse as CreateEmbeddingResponse,
-    type EmbeddingCreateParams as EmbeddingCreateParams,
+    type EmbeddingCreateParams as EmbeddingCreateParams
   };
 }

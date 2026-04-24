@@ -1,5 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+
 /**
  * Credential for MCP server authentication.
  *
@@ -42,7 +43,7 @@ export interface DedalusModel {
 /**
  * Dedalus model choice - either a string ID or DedalusModel configuration object.
  */
-export type DedalusModelChoice = string | DedalusModel;
+export type DedalusModelChoice = string | DedalusModel
 
 /**
  * Schema for Function.
@@ -58,19 +59,14 @@ export interface FunctionDefinition {
   name: string;
 }
 
-export type JSONObjectInput = { [key: string]: JSONValueInput | null };
+export type JSONObjectInput = { [key: string]: JSONValueInput | null }
 
-export type JSONValueInput =
-  | string
-  | number
-  | boolean
-  | { [key: string]: JSONValueInput | null }
-  | Array<JSONValueInput | null>;
+export type JSONValueInput = string | number | boolean | { [key: string]: JSONValueInput | null } | Array<JSONValueInput | null>
 
 /**
  * List of credentials for MCP server authentication.
  */
-export type MCPCredentials = Array<Credential>;
+export type MCPCredentials = Array<Credential>
 
 /**
  * Structured MCP server specification.
@@ -110,7 +106,7 @@ export interface MCPServerSpec {
 /**
  * List of MCP server inputs (slugs or structured specs).
  */
-export type MCPServers = Array<string | MCPServerSpec>;
+export type MCPServers = Array<string | MCPServerSpec>
 
 /**
  * Result of a single MCP tool execution.
@@ -273,7 +269,7 @@ export interface Reasoning {
 
   summary?: 'auto' | 'concise' | 'detailed' | null;
 
-  [k: string]: unknown;
+[k: string]: unknown
 }
 
 /**
@@ -361,13 +357,7 @@ export interface ResponseFormatText {
   type: 'text';
 }
 
-export type ToolChoice =
-  | 'auto'
-  | 'required'
-  | 'none'
-  | string
-  | { [key: string]: unknown }
-  | ToolChoice.MCPToolChoice;
+export type ToolChoice = 'auto' | 'required' | 'none' | string | { [key: string]: unknown } | ToolChoice.MCPToolChoice
 
 export namespace ToolChoice {
   export interface MCPToolChoice {

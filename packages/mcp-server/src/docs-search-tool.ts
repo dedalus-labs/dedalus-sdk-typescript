@@ -14,8 +14,7 @@ export const metadata: Metadata = {
 
 export const tool: Tool = {
   name: 'search_docs',
-  description:
-    'Search SDK documentation to find methods, parameters, and usage examples for interacting with the API. Use this before writing code when you need to discover the right approach.',
+  description: 'Search SDK documentation to find methods, parameters, and usage examples for interacting with the API. Use this before writing code when you need to discover the right approach.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -32,7 +31,7 @@ export const tool: Tool = {
         type: 'string',
         description: 'The amount of detail to return.',
         enum: ['default', 'verbose'],
-      },
+      }
     },
     required: ['query', 'language'],
   },
@@ -41,8 +40,7 @@ export const tool: Tool = {
   },
 };
 
-const docsSearchURL =
-  process.env['DOCS_SEARCH_URL'] || 'https://api.stainless.com/api/projects/dedalus-sdk/docs/search';
+const docsSearchURL = process.env['DOCS_SEARCH_URL'] || 'https://api.stainless.com/api/projects/dedalus-sdk/docs/search'
 
 let _localSearch: LocalDocsSearch | undefined;
 
@@ -67,27 +65,30 @@ async function searchLocal(args: Record<string, unknown>): Promise<unknown> {
   }).results;
 }
 
-async function searchRemote(args: Record<string, unknown>, reqContext: McpRequestContext): Promise<unknown> {
+async function searchRemote(
+  args: Record<string, unknown>,
+  reqContext: McpRequestContext,
+): Promise<unknown> {
   const body = args as any;
   const query = new URLSearchParams(body).toString();
 
   const startTime = Date.now();
-  const result = await fetch(`${docsSearchURL}?${query}`, {
-    headers: {
-      ...(reqContext.stainlessApiKey && { Authorization: reqContext.stainlessApiKey }),
-      ...(reqContext.mcpSessionId && { 'x-stainless-mcp-session-id': reqContext.mcpSessionId }),
-      ...(reqContext.mcpClientInfo && {
-        'x-stainless-mcp-client-info': JSON.stringify(reqContext.mcpClientInfo),
-      }),
+  const result = await fetch(
+    `${docsSearchURL}?${query}`,
+    {
+      headers: {
+        ...(reqContext.stainlessApiKey && { Authorization: reqContext.stainlessApiKey }),
+        ...(reqContext.mcpSessionId && { 'x-stainless-mcp-session-id': reqContext.mcpSessionId }),
+        ...(reqContext.mcpClientInfo && { 'x-stainless-mcp-client-info': JSON.stringify(reqContext.mcpClientInfo) }),
+      },
     },
-  });
+  );
 
   const logger = getLogger();
 
   if (!result.ok) {
     const errorText = await result.text();
-    logger.warn(
-      {
+    logger.warn({
         durationMs: Date.now() - startTime,
         query: body.query,
         status: result.status,
@@ -98,19 +99,14 @@ async function searchRemote(args: Record<string, unknown>, reqContext: McpReques
     );
 
     if (result.status === 404 && !reqContext.stainlessApiKey) {
-      throw new Error(
-        'Could not find docs for this project. You may need to provide a Stainless API key via the STAINLESS_API_KEY environment variable, the --stainless-api-key flag, or the x-stainless-api-key HTTP header.',
-      );
+      throw new Error('Could not find docs for this project. You may need to provide a Stainless API key via the STAINLESS_API_KEY environment variable, the --stainless-api-key flag, or the x-stainless-api-key HTTP header.');
     }
 
-    throw new Error(
-      `${result.status}: ${result.statusText} when using doc search tool. Details: ${errorText}`,
-    );
+    throw new Error(`${result.status}: ${result.statusText} when using doc search tool. Details: ${errorText}`);
   }
 
   const resultBody = await result.json();
-  logger.info(
-    {
+  logger.info({
       durationMs: Date.now() - startTime,
       query: body.query,
     },
@@ -119,13 +115,10 @@ async function searchRemote(args: Record<string, unknown>, reqContext: McpReques
   return resultBody;
 }
 
-export const handler = async ({
-  reqContext,
-  args,
-}: {
-  reqContext: McpRequestContext;
-  args: Record<string, unknown> | undefined;
-}) => {
+export const handler = async (
+  { reqContext, args }:
+  { reqContext: McpRequestContext; args: Record<string, unknown> | undefined },
+) => {
   const body = args ?? {};
 
   if (_localSearch) {

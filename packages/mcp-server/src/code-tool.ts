@@ -1,16 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import {
-  ContentBlock,
-  McpRequestContext,
-  McpTool,
-  Metadata,
-  ToolCallResult,
-  asErrorResult,
-  asTextContentResult,
-} from './types';
+import { ContentBlock, McpRequestContext, McpTool, Metadata, ToolCallResult, asErrorResult, asTextContentResult } from './types';
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { readEnv } from './util';
+import { readEnv } from "./util";
 import { WorkerInput, WorkerOutput } from './code-tool-types';
 import { getLogger } from './logger';
 import { SdkMethod } from './methods';
@@ -52,13 +44,10 @@ Always type dynamic key-value stores explicitly as Record<string, YourValueType>
  * @param codeExecutionMode - Whether to execute code in a local Deno environment or in a remote
  * sandbox environment hosted by Stainless.
  */
-export function codeTool({
-  blockedMethods,
-  codeExecutionMode,
-}: {
-  blockedMethods: SdkMethod[] | undefined;
-  codeExecutionMode: McpCodeExecutionMode;
-}): McpTool {
+export function codeTool(
+  {blockedMethods, codeExecutionMode}:
+  {blockedMethods: SdkMethod[] | undefined, codeExecutionMode: McpCodeExecutionMode},
+): McpTool {
   const metadata: Metadata = { resource: 'all', operation: 'write', tags: [] };
   const tool: Tool = {
     name: 'execute',
@@ -81,13 +70,10 @@ export function codeTool({
 
   const logger = getLogger();
 
-  const handler = async ({
-    reqContext,
-    args,
-  }: {
-    reqContext: McpRequestContext;
-    args: any;
-  }): Promise<ToolCallResult> => {
+  const handler = async (
+    {reqContext, args}:
+    {reqContext: McpRequestContext, args: any},
+  ): Promise<ToolCallResult> => {
     const code = args.code as string;
     // Do very basic blocking of code that includes forbidden method names.
     //
@@ -97,11 +83,7 @@ export function codeTool({
     if (blockedMethods) {
       const blockedMatches = blockedMethods.filter((method) => code.includes(method.fullyQualifiedName));
       if (blockedMatches.length > 0) {
-        return asErrorResult(
-          `The following methods have been blocked by the MCP server and cannot be used in code execution: ${blockedMatches
-            .map((m) => m.fullyQualifiedName)
-            .join(', ')}`,
-        );
+        return asErrorResult(`The following methods have been blocked by the MCP server and cannot be used in code execution: ${blockedMatches.map((m) => m.fullyQualifiedName).join(', ')}`);
       }
     }
 
@@ -126,48 +108,44 @@ export function codeTool({
       'Got code tool execution result',
     );
     return result;
-  };
+  }
 
   return { metadata, tool, handler };
 }
 
-const remoteStainlessHandler = async ({
-  reqContext,
-  args,
-}: {
-  reqContext: McpRequestContext;
-  args: any;
-}): Promise<ToolCallResult> => {
+const remoteStainlessHandler = async (
+  {reqContext, args}:
+  {reqContext: McpRequestContext, args: any},
+): Promise<ToolCallResult> => {
   const code = args.code as string;
   const intent = args.intent as string | undefined;
   const client = reqContext.client;
 
-  const codeModeEndpoint = readEnv('CODE_MODE_ENDPOINT_URL') ?? 'https://api.stainless.com/api/ai/code-tool';
+  const codeModeEndpoint = readEnv("CODE_MODE_ENDPOINT_URL") ?? "https://api.stainless.com/api/ai/code-tool";
 
   const localClientEnvs = {
-    DEDALUS_API_KEY: readEnv('DEDALUS_API_KEY') ?? client.apiKey ?? undefined,
-    DEDALUS_X_API_KEY: readEnv('DEDALUS_X_API_KEY') ?? client.xAPIKey ?? undefined,
-    DEDALUS_AS_URL: readEnv('DEDALUS_AS_URL') ?? client.asBaseURL ?? undefined,
-    DEDALUS_ORG_ID: readEnv('DEDALUS_ORG_ID') ?? client.dedalusOrgID ?? undefined,
-    DEDALUS_PROVIDER: readEnv('DEDALUS_PROVIDER') ?? client.provider ?? undefined,
-    DEDALUS_PROVIDER_KEY: readEnv('DEDALUS_PROVIDER_KEY') ?? client.providerKey ?? undefined,
-    DEDALUS_PROVIDER_MODEL: readEnv('DEDALUS_PROVIDER_MODEL') ?? client.providerModel ?? undefined,
-    DEDALUS_BASE_URL:
-      readEnv('DEDALUS_BASE_URL') ?? readEnv('DEDALUS_ENVIRONMENT') ? undefined : client.baseURL ?? undefined,
-  };
+  DEDALUS_API_KEY: readEnv('DEDALUS_API_KEY') ?? client.apiKey ?? undefined,
+  DEDALUS_X_API_KEY: readEnv('DEDALUS_X_API_KEY') ?? client.xAPIKey ?? undefined,
+  DEDALUS_AS_URL: readEnv('DEDALUS_AS_URL') ?? client.asBaseURL ?? undefined,
+  DEDALUS_ORG_ID: readEnv('DEDALUS_ORG_ID') ?? client.dedalusOrgID ?? undefined,
+  DEDALUS_PROVIDER: readEnv('DEDALUS_PROVIDER') ?? client.provider ?? undefined,
+  DEDALUS_PROVIDER_KEY: readEnv('DEDALUS_PROVIDER_KEY') ?? client.providerKey ?? undefined,
+  DEDALUS_PROVIDER_MODEL: readEnv('DEDALUS_PROVIDER_MODEL') ?? client.providerModel ?? undefined,
+  DEDALUS_BASE_URL: readEnv('DEDALUS_BASE_URL') ?? readEnv('DEDALUS_ENVIRONMENT') ? undefined : client.baseURL ?? undefined,
+};
   // Merge any upstream client envs from the request header, with upstream values taking precedence.
   const mergedClientEnvs = { ...localClientEnvs, ...reqContext.upstreamClientEnvs };
 
   // Setting a Stainless API key authenticates requests to the code tool endpoint.
   const res = await fetch(codeModeEndpoint, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      ...(reqContext.stainlessApiKey && { Authorization: reqContext.stainlessApiKey }),
-      'Content-Type': 'application/json',
-      'x-stainless-mcp-client-envs': JSON.stringify(mergedClientEnvs),
+      ...(reqContext.stainlessApiKey && { Authorization: reqContext.stainlessApiKey, }),
+      "Content-Type": "application/json",
+      "x-stainless-mcp-client-envs": JSON.stringify(mergedClientEnvs),
     },
     body: JSON.stringify({
-      project_name: 'dedalus-sdk',
+      project_name: "dedalus-sdk",
       code,
       intent,
       client_opts: { environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any },
@@ -176,18 +154,12 @@ const remoteStainlessHandler = async ({
 
   if (!res.ok) {
     if (res.status === 404 && !reqContext.stainlessApiKey) {
-      throw new Error(
-        'Could not access code tool for this project. You may need to provide a Stainless API key via the STAINLESS_API_KEY environment variable, the --stainless-api-key flag, or the x-stainless-api-key HTTP header.',
-      );
+      throw new Error('Could not access code tool for this project. You may need to provide a Stainless API key via the STAINLESS_API_KEY environment variable, the --stainless-api-key flag, or the x-stainless-api-key HTTP header.');
     }
-    throw new Error(
-      `${res.status}: ${
-        res.statusText
-      } error when trying to contact Code Tool server. Details: ${await res.text()}`,
-    );
+    throw new Error(`${res.status}: ${res.statusText} error when trying to contact Code Tool server. Details: ${await res.text()}`);
   }
 
-  const { is_error, result, log_lines, err_lines } = (await res.json()) as WorkerOutput;
+  const { is_error, result, log_lines, err_lines } = await res.json() as WorkerOutput;
   const hasLogs = log_lines.length > 0 || err_lines.length > 0;
   const output = {
     result,
@@ -195,18 +167,17 @@ const remoteStainlessHandler = async ({
     ...(err_lines.length > 0 && { err_lines }),
   };
   if (is_error) {
-    return asErrorResult(typeof result === 'string' && !hasLogs ? result : JSON.stringify(output, null, 2));
+    return asErrorResult(
+      typeof result === 'string' && !hasLogs ? result : JSON.stringify(output, null, 2),
+    );
   }
   return asTextContentResult(output);
 };
 
-const localDenoHandler = async ({
-  reqContext,
-  args,
-}: {
-  reqContext: McpRequestContext;
-  args: unknown;
-}): Promise<ToolCallResult> => {
+const localDenoHandler = async (
+  {reqContext, args} :
+  {reqContext: McpRequestContext, args: unknown},
+): Promise<ToolCallResult> => {
   const fs = await import('node:fs');
   const path = await import('node:path');
   const url = await import('node:url');
@@ -231,20 +202,24 @@ const localDenoHandler = async ({
   } catch {
     try {
       // Use deno binary in node_modules if it's found
-      const denoNodeModulesPath = path.resolve(packageNodeModulesPath, 'deno', 'bin.cjs');
+      const denoNodeModulesPath = path.resolve(
+        packageNodeModulesPath,
+        'deno',
+        'bin.cjs',
+      );
       await fs.promises.access(denoNodeModulesPath, fs.constants.X_OK);
       denoPath = denoNodeModulesPath;
     } catch {
       return asErrorResult(
         'Deno is required for code execution but was not found. ' +
-          'Install it from https://deno.land or run: npm install deno',
+        'Install it from https://deno.land or run: npm install deno',
       );
     }
   }
 
   const allowReadPaths = [
     'code-tool-worker.mjs',
-    `${workerPath.replace(/([\/\\]node_modules)[\/\\].+$/, '$1')}/`,
+    `${workerPath.replace(/([\/\\]node_modules)[\/\\].+$/, "$1")}/`,
     packageRoot,
   ];
 
@@ -278,7 +253,7 @@ const localDenoHandler = async ({
       // Merge any upstream client envs into the Deno subprocess environment,
       // with the upstream env vars taking precedence.
       env: { ...process.env, ...reqContext.upstreamClientEnvs },
-    },
+    }
   });
 
   try {
@@ -290,17 +265,17 @@ const localDenoHandler = async ({
       // Strip null/undefined values so that the worker SDK client can fall back to
       // reading from environment variables (including any upstreamClientEnvs).
       const opts = {
-        ...(client.baseURL != null ? { baseURL: client.baseURL } : undefined),
-        ...(client.apiKey != null ? { apiKey: client.apiKey } : undefined),
-        ...(client.xAPIKey != null ? { xAPIKey: client.xAPIKey } : undefined),
-        ...(client.asBaseURL != null ? { asBaseURL: client.asBaseURL } : undefined),
-        ...(client.dedalusOrgID != null ? { dedalusOrgID: client.dedalusOrgID } : undefined),
-        ...(client.provider != null ? { provider: client.provider } : undefined),
-        ...(client.providerKey != null ? { providerKey: client.providerKey } : undefined),
-        ...(client.providerModel != null ? { providerModel: client.providerModel } : undefined),
-        defaultHeaders: {
-          'X-Stainless-MCP': 'true',
-        },
+          ...(client.baseURL != null ? { baseURL: client.baseURL } : undefined),
+          ...(client.apiKey != null ? { apiKey: client.apiKey } : undefined),
+          ...(client.xAPIKey != null ? { xAPIKey: client.xAPIKey } : undefined),
+          ...(client.asBaseURL != null ? { asBaseURL: client.asBaseURL } : undefined),
+          ...(client.dedalusOrgID != null ? { dedalusOrgID: client.dedalusOrgID } : undefined),
+          ...(client.provider != null ? { provider: client.provider } : undefined),
+          ...(client.providerKey != null ? { providerKey: client.providerKey } : undefined),
+          ...(client.providerModel != null ? { providerModel: client.providerModel } : undefined),
+          defaultHeaders: {
+            'X-Stainless-MCP': 'true',
+          },
       } satisfies Partial<ClientOptions> as ClientOptions;
 
       const req = worker.request(
@@ -347,12 +322,11 @@ const localDenoHandler = async ({
     if (resp.status === 200) {
       const { result, log_lines, err_lines } = (await resp.json()) as WorkerOutput;
       const returnOutput: ContentBlock | null =
-        result == null ? null : (
-          {
+        result == null ? null
+        : {
             type: 'text',
             text: typeof result === 'string' ? result : JSON.stringify(result),
-          }
-        );
+          };
       const logOutput: ContentBlock | null =
         log_lines.length === 0 ?
           null
@@ -373,12 +347,11 @@ const localDenoHandler = async ({
     } else {
       const { result, log_lines, err_lines } = (await resp.json()) as WorkerOutput;
       const messageOutput: ContentBlock | null =
-        result == null ? null : (
-          {
+        result == null ? null
+        : {
             type: 'text',
             text: typeof result === 'string' ? result : JSON.stringify(result),
-          }
-        );
+          };
       const logOutput: ContentBlock | null =
         log_lines.length === 0 ?
           null

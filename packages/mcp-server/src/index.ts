@@ -17,7 +17,7 @@ async function main() {
   const selectedTools = await selectToolsOrError(options);
 
   getLogger().info(
-    { tools: selectedTools.map((e) => e.tool.name) },
+    {tools: selectedTools.map((e) => e.tool.name)},
     `MCP Server starting with ${selectedTools.length} tools`,
   );
 
