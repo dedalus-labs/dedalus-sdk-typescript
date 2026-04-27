@@ -2,7 +2,52 @@
 
 import { APIResource } from '../../core/resource';
 import * as CompletionsAPI from './completions';
-import { Audio, ChatCompletion, ChatCompletionAssistantMessageParam, ChatCompletionAudioParam, ChatCompletionChunk, ChatCompletionContentPartFileParam, ChatCompletionContentPartImageParam, ChatCompletionContentPartInputAudioParam, ChatCompletionContentPartRefusalParam, ChatCompletionContentPartTextParam, ChatCompletionCreateParams, ChatCompletionDeveloperMessageParam, ChatCompletionFunctionMessageParam, ChatCompletionFunctions, ChatCompletionMessage, ChatCompletionMessageCustomToolCall, ChatCompletionMessageToolCall, ChatCompletionSystemMessageParam, ChatCompletionTokenLogprob, ChatCompletionToolMessageParam, ChatCompletionToolParam, ChatCompletionUserMessageParam, Choice, ChoiceDelta, ChoiceDeltaToolCall, ChoiceLogprobs, CompletionCreateParams, CompletionCreateParamsNonStreaming, CompletionCreateParamsStreaming, CompletionTokensDetails, CompletionUsage, Completions, DeferredCallResponse, InputTokenDetails, PredictionContent, PromptTokensDetails, StreamChoice, StreamChoiceLogprobs, ThinkingConfigDisabled, ThinkingConfigEnabled, ToolChoiceAny, ToolChoiceAuto, ToolChoiceNone, ToolChoiceTool } from './completions';
+import {
+  Audio,
+  ChatCompletion,
+  ChatCompletionAssistantMessageParam,
+  ChatCompletionAudioParam,
+  ChatCompletionChunk,
+  ChatCompletionContentPartFileParam,
+  ChatCompletionContentPartImageParam,
+  ChatCompletionContentPartInputAudioParam,
+  ChatCompletionContentPartRefusalParam,
+  ChatCompletionContentPartTextParam,
+  ChatCompletionCreateParams,
+  ChatCompletionDeveloperMessageParam,
+  ChatCompletionFunctionMessageParam,
+  ChatCompletionFunctions,
+  ChatCompletionMessage,
+  ChatCompletionMessageCustomToolCall,
+  ChatCompletionMessageToolCall,
+  ChatCompletionSystemMessageParam,
+  ChatCompletionTokenLogprob,
+  ChatCompletionToolMessageParam,
+  ChatCompletionToolParam,
+  ChatCompletionUserMessageParam,
+  Choice,
+  ChoiceDelta,
+  ChoiceDeltaToolCall,
+  ChoiceLogprobs,
+  CompletionCreateParams,
+  CompletionCreateParamsNonStreaming,
+  CompletionCreateParamsStreaming,
+  CompletionTokensDetails,
+  CompletionUsage,
+  Completions,
+  DeferredCallResponse,
+  InputTokenDetails,
+  PredictionContent,
+  PromptTokensDetails,
+  StreamChoice,
+  StreamChoiceLogprobs,
+  ThinkingConfigDisabled,
+  ThinkingConfigEnabled,
+  ToolChoiceAny,
+  ToolChoiceAuto,
+  ToolChoiceNone,
+  ToolChoiceTool,
+} from './completions';
 
 export class Chat extends APIResource {
   completions: CompletionsAPI.Completions = new CompletionsAPI.Completions(this._client);
@@ -55,6 +100,6 @@ export declare namespace Chat {
     type ToolChoiceTool as ToolChoiceTool,
     type CompletionCreateParams as CompletionCreateParams,
     type CompletionCreateParamsNonStreaming as CompletionCreateParamsNonStreaming,
-    type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming
+    type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming,
   };
 }

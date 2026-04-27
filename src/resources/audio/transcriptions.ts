@@ -24,7 +24,10 @@ export class Transcriptions extends APIResource {
    * Returns: Transcription object with the transcribed text
    */
   create(body: TranscriptionCreateParams, options?: RequestOptions): APIPromise<TranscriptionCreateResponse> {
-    return this._client.post('/v1/audio/transcriptions', multipartFormRequestOptions({ body, ...options }, this._client));
+    return this._client.post(
+      '/v1/audio/transcriptions',
+      multipartFormRequestOptions({ body, ...options }, this._client),
+    );
   }
 }
 
@@ -41,7 +44,9 @@ export class Transcriptions extends APIResource {
  * - segments (optional): list[TranscriptionSegment]
  * - usage (optional): TranscriptTextUsageDuration
  */
-export type TranscriptionCreateResponse = TranscriptionCreateResponse.CreateTranscriptionResponseVerboseJSON | TranscriptionCreateResponse.CreateTranscriptionResponseJSON
+export type TranscriptionCreateResponse =
+  | TranscriptionCreateResponse.CreateTranscriptionResponseVerboseJSON
+  | TranscriptionCreateResponse.CreateTranscriptionResponseJSON;
 
 export namespace TranscriptionCreateResponse {
   /**
@@ -225,7 +230,9 @@ export namespace TranscriptionCreateResponse {
     /**
      * Token usage statistics for the request.
      */
-    usage?: CreateTranscriptionResponseJSON.TranscriptTextUsageTokens | CreateTranscriptionResponseJSON.TranscriptTextUsageDuration;
+    usage?:
+      | CreateTranscriptionResponseJSON.TranscriptTextUsageTokens
+      | CreateTranscriptionResponseJSON.TranscriptTextUsageDuration;
   }
 
   export namespace CreateTranscriptionResponseJSON {
@@ -330,6 +337,6 @@ export interface TranscriptionCreateParams {
 export declare namespace Transcriptions {
   export {
     type TranscriptionCreateResponse as TranscriptionCreateResponse,
-    type TranscriptionCreateParams as TranscriptionCreateParams
+    type TranscriptionCreateParams as TranscriptionCreateParams,
   };
 }

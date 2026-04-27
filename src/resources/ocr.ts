@@ -74,6 +74,6 @@ export declare namespace OCR {
     type OCRPage as OCRPage,
     type OCRRequest as OCRRequest,
     type OCRResponse as OCRResponse,
-    type OCRProcessParams as OCRProcessParams
+    type OCRProcessParams as OCRProcessParams,
   };
 }

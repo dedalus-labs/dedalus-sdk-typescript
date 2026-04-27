@@ -847,8 +847,5 @@ export namespace ResponseCreateParams {
 }
 
 export declare namespace Responses {
-  export {
-    type Response as Response,
-    type ResponseCreateParams as ResponseCreateParams
-  };
+  export { type Response as Response, type ResponseCreateParams as ResponseCreateParams };
 }

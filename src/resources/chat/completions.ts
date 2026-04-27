@@ -69,11 +69,22 @@ export class Completions extends APIResource {
    * );
    * ```
    */
-  create(body: CompletionCreateParamsNonStreaming, options?: RequestOptions): APIPromise<ChatCompletion>
-  create(body: CompletionCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<ChatCompletionChunk>>
-  create(body: CompletionCreateParamsBase, options?: RequestOptions): APIPromise<Stream<ChatCompletionChunk> | ChatCompletion>
-  create(body: CompletionCreateParams, options?: RequestOptions): APIPromise<ChatCompletion> | APIPromise<Stream<ChatCompletionChunk>> {
-    return this._client.post('/v1/chat/completions', { body, ...options, stream: body.stream ?? false }) as APIPromise<ChatCompletion> | APIPromise<Stream<ChatCompletionChunk>>;
+  create(body: CompletionCreateParamsNonStreaming, options?: RequestOptions): APIPromise<ChatCompletion>;
+  create(
+    body: CompletionCreateParamsStreaming,
+    options?: RequestOptions,
+  ): APIPromise<Stream<ChatCompletionChunk>>;
+  create(
+    body: CompletionCreateParamsBase,
+    options?: RequestOptions,
+  ): APIPromise<Stream<ChatCompletionChunk> | ChatCompletion>;
+  create(
+    body: CompletionCreateParams,
+    options?: RequestOptions,
+  ): APIPromise<ChatCompletion> | APIPromise<Stream<ChatCompletionChunk>> {
+    return this._client.post('/v1/chat/completions', { body, ...options, stream: body.stream ?? false }) as
+      | APIPromise<ChatCompletion>
+      | APIPromise<Stream<ChatCompletionChunk>>;
   }
 }
 
@@ -366,7 +377,19 @@ export interface ChatCompletionAudioParam {
    * `marin`, and `cedar`. You may also provide a custom voice object with an `id`,
    * for example `{ "id": "voice_1234" }`.
    */
-  voice: string | 'alloy' | 'ash' | 'ballad' | 'coral' | 'echo' | 'sage' | 'shimmer' | 'verse' | 'marin' | 'cedar' | Shared.VoiceIDsOrCustomVoice;
+  voice:
+    | string
+    | 'alloy'
+    | 'ash'
+    | 'ballad'
+    | 'coral'
+    | 'echo'
+    | 'sage'
+    | 'shimmer'
+    | 'verse'
+    | 'marin'
+    | 'cedar'
+    | Shared.VoiceIDsOrCustomVoice;
 }
 
 /**
@@ -802,7 +825,14 @@ export interface ChatCompletionCreateParams {
   /**
    * Conversation history (OpenAI: messages, Google: contents, Responses: input)
    */
-  messages?: Array<ChatCompletionDeveloperMessageParam | ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam | ChatCompletionAssistantMessageParam | ChatCompletionToolMessageParam | ChatCompletionFunctionMessageParam> | null;
+  messages?: Array<
+    | ChatCompletionDeveloperMessageParam
+    | ChatCompletionSystemMessageParam
+    | ChatCompletionUserMessageParam
+    | ChatCompletionAssistantMessageParam
+    | ChatCompletionToolMessageParam
+    | ChatCompletionFunctionMessageParam
+  > | null;
 
   /**
    * Set of 16 key-value pairs that can be attached to an object. This can be useful
@@ -905,7 +935,11 @@ export interface ChatCompletionCreateParams {
    * message the model generates is valid JSON. Using `json_schema` is preferred for
    * models that support it.
    */
-  response_format?: Shared.ResponseFormatText | Shared.ResponseFormatJSONSchema | Shared.ResponseFormatJSONObject | null;
+  response_format?:
+    | Shared.ResponseFormatText
+    | Shared.ResponseFormatJSONSchema
+    | Shared.ResponseFormatJSONObject
+    | null;
 
   /**
    * Whether to inject a safety prompt before all conversations.
@@ -984,7 +1018,11 @@ export interface ChatCompletionCreateParams {
   /**
    * Extended thinking configuration (Anthropic-specific)
    */
-  thinking?: ThinkingConfigEnabled | ThinkingConfigDisabled | ChatCompletionCreateParams.ThinkingConfigAdaptive | null;
+  thinking?:
+    | ThinkingConfigEnabled
+    | ThinkingConfigDisabled
+    | ChatCompletionCreateParams.ThinkingConfigAdaptive
+    | null;
 
   /**
    * Controls which (if any) tool is called by the model. `none` means the model will
@@ -1046,7 +1084,7 @@ export interface ChatCompletionCreateParams {
    */
   web_search_options?: Shared.JSONObjectInput | null;
 
-[k: string]: unknown
+  [k: string]: unknown;
 }
 
 export namespace ChatCompletionCreateParams {
@@ -1067,12 +1105,30 @@ export namespace ChatCompletionCreateParams {
     /**
      * Required. The category for this setting.
      */
-    category: 'HARM_CATEGORY_UNSPECIFIED' | 'HARM_CATEGORY_DEROGATORY' | 'HARM_CATEGORY_TOXICITY' | 'HARM_CATEGORY_VIOLENCE' | 'HARM_CATEGORY_SEXUAL' | 'HARM_CATEGORY_MEDICAL' | 'HARM_CATEGORY_DANGEROUS' | 'HARM_CATEGORY_HARASSMENT' | 'HARM_CATEGORY_HATE_SPEECH' | 'HARM_CATEGORY_SEXUALLY_EXPLICIT' | 'HARM_CATEGORY_DANGEROUS_CONTENT' | 'HARM_CATEGORY_CIVIC_INTEGRITY';
+    category:
+      | 'HARM_CATEGORY_UNSPECIFIED'
+      | 'HARM_CATEGORY_DEROGATORY'
+      | 'HARM_CATEGORY_TOXICITY'
+      | 'HARM_CATEGORY_VIOLENCE'
+      | 'HARM_CATEGORY_SEXUAL'
+      | 'HARM_CATEGORY_MEDICAL'
+      | 'HARM_CATEGORY_DANGEROUS'
+      | 'HARM_CATEGORY_HARASSMENT'
+      | 'HARM_CATEGORY_HATE_SPEECH'
+      | 'HARM_CATEGORY_SEXUALLY_EXPLICIT'
+      | 'HARM_CATEGORY_DANGEROUS_CONTENT'
+      | 'HARM_CATEGORY_CIVIC_INTEGRITY';
 
     /**
      * Required. Controls the probability threshold at which harm is blocked.
      */
-    threshold: 'HARM_BLOCK_THRESHOLD_UNSPECIFIED' | 'BLOCK_LOW_AND_ABOVE' | 'BLOCK_MEDIUM_AND_ABOVE' | 'BLOCK_ONLY_HIGH' | 'BLOCK_NONE' | 'OFF';
+    threshold:
+      | 'HARM_BLOCK_THRESHOLD_UNSPECIFIED'
+      | 'BLOCK_LOW_AND_ABOVE'
+      | 'BLOCK_MEDIUM_AND_ABOVE'
+      | 'BLOCK_ONLY_HIGH'
+      | 'BLOCK_NONE'
+      | 'OFF';
   }
 
   /**
@@ -1635,7 +1691,14 @@ export interface ChatCompletionUserMessageParam {
   /**
    * The contents of the user message.
    */
-  content: string | Array<ChatCompletionContentPartTextParam | ChatCompletionContentPartImageParam | ChatCompletionContentPartInputAudioParam | ChatCompletionContentPartFileParam>;
+  content:
+    | string
+    | Array<
+        | ChatCompletionContentPartTextParam
+        | ChatCompletionContentPartImageParam
+        | ChatCompletionContentPartInputAudioParam
+        | ChatCompletionContentPartFileParam
+      >;
 
   /**
    * The role of the messages author, in this case `user`.
@@ -2176,7 +2239,7 @@ export interface ToolChoiceTool {
   disable_parallel_tool_use?: boolean;
 }
 
-export type CompletionCreateParams = CompletionCreateParamsNonStreaming | CompletionCreateParamsStreaming
+export type CompletionCreateParams = CompletionCreateParamsNonStreaming | CompletionCreateParamsStreaming;
 
 export interface CompletionCreateParamsBase {
   /**
@@ -2330,7 +2393,14 @@ export interface CompletionCreateParamsBase {
   /**
    * Conversation history (OpenAI: messages, Google: contents, Responses: input)
    */
-  messages?: Array<ChatCompletionDeveloperMessageParam | ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam | ChatCompletionAssistantMessageParam | ChatCompletionToolMessageParam | ChatCompletionFunctionMessageParam> | null;
+  messages?: Array<
+    | ChatCompletionDeveloperMessageParam
+    | ChatCompletionSystemMessageParam
+    | ChatCompletionUserMessageParam
+    | ChatCompletionAssistantMessageParam
+    | ChatCompletionToolMessageParam
+    | ChatCompletionFunctionMessageParam
+  > | null;
 
   /**
    * Set of 16 key-value pairs that can be attached to an object. This can be useful
@@ -2433,7 +2503,11 @@ export interface CompletionCreateParamsBase {
    * message the model generates is valid JSON. Using `json_schema` is preferred for
    * models that support it.
    */
-  response_format?: Shared.ResponseFormatText | Shared.ResponseFormatJSONSchema | Shared.ResponseFormatJSONObject | null;
+  response_format?:
+    | Shared.ResponseFormatText
+    | Shared.ResponseFormatJSONSchema
+    | Shared.ResponseFormatJSONObject
+    | null;
 
   /**
    * Whether to inject a safety prompt before all conversations.
@@ -2512,7 +2586,11 @@ export interface CompletionCreateParamsBase {
   /**
    * Extended thinking configuration (Anthropic-specific)
    */
-  thinking?: ThinkingConfigEnabled | ThinkingConfigDisabled | CompletionCreateParams.ThinkingConfigAdaptive | null;
+  thinking?:
+    | ThinkingConfigEnabled
+    | ThinkingConfigDisabled
+    | CompletionCreateParams.ThinkingConfigAdaptive
+    | null;
 
   /**
    * Controls which (if any) tool is called by the model. `none` means the model will
@@ -2574,7 +2652,7 @@ export interface CompletionCreateParamsBase {
    */
   web_search_options?: Shared.JSONObjectInput | null;
 
-[k: string]: unknown
+  [k: string]: unknown;
 }
 
 export namespace CompletionCreateParams {
@@ -2595,12 +2673,30 @@ export namespace CompletionCreateParams {
     /**
      * Required. The category for this setting.
      */
-    category: 'HARM_CATEGORY_UNSPECIFIED' | 'HARM_CATEGORY_DEROGATORY' | 'HARM_CATEGORY_TOXICITY' | 'HARM_CATEGORY_VIOLENCE' | 'HARM_CATEGORY_SEXUAL' | 'HARM_CATEGORY_MEDICAL' | 'HARM_CATEGORY_DANGEROUS' | 'HARM_CATEGORY_HARASSMENT' | 'HARM_CATEGORY_HATE_SPEECH' | 'HARM_CATEGORY_SEXUALLY_EXPLICIT' | 'HARM_CATEGORY_DANGEROUS_CONTENT' | 'HARM_CATEGORY_CIVIC_INTEGRITY';
+    category:
+      | 'HARM_CATEGORY_UNSPECIFIED'
+      | 'HARM_CATEGORY_DEROGATORY'
+      | 'HARM_CATEGORY_TOXICITY'
+      | 'HARM_CATEGORY_VIOLENCE'
+      | 'HARM_CATEGORY_SEXUAL'
+      | 'HARM_CATEGORY_MEDICAL'
+      | 'HARM_CATEGORY_DANGEROUS'
+      | 'HARM_CATEGORY_HARASSMENT'
+      | 'HARM_CATEGORY_HATE_SPEECH'
+      | 'HARM_CATEGORY_SEXUALLY_EXPLICIT'
+      | 'HARM_CATEGORY_DANGEROUS_CONTENT'
+      | 'HARM_CATEGORY_CIVIC_INTEGRITY';
 
     /**
      * Required. Controls the probability threshold at which harm is blocked.
      */
-    threshold: 'HARM_BLOCK_THRESHOLD_UNSPECIFIED' | 'BLOCK_LOW_AND_ABOVE' | 'BLOCK_MEDIUM_AND_ABOVE' | 'BLOCK_ONLY_HIGH' | 'BLOCK_NONE' | 'OFF';
+    threshold:
+      | 'HARM_BLOCK_THRESHOLD_UNSPECIFIED'
+      | 'BLOCK_LOW_AND_ABOVE'
+      | 'BLOCK_MEDIUM_AND_ABOVE'
+      | 'BLOCK_ONLY_HIGH'
+      | 'BLOCK_NONE'
+      | 'OFF';
   }
 
   /**
@@ -2614,8 +2710,8 @@ export namespace CompletionCreateParams {
     type: 'adaptive';
   }
 
-  export type CompletionCreateParamsNonStreaming = CompletionsAPI.CompletionCreateParamsNonStreaming
-  export type CompletionCreateParamsStreaming = CompletionsAPI.CompletionCreateParamsStreaming
+  export type CompletionCreateParamsNonStreaming = CompletionsAPI.CompletionCreateParamsNonStreaming;
+  export type CompletionCreateParamsStreaming = CompletionsAPI.CompletionCreateParamsStreaming;
 }
 
 export interface CompletionCreateParamsNonStreaming extends CompletionCreateParamsBase {
@@ -2624,7 +2720,7 @@ export interface CompletionCreateParamsNonStreaming extends CompletionCreatePara
    */
   stream?: false | null;
 
-[k: string]: unknown
+  [k: string]: unknown;
 }
 
 export interface CompletionCreateParamsStreaming extends CompletionCreateParamsBase {
@@ -2633,7 +2729,7 @@ export interface CompletionCreateParamsStreaming extends CompletionCreateParamsB
    */
   stream: true;
 
-[k: string]: unknown
+  [k: string]: unknown;
 }
 
 export declare namespace Completions {
@@ -2680,6 +2776,6 @@ export declare namespace Completions {
     type ToolChoiceTool as ToolChoiceTool,
     type CompletionCreateParams as CompletionCreateParams,
     type CompletionCreateParamsNonStreaming as CompletionCreateParamsNonStreaming,
-    type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming
+    type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming,
   };
 }

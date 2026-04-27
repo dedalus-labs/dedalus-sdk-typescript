@@ -3,7 +3,9 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
-  CallToolRequestSchema,ListToolsRequestSchema,SetLevelRequestSchema
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  SetLevelRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { ClientOptions } from 'dedalus-labs';
 import Dedalus from 'dedalus-labs';
@@ -14,25 +16,26 @@ import { LocalDocsSearch } from './local-docs-search';
 import { getInstructions } from './instructions';
 import { McpOptions } from './options';
 import { blockedMethodsForCodeTool } from './methods';
-import { HandlerFunction, McpRequestContext, ToolCallResult, McpTool } from "./types"
+import { HandlerFunction, McpRequestContext, ToolCallResult, McpTool } from './types';
 import { readEnv } from './util';
 
 export const newMcpServer = async ({
   stainlessApiKey,
   customInstructionsPath,
 }: {
-  stainlessApiKey?: string | undefined,
-  customInstructionsPath?: string | undefined,
-}) => new McpServer(
-  {
-    name: 'dedalus_labs_api',
-    version: '0.1.0-alpha.9',
-  },
-  {
-    instructions: await getInstructions({stainlessApiKey, customInstructionsPath}),
-    capabilities: { tools: {}, logging: {} },
-  }
-);
+  stainlessApiKey?: string | undefined;
+  customInstructionsPath?: string | undefined;
+}) =>
+  new McpServer(
+    {
+      name: 'dedalus_labs_api',
+      version: '0.1.0-alpha.9',
+    },
+    {
+      instructions: await getInstructions({ stainlessApiKey, customInstructionsPath }),
+      capabilities: { tools: {}, logging: {} },
+    },
+  );
 
 /**
  * Initializes the provided MCP Server with the given tools and handlers.
@@ -54,15 +57,15 @@ export async function initMcpServer(params: {
     (message: string, ...rest: unknown[]) => {
       void server.sendLoggingMessage({
         level,
-        data: {message, rest},
+        data: { message, rest },
       });
-    }
+    };
   const logger = {
-    debug: logAtLevel("debug"),
-    info: logAtLevel("info"),
-    warn: logAtLevel("warning"),
-    error: logAtLevel("error"),
-  }
+    debug: logAtLevel('debug'),
+    info: logAtLevel('info'),
+    warn: logAtLevel('warning'),
+    error: logAtLevel('error'),
+  };
 
   if (params.mcpOptions?.docsSearchMode === 'local') {
     const docsDir = params.mcpOptions?.docsDir;
@@ -79,14 +82,14 @@ export async function initMcpServer(params: {
     if (!_client) {
       try {
         _client = new Dedalus({
-  ...({ environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any }),
-  logger,
-  ...params.clientOptions,
-  defaultHeaders: {
-    ...params.clientOptions?.defaultHeaders,
-    'X-Stainless-MCP': 'true',
-  },
-});
+          ...{ environment: (readEnv('DEDALUS_ENVIRONMENT') || undefined) as any },
+          logger,
+          ...params.clientOptions,
+          defaultHeaders: {
+            ...params.clientOptions?.defaultHeaders,
+            'X-Stainless-MCP': 'true',
+          },
+        });
         if (_logLevel) {
           _client = _client.withOptions({ logLevel: _logLevel });
         }
@@ -119,10 +122,12 @@ export async function initMcpServer(params: {
       client = getClient();
     } catch (error) {
       return {
-        content: [{
-          type: 'text' as const,
-          text: `Failed to initialize client: ${error instanceof Error ? error.message : String(error)}`,
-        }],
+        content: [
+          {
+            type: 'text' as const,
+            text: `Failed to initialize client: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
         isError: true,
       };
     }
@@ -172,17 +177,16 @@ export async function initMcpServer(params: {
 /**
  * Selects the tools to include in the MCP Server based on the provided options.
  */
-export function selectTools(
-  options?: McpOptions
-): McpTool[] {
-
+export function selectTools(options?: McpOptions): McpTool[] {
   const includedTools = [];
 
   if (options?.includeCodeTool ?? true) {
-    includedTools.push(codeTool({
-      blockedMethods: blockedMethodsForCodeTool(options),
-      codeExecutionMode: options?.codeExecutionMode ?? 'stainless-sandbox',
-    }));
+    includedTools.push(
+      codeTool({
+        blockedMethods: blockedMethodsForCodeTool(options),
+        codeExecutionMode: options?.codeExecutionMode ?? 'stainless-sandbox',
+      }),
+    );
   }
   if (options?.includeDocsTools ?? true) {
     includedTools.push(docsSearchTool);
@@ -193,13 +197,14 @@ export function selectTools(
 /**
  * Runs the provided handler with the given client and arguments.
  */
-export async function executeHandler(
-  {handler, reqContext, args}:
-  {
-    handler: HandlerFunction;
-    reqContext: McpRequestContext;
-    args: Record<string, unknown> | undefined;
-  }
-): Promise<ToolCallResult> {
-  return await handler({reqContext, args: args || {}});
+export async function executeHandler({
+  handler,
+  reqContext,
+  args,
+}: {
+  handler: HandlerFunction;
+  reqContext: McpRequestContext;
+  args: Record<string, unknown> | undefined;
+}): Promise<ToolCallResult> {
+  return await handler({ reqContext, args: args || {} });
 }

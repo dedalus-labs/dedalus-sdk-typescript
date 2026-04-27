@@ -2,19 +2,19 @@
 
 import { castToError } from '../internal/errors';
 
-export class DedalusError extends Error {
-}
+export class DedalusError extends Error {}
 
-export class APIError<TStatus extends number | undefined = number | undefined, THeaders extends Headers | undefined = Headers | undefined, TError extends Object | undefined = Object | undefined> extends DedalusError {
+export class APIError<
+  TStatus extends number | undefined = number | undefined,
+  THeaders extends Headers | undefined = Headers | undefined,
+  TError extends Object | undefined = Object | undefined,
+> extends DedalusError {
   /** HTTP status for the response that caused the error */
   readonly status: TStatus;
   /** HTTP headers for the response that caused the error */
   readonly headers: THeaders;
   /** JSON body of the response that caused the error */
   readonly error: TError;
-
-
-  ;
 
   constructor(status: TStatus, error: TError, message: string | undefined, headers: THeaders) {
     super(`${APIError.makeMessage(status, error, message)}`);
@@ -26,7 +26,8 @@ export class APIError<TStatus extends number | undefined = number | undefined, T
   private static makeMessage(status: number | undefined, error: any, message: string | undefined) {
     const msg =
       error?.message ?
-        typeof error.message === 'string' ? error.message
+        typeof error.message === 'string' ?
+          error.message
         : JSON.stringify(error.message)
       : error ? JSON.stringify(error)
       : message;
@@ -43,7 +44,12 @@ export class APIError<TStatus extends number | undefined = number | undefined, T
     return '(no status code or body)';
   }
 
-  static generate(status: number | undefined, errorResponse: Object | undefined, message: string | undefined, headers: Headers | undefined): APIError {
+  static generate(
+    status: number | undefined,
+    errorResponse: Object | undefined,
+    message: string | undefined,
+    headers: Headers | undefined,
+  ): APIError {
     if (!status || !headers) {
       return new APIConnectionError({ message, cause: castToError(errorResponse) });
     }
@@ -107,26 +113,18 @@ export class APIConnectionTimeoutError extends APIConnectionError {
   }
 }
 
-export class BadRequestError extends APIError<400, Headers> {
-}
+export class BadRequestError extends APIError<400, Headers> {}
 
-export class AuthenticationError extends APIError<401, Headers> {
-}
+export class AuthenticationError extends APIError<401, Headers> {}
 
-export class PermissionDeniedError extends APIError<403, Headers> {
-}
+export class PermissionDeniedError extends APIError<403, Headers> {}
 
-export class NotFoundError extends APIError<404, Headers> {
-}
+export class NotFoundError extends APIError<404, Headers> {}
 
-export class ConflictError extends APIError<409, Headers> {
-}
+export class ConflictError extends APIError<409, Headers> {}
 
-export class UnprocessableEntityError extends APIError<422, Headers> {
-}
+export class UnprocessableEntityError extends APIError<422, Headers> {}
 
-export class RateLimitError extends APIError<429, Headers> {
-}
+export class RateLimitError extends APIError<429, Headers> {}
 
-export class InternalServerError extends APIError<number, Headers> {
-}
+export class InternalServerError extends APIError<number, Headers> {}

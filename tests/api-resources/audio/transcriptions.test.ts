@@ -2,12 +2,18 @@
 
 import Dedalus, { toFile } from 'dedalus-labs';
 
-const client = new Dedalus({ apiKey: 'My API Key', baseURL: process.env["TEST_API_BASE_URL"] ?? 'http://127.0.0.1:4010' });
+const client = new Dedalus({
+  apiKey: 'My API Key',
+  baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
+});
 
 describe('resource transcriptions', () => {
   // Mock server tests are disabled
   test.skip('create: only required params', async () => {
-    const responsePromise = client.audio.transcriptions.create({ file: await toFile(Buffer.from('Example data'), 'README.md'), model: 'model' });
+    const responsePromise = client.audio.transcriptions.create({
+      file: await toFile(Buffer.from('Example data'), 'README.md'),
+      model: 'model',
+    });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -20,12 +26,12 @@ describe('resource transcriptions', () => {
   // Mock server tests are disabled
   test.skip('create: required and optional params', async () => {
     const response = await client.audio.transcriptions.create({
-    file: await toFile(Buffer.from('Example data'), 'README.md'),
-    model: 'model',
-    language: 'language',
-    prompt: 'prompt',
-    response_format: 'response_format',
-    temperature: 0,
-  });
+      file: await toFile(Buffer.from('Example data'), 'README.md'),
+      model: 'model',
+      language: 'language',
+      prompt: 'prompt',
+      response_format: 'response_format',
+      temperature: 0,
+    });
   });
 });

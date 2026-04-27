@@ -95,7 +95,17 @@ export interface Model {
   /**
    * Provider that hosts this model
    */
-  provider: 'openai' | 'anthropic' | 'google' | 'xai' | 'mistral' | 'groq' | 'fireworks' | 'deepseek' | 'moonshot' | 'cerebras';
+  provider:
+    | 'openai'
+    | 'anthropic'
+    | 'google'
+    | 'xai'
+    | 'mistral'
+    | 'groq'
+    | 'fireworks'
+    | 'deepseek'
+    | 'moonshot'
+    | 'cerebras';
 
   /**
    * Normalized model capabilities across all providers.
@@ -216,8 +226,5 @@ export namespace Model {
 }
 
 export declare namespace Models {
-  export {
-    type ListModelsResponse as ListModelsResponse,
-    type Model as Model
-  };
+  export { type ListModelsResponse as ListModelsResponse, type Model as Model };
 }

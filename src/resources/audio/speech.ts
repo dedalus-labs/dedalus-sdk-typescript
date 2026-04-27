@@ -17,7 +17,12 @@ export class Speech extends APIResource {
    * users.
    */
   create(body: SpeechCreateParams, options?: RequestOptions): APIPromise<Response> {
-    return this._client.post('/v1/audio/speech', { body, ...options, headers: buildHeaders([{Accept: 'audio/mpeg'}, options?.headers]), __binaryResponse: true });
+    return this._client.post('/v1/audio/speech', {
+      body,
+      ...options,
+      headers: buildHeaders([{ Accept: 'audio/mpeg' }, options?.headers]),
+      __binaryResponse: true,
+    });
   }
 }
 
@@ -41,7 +46,19 @@ export interface SpeechCreateParams {
    * voices are available in the
    * [Text to speech guide](/docs/guides/text-to-speech#voice-options).
    */
-  voice: string | 'alloy' | 'ash' | 'ballad' | 'coral' | 'echo' | 'sage' | 'shimmer' | 'verse' | 'marin' | 'cedar' | Shared.VoiceIDsOrCustomVoice;
+  voice:
+    | string
+    | 'alloy'
+    | 'ash'
+    | 'ballad'
+    | 'coral'
+    | 'echo'
+    | 'sage'
+    | 'shimmer'
+    | 'verse'
+    | 'marin'
+    | 'cedar'
+    | Shared.VoiceIDsOrCustomVoice;
 
   /**
    * Control the voice of your generated audio with additional instructions. Does not
@@ -69,7 +86,5 @@ export interface SpeechCreateParams {
 }
 
 export declare namespace Speech {
-  export {
-    type SpeechCreateParams as SpeechCreateParams
-  };
+  export { type SpeechCreateParams as SpeechCreateParams };
 }

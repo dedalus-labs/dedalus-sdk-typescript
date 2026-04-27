@@ -59,8 +59,8 @@ function getTSDiagnostics(code: string): string[] {
   const codeWithImport = [
     'import { Dedalus } from "dedalus-labs";',
     functionSource.type === 'declaration' ?
-      `async function run(${functionSource.client}: Dedalus)` :
-      `const run: (${functionSource.client}: Dedalus) => Promise<unknown> =`,
+      `async function run(${functionSource.client}: Dedalus)`
+    : `const run: (${functionSource.client}: Dedalus) => Promise<unknown> =`,
     functionSource.code,
   ].join('\n');
   const sourcePath = path.resolve('code.ts');
@@ -108,18 +108,18 @@ function getTSDiagnostics(code: string): string[] {
 
 const fuse = new Fuse(
   [
-    "client.models.list",
-    "client.models.retrieve",
-    "client.embeddings.create",
-    "client.audio.speech.create",
-    "client.audio.transcriptions.create",
-    "client.audio.translations.create",
-    "client.images.createVariation",
-    "client.images.edit",
-    "client.images.generate",
-    "client.ocr.process",
-    "client.responses.create",
-    "client.chat.completions.create"
+    'client.models.list',
+    'client.models.retrieve',
+    'client.embeddings.create',
+    'client.audio.speech.create',
+    'client.audio.transcriptions.create',
+    'client.audio.translations.create',
+    'client.images.createVariation',
+    'client.images.edit',
+    'client.images.generate',
+    'client.ocr.process',
+    'client.responses.create',
+    'client.chat.completions.create',
   ],
   { threshold: 1, shouldSort: true },
 );
@@ -202,7 +202,12 @@ function parseError(code: string, error: unknown): string | undefined {
     // Deno uses V8; the first "<anonymous>:LINE:COLUMN" is the top of stack.
     const lineNumber = error.stack?.match(/<anonymous>:([0-9]+):[0-9]+/)?.[1];
     // -1 for the zero-based indexing
-    const line = lineNumber && code.split('\n').at(parseInt(lineNumber, 10) - 1)?.trim();
+    const line =
+      lineNumber &&
+      code
+        .split('\n')
+        .at(parseInt(lineNumber, 10) - 1)
+        ?.trim();
     return line ? `${message}\n  at line ${lineNumber}\n    ${line}` : message;
   } catch {
     return message;
@@ -214,8 +219,9 @@ const fetch = async (req: Request): Promise<Response> => {
 
   const runFunctionSource = code ? getRunFunctionSource(code) : null;
   if (!runFunctionSource) {
-    const message = code
-      ? 'The code is missing a top-level `run` function.'
+    const message =
+      code ?
+        'The code is missing a top-level `run` function.'
       : 'The code argument is missing. Provide one containing a top-level `run` function.';
     return Response.json(
       {
@@ -260,7 +266,7 @@ const fetch = async (req: Request): Promise<Response> => {
   try {
     let run_ = async (client: any) => {};
     run_ = (await tseval(`${code}\nexport default run;`)).default;
-    const result = await run_(makeSdkProxy(client, { path: ["client"] }));
+    const result = await run_(makeSdkProxy(client, { path: ['client'] }));
     return Response.json({
       is_error: false,
       result,

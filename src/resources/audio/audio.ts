@@ -19,20 +19,17 @@ Audio.Transcriptions = Transcriptions;
 Audio.Translations = Translations;
 
 export declare namespace Audio {
-  export {
-    Speech as Speech,
-    type SpeechCreateParams as SpeechCreateParams
-  };
+  export { Speech as Speech, type SpeechCreateParams as SpeechCreateParams };
 
   export {
     Transcriptions as Transcriptions,
     type TranscriptionCreateResponse as TranscriptionCreateResponse,
-    type TranscriptionCreateParams as TranscriptionCreateParams
+    type TranscriptionCreateParams as TranscriptionCreateParams,
   };
 
   export {
     Translations as Translations,
     type TranslationCreateResponse as TranslationCreateResponse,
-    type TranslationCreateParams as TranslationCreateParams
+    type TranslationCreateParams as TranslationCreateParams,
   };
 }
