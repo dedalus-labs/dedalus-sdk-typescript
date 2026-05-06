@@ -336,7 +336,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          "curl https://api.dedaluslabs.ai/v1/images/generations \\\n    -H 'Content-Type: application/json' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -d '{\n          \"prompt\": \"A white siamese cat\"\n        }'",
+          'curl https://api.dedaluslabs.ai/v1/images/generations \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "prompt": "A white siamese cat",\n          "background": "transparent",\n          "model": "openai/dall-e-3",\n          "moderation": "auto",\n          "n": 1,\n          "output_compression": 85,\n          "output_format": "png",\n          "partial_images": 0,\n          "quality": "standard",\n          "response_format": "url",\n          "size": "1024x1024",\n          "stream": true,\n          "style": "vivid"\n        }\'',
       },
     },
   },
@@ -524,7 +524,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          "curl https://api.dedaluslabs.ai/v1/responses \\\n    -H 'Content-Type: application/json' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -d '{}'",
+          'curl https://api.dedaluslabs.ai/v1/responses \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "background": true,\n          "credentials": {\n            "connection_name": "external-service",\n            "values": {\n              "api_key": "sk-..."\n            }\n          },\n          "include": [\n            "message.output_text.logprobs"\n          ],\n          "input": "What is the capital of France?",\n          "instructions": "You are a helpful assistant.",\n          "max_output_tokens": 1000,\n          "max_tool_calls": 10,\n          "mcp_servers": "dedalus-labs/example-server",\n          "model": "openai/gpt-4o",\n          "parallel_tool_calls": true,\n          "service_tier": "auto",\n          "stream": true,\n          "stream_options": {\n            "include_usage": true\n          },\n          "temperature": 0,\n          "text": {\n            "type": "text"\n          },\n          "tool_choice": "auto",\n          "tools": [\n            {\n              "function": {\n                "description": null,\n                "name": null,\n                "parameters": null\n              },\n              "type": "function"\n            }\n          ],\n          "top_logprobs": 5,\n          "top_p": 0.1,\n          "truncation": "auto"\n        }\'',
       },
     },
   },
@@ -621,7 +621,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          "curl https://api.dedaluslabs.ai/v1/chat/completions \\\n    -H 'Content-Type: application/json' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -d '{\n          \"model\": \"openai/gpt-5\"\n        }'",
+          'curl https://api.dedaluslabs.ai/v1/chat/completions \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "model": "openai/gpt-5",\n          "agent_attributes": {\n            "accuracy": 0.9,\n            "complexity": 0.8\n          },\n          "audio": {\n            "format": "mp3",\n            "voice": "alloy"\n          },\n          "credentials": {\n            "connection_name": "external-service",\n            "values": {\n              "api_key": "sk-..."\n            }\n          },\n          "max_turns": 5,\n          "mcp_servers": "dedalus-labs/example-server",\n          "model_attributes": {\n            "gpt-5": {\n              "accuracy": 0.95,\n              "speed": 0.6\n            }\n          }\n        }\'',
       },
     },
   },
