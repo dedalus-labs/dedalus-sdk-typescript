@@ -94,6 +94,10 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nlist_models_response = dedalus.models.list\n\nputs(list_models_response)',
       },
+      cli: {
+        method: 'models list',
+        example: "dedalus-sdk models list \\\n  --api-key 'My API Key'",
+      },
       http: {
         example:
           "curl https://api.dedaluslabs.ai/v1/models \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\"",
@@ -144,6 +148,10 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'models.retrieve',
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nmodel = dedalus.models.retrieve("model_id")\n\nputs(model)',
+      },
+      cli: {
+        method: 'models retrieve',
+        example: "dedalus-sdk models retrieve \\\n  --api-key 'My API Key' \\\n  --model-id model_id",
       },
       http: {
         example:
@@ -200,6 +208,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'embeddings.create',
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\ncreate_embedding_response = dedalus.embeddings.create(input: "string", model: :"text-embedding-ada-002")\n\nputs(create_embedding_response)',
+      },
+      cli: {
+        method: 'embeddings create',
+        example:
+          "dedalus-sdk embeddings create \\\n  --api-key 'My API Key' \\\n  --input string \\\n  --model text-embedding-ada-002",
       },
       http: {
         example:
@@ -259,6 +272,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nspeech = dedalus.audio.speech.create(input: "input", model: :"tts-1", voice: :alloy)\n\nputs(speech)',
       },
+      cli: {
+        method: 'speech create',
+        example:
+          "dedalus-sdk audio:speech create \\\n  --api-key 'My API Key' \\\n  --input input \\\n  --model tts-1 \\\n  --voice alloy",
+      },
       http: {
         example:
           'curl https://api.dedaluslabs.ai/v1/audio/speech \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "input": "input",\n          "model": "tts-1",\n          "voice": "alloy"\n        }\'',
@@ -317,6 +335,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\ntranscription = dedalus.audio.transcriptions.create(file: StringIO.new("Example data"), model: "model")\n\nputs(transcription)',
       },
+      cli: {
+        method: 'transcriptions create',
+        example:
+          "dedalus-sdk audio:transcriptions create \\\n  --api-key 'My API Key' \\\n  --file 'Example data' \\\n  --model model",
+      },
       http: {
         example:
           "curl https://api.dedaluslabs.ai/v1/audio/transcriptions \\\n    -H 'Content-Type: multipart/form-data' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -F 'file=@/path/to/file' \\\n    -F model=model",
@@ -373,6 +396,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'audio.translations.create',
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\ntranslation = dedalus.audio.translations.create(file: StringIO.new("Example data"), model: "model")\n\nputs(translation)',
+      },
+      cli: {
+        method: 'translations create',
+        example:
+          "dedalus-sdk audio:translations create \\\n  --api-key 'My API Key' \\\n  --file 'Example data' \\\n  --model model",
       },
       http: {
         example:
@@ -439,6 +467,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nimages_response = dedalus.images.generate(prompt: "A white siamese cat")\n\nputs(images_response)',
       },
+      cli: {
+        method: 'images generate',
+        example:
+          "dedalus-sdk images generate \\\n  --api-key 'My API Key' \\\n  --prompt 'A white siamese cat'",
+      },
       http: {
         example:
           'curl https://api.dedaluslabs.ai/v1/images/generations \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "prompt": "A white siamese cat",\n          "background": "transparent",\n          "model": "openai/dall-e-3",\n          "moderation": "auto",\n          "n": 1,\n          "output_compression": 85,\n          "output_format": "png",\n          "partial_images": 0,\n          "quality": "standard",\n          "response_format": "url",\n          "size": "1024x1024",\n          "stream": true,\n          "style": "vivid"\n        }\'',
@@ -498,6 +531,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nimages_response = dedalus.images.edit(image: StringIO.new("Example data"), prompt: "prompt")\n\nputs(images_response)',
       },
+      cli: {
+        method: 'images edit',
+        example:
+          "dedalus-sdk images edit \\\n  --api-key 'My API Key' \\\n  --image 'Example data' \\\n  --prompt prompt",
+      },
       http: {
         example:
           "curl https://api.dedaluslabs.ai/v1/images/edits \\\n    -H 'Content-Type: multipart/form-data' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -F 'image=@/path/to/image' \\\n    -F prompt=prompt",
@@ -554,6 +592,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nimages_response = dedalus.images.create_variation(image: StringIO.new("Example data"))\n\nputs(images_response)',
       },
+      cli: {
+        method: 'images create_variation',
+        example:
+          "dedalus-sdk images create-variation \\\n  --api-key 'My API Key' \\\n  --image 'Example data'",
+      },
       http: {
         example:
           "curl https://api.dedaluslabs.ai/v1/images/variations \\\n    -H 'Content-Type: multipart/form-data' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -F 'image=@/path/to/image'",
@@ -603,6 +646,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'ocr.process',
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nocr_response = dedalus.ocr.process(document: {document_url: "document_url"})\n\nputs(ocr_response)',
+      },
+      cli: {
+        method: 'ocr process',
+        example:
+          "dedalus-sdk ocr process \\\n  --api-key 'My API Key' \\\n  --document '{document_url: document_url}'",
       },
       http: {
         example:
@@ -686,6 +734,10 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'responses.create',
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nresponse = dedalus.responses.create\n\nputs(response)',
+      },
+      cli: {
+        method: 'responses create',
+        example: "dedalus-sdk responses create \\\n  --api-key 'My API Key'",
       },
       http: {
         example:
@@ -799,6 +851,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           'require "dedalus_sdk"\n\ndedalus = DedalusSDK::Client.new(\n  api_key: "My API Key",\n  environment: "development" # defaults to "production"\n)\n\nchat_completion = dedalus.chat.completions.create(model: "openai/gpt-5")\n\nputs(chat_completion)',
       },
+      cli: {
+        method: 'completions create',
+        example:
+          "dedalus-sdk chat:completions create \\\n  --api-key 'My API Key' \\\n  --model openai/gpt-5",
+      },
       http: {
         example:
           'curl https://api.dedaluslabs.ai/v1/chat/completions \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "model": "openai/gpt-5",\n          "agent_attributes": {\n            "accuracy": 0.9,\n            "complexity": 0.8\n          },\n          "audio": {\n            "format": "mp3",\n            "voice": "alloy"\n          },\n          "credentials": {\n            "connection_name": "external-service",\n            "values": {\n              "api_key": "sk-..."\n            }\n          },\n          "max_turns": 5,\n          "mcp_servers": "dedalus-labs/example-server",\n          "model_attributes": {\n            "gpt-5": {\n              "accuracy": 0.95,\n              "speed": 0.6\n            }\n          }\n        }\'',
@@ -808,6 +865,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
 ];
 
 const EMBEDDED_READMES: { language: string; content: string }[] = [
+  {
+    language: 'cli',
+    content:
+      "# Dedalus CLI\n\nThe official CLI for the [Dedalus REST API](https://docs.dedaluslabs.ai).\n\nIt is generated with [Stainless](https://www.stainless.com/).\n\n## Installation\n\n### Installing with Go\n\nTo test or install the CLI locally, you need [Go](https://go.dev/doc/install) version 1.22 or later installed.\n\n~~~sh\ngo install 'github.com/stainless-sdks/dedalus-sdk-cli/cmd/dedalus-sdk@latest'\n~~~\n\nOnce you have run `go install`, the binary is placed in your Go bin directory:\n\n- **Default location**: `$HOME/go/bin` (or `$GOPATH/bin` if GOPATH is set)\n- **Check your path**: Run `go env GOPATH` to see the base directory\n\nIf commands aren't found after installation, add the Go bin directory to your PATH:\n\n~~~sh\n# Add to your shell profile (.zshrc, .bashrc, etc.)\nexport PATH=\"$PATH:$(go env GOPATH)/bin\"\n~~~\n\n### Running Locally\n\nAfter cloning the git repository for this project, you can use the\n`scripts/run` script to run the tool locally:\n\n~~~sh\n./scripts/run args...\n~~~\n\n## Usage\n\nThe CLI follows a resource-based command structure:\n\n~~~sh\ndedalus-sdk [resource] <command> [flags...]\n~~~\n\n~~~sh\ndedalus-sdk chat:completions create \\\n  --api-key 'My API Key' \\\n  --model openai/gpt-5-nano \\\n  --message '{content: You are Stephen Dedalus. Respond in morose Joycean malaise., role: system}' \\\n  --message \"{content: 'Hello, how are you today?', role: user}\"\n~~~\n\nFor details about specific commands, use the `--help` flag.\n\n### Environment variables\n\n| Environment variable     | Description                                                          | Required | Default value                 |\n| ------------------------ | -------------------------------------------------------------------- | -------- | ----------------------------- |\n| `DEDALUS_API_KEY`        | API key for Bearer token authentication.                             | no       | `null`                        |\n| `DEDALUS_X_API_KEY`      | API key for X-API-Key header authentication.                         | no       | `null`                        |\n| `DEDALUS_AS_URL`         | MCP Authorization Server URL                                         | no       | `\"https://as.dedaluslabs.ai\"` |\n| `DEDALUS_ORG_ID`         | Organization ID for request scoping.                                 | no       | `null`                        |\n| `DEDALUS_PROVIDER`       | Provider name for BYOK mode (e.g., 'google', 'openai', 'anthropic'). | no       | `null`                        |\n| `DEDALUS_PROVIDER_KEY`   | Provider API key for BYOK mode.                                      | no       | `null`                        |\n| `DEDALUS_PROVIDER_MODEL` | Model identifier for BYOK provider.                                  | no       | `null`                        |\n\n### Global flags\n\n- `--api-key` - API key for Bearer token authentication. (can also be set with `DEDALUS_API_KEY` env var)\n- `--x-api-key` - API key for X-API-Key header authentication. (can also be set with `DEDALUS_X_API_KEY` env var)\n- `--as-base-url` - MCP Authorization Server URL (can also be set with `DEDALUS_AS_URL` env var)\n- `--dedalus-org-id` - Organization ID for request scoping. (can also be set with `DEDALUS_ORG_ID` env var)\n- `--provider` - Provider name for BYOK mode (e.g., 'google', 'openai', 'anthropic'). (can also be set with `DEDALUS_PROVIDER` env var)\n- `--provider-key` - Provider API key for BYOK mode. (can also be set with `DEDALUS_PROVIDER_KEY` env var)\n- `--provider-model` - Model identifier for BYOK provider. (can also be set with `DEDALUS_PROVIDER_MODEL` env var)\n- `--help` - Show command line usage\n- `--debug` - Enable debug logging (includes HTTP request/response details)\n- `--version`, `-v` - Show the CLI version\n- `--base-url` - Use a custom API backend URL\n- `--format` - Change the output format (`auto`, `explore`, `json`, `jsonl`, `pretty`, `raw`, `yaml`)\n- `--format-error` - Change the output format for errors (`auto`, `explore`, `json`, `jsonl`, `pretty`, `raw`, `yaml`)\n- `--transform` - Transform the data output using [GJSON syntax](https://github.com/tidwall/gjson/blob/master/SYNTAX.md)\n- `--transform-error` - Transform the error output using [GJSON syntax](https://github.com/tidwall/gjson/blob/master/SYNTAX.md)\n\n### Passing files as arguments\n\nTo pass files to your API, you can use the `@myfile.ext` syntax:\n\n~~~bash\ndedalus-sdk <command> --arg @abe.jpg\n~~~\n\nFiles can also be passed inside JSON or YAML blobs:\n\n~~~bash\ndedalus-sdk <command> --arg '{image: \"@abe.jpg\"}'\n# Equivalent:\ndedalus-sdk <command> <<YAML\narg:\n  image: \"@abe.jpg\"\nYAML\n~~~\n\nIf you need to pass a string literal that begins with an `@` sign, you can\nescape the `@` sign to avoid accidentally passing a file.\n\n~~~bash\ndedalus-sdk <command> --username '\\@abe'\n~~~\n\n#### Explicit encoding\n\nFor JSON endpoints, the CLI tool does filetype sniffing to determine whether the\nfile contents should be sent as a string literal (for plain text files) or as a\nbase64-encoded string literal (for binary files). If you need to explicitly send\nthe file as either plain text or base64-encoded data, you can use\n`@file://myfile.txt` (for string encoding) or `@data://myfile.dat` (for\nbase64-encoding). Note that absolute paths will begin with `@file://` or\n`@data://`, followed by a third `/` (for example, `@file:///tmp/file.txt`).\n\n~~~bash\ndedalus-sdk <command> --arg @data://file.txt\n~~~\n\n## Linking different Go SDK versions\n\nYou can link the CLI against a different version of the Dedalus Go SDK\nfor development purposes using the `./scripts/link` script.\n\nTo link to a specific version from a repository (version can be a branch,\ngit tag, or commit hash):\n\n~~~bash\n./scripts/link github.com/org/repo@version\n~~~\n\nTo link to a local copy of the SDK:\n\n~~~bash\n./scripts/link ../path/to/githubcomdedaluslabsdedalussdkgo-go\n~~~\n\nIf you run the link script without any arguments, it will default to `../githubcomdedaluslabsdedalussdkgo-go`.\n",
+  },
   {
     language: 'go',
     content:
