@@ -103,6 +103,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$listModelsResponse = $client->models->list();\n\nvar_dump($listModelsResponse);",
       },
+      csharp: {
+        method: 'Models.List',
+        example:
+          'ModelListParams parameters = new();\n\nvar listModelsResponse = await client.Models.List(parameters);\n\nConsole.WriteLine(listModelsResponse);',
+      },
       http: {
         example:
           "curl https://api.dedaluslabs.ai/v1/models \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\"",
@@ -162,6 +167,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'models->retrieve',
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$model = $client->models->retrieve('model_id');\n\nvar_dump($model);",
+      },
+      csharp: {
+        method: 'Models.Retrieve',
+        example:
+          'ModelRetrieveParams parameters = new() { ModelID = "model_id" };\n\nvar model = await client.Models.Retrieve(parameters);\n\nConsole.WriteLine(model);',
       },
       http: {
         example:
@@ -228,6 +238,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'embeddings->create',
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$createEmbeddingResponse = $client->embeddings->create(\n  input: 'string',\n  model: 'text-embedding-ada-002',\n  dimensions: 1,\n  encodingFormat: 'float',\n  user: 'user',\n);\n\nvar_dump($createEmbeddingResponse);",
+      },
+      csharp: {
+        method: 'Embeddings.Create',
+        example:
+          'EmbeddingCreateParams parameters = new()\n{\n    Input = "string",\n    Model = Model.TextEmbeddingAda002,\n};\n\nvar createEmbeddingResponse = await client.Embeddings.Create(parameters);\n\nConsole.WriteLine(createEmbeddingResponse);',
       },
       http: {
         example:
@@ -297,6 +312,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$speech = $client->audio->speech->create(\n  input: 'input',\n  model: 'tts-1',\n  voice: 'alloy',\n  instructions: 'instructions',\n  responseFormat: 'mp3',\n  speed: 0.25,\n  streamFormat: 'sse',\n);\n\nvar_dump($speech);",
       },
+      csharp: {
+        method: 'Audio.Speech.Create',
+        example:
+          'SpeechCreateParams parameters = new()\n{\n    Input = "input",\n    Model = Model.Tts1,\n    Voice = UnionMember1.Alloy,\n};\n\nvar speech = await client.Audio.Speech.Create(parameters);\n\nConsole.WriteLine(speech);',
+      },
       http: {
         example:
           'curl https://api.dedaluslabs.ai/v1/audio/speech \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "input": "input",\n          "model": "tts-1",\n          "voice": "alloy"\n        }\'',
@@ -365,6 +385,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$transcription = $client->audio->transcriptions->create(\n  file: FileParam::fromString('Example data', filename: uniqid('file-upload-', true)),\n  model: 'model',\n  language: 'language',\n  prompt: 'prompt',\n  responseFormat: 'response_format',\n  temperature: 0,\n);\n\nvar_dump($transcription);",
       },
+      csharp: {
+        method: 'Audio.Transcriptions.Create',
+        example:
+          'TranscriptionCreateParams parameters = new()\n{\n    File = Encoding.UTF8.GetBytes("Example data"),\n    Model = "model",\n};\n\nvar transcription = await client.Audio.Transcriptions.Create(parameters);\n\nConsole.WriteLine(transcription);',
+      },
       http: {
         example:
           "curl https://api.dedaluslabs.ai/v1/audio/transcriptions \\\n    -H 'Content-Type: multipart/form-data' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -F 'file=@/path/to/file' \\\n    -F model=model",
@@ -431,6 +456,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'audio->translations->create',
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$translation = $client->audio->translations->create(\n  file: FileParam::fromString('Example data', filename: uniqid('file-upload-', true)),\n  model: 'model',\n  prompt: 'prompt',\n  responseFormat: 'response_format',\n  temperature: 0,\n);\n\nvar_dump($translation);",
+      },
+      csharp: {
+        method: 'Audio.Translations.Create',
+        example:
+          'TranslationCreateParams parameters = new()\n{\n    File = Encoding.UTF8.GetBytes("Example data"),\n    Model = "model",\n};\n\nvar translation = await client.Audio.Translations.Create(parameters);\n\nConsole.WriteLine(translation);',
       },
       http: {
         example:
@@ -507,6 +537,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$imagesResponse = $client->images->generate(\n  prompt: 'A white siamese cat',\n  background: 'transparent',\n  model: 'openai/dall-e-3',\n  moderation: 'auto',\n  n: 1,\n  outputCompression: 85,\n  outputFormat: 'png',\n  partialImages: 0,\n  quality: 'standard',\n  responseFormat: 'url',\n  size: '1024x1024',\n  stream: true,\n  style: 'vivid',\n  user: 'user',\n);\n\nvar_dump($imagesResponse);",
       },
+      csharp: {
+        method: 'Images.Generate',
+        example:
+          'ImageGenerateParams parameters = new() { Prompt = "A white siamese cat" };\n\nvar imagesResponse = await client.Images.Generate(parameters);\n\nConsole.WriteLine(imagesResponse);',
+      },
       http: {
         example:
           'curl https://api.dedaluslabs.ai/v1/images/generations \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "prompt": "A white siamese cat",\n          "background": "transparent",\n          "model": "openai/dall-e-3",\n          "moderation": "auto",\n          "n": 1,\n          "output_compression": 85,\n          "output_format": "png",\n          "partial_images": 0,\n          "quality": "standard",\n          "response_format": "url",\n          "size": "1024x1024",\n          "stream": true,\n          "style": "vivid"\n        }\'',
@@ -576,6 +611,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$imagesResponse = $client->images->edit(\n  image: FileParam::fromString('Example data', filename: uniqid('file-upload-', true)),\n  prompt: 'prompt',\n  mask: FileParam::fromString('Example data', filename: uniqid('file-upload-', true)),\n  model: 'model',\n  n: 0,\n  responseFormat: 'response_format',\n  size: 'size',\n  user: 'user',\n);\n\nvar_dump($imagesResponse);",
       },
+      csharp: {
+        method: 'Images.Edit',
+        example:
+          'ImageEditParams parameters = new()\n{\n    Image = Encoding.UTF8.GetBytes("Example data"),\n    Prompt = "prompt",\n};\n\nvar imagesResponse = await client.Images.Edit(parameters);\n\nConsole.WriteLine(imagesResponse);',
+      },
       http: {
         example:
           "curl https://api.dedaluslabs.ai/v1/images/edits \\\n    -H 'Content-Type: multipart/form-data' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -F 'image=@/path/to/image' \\\n    -F prompt=prompt",
@@ -642,6 +682,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$imagesResponse = $client->images->createVariation(\n  image: FileParam::fromString('Example data', filename: uniqid('file-upload-', true)),\n  model: 'model',\n  n: 0,\n  responseFormat: 'response_format',\n  size: 'size',\n  user: 'user',\n);\n\nvar_dump($imagesResponse);",
       },
+      csharp: {
+        method: 'Images.CreateVariation',
+        example:
+          'ImageCreateVariationParams parameters = new()\n{\n    Image = Encoding.UTF8.GetBytes("Example data")\n};\n\nvar imagesResponse = await client.Images.CreateVariation(parameters);\n\nConsole.WriteLine(imagesResponse);',
+      },
       http: {
         example:
           "curl https://api.dedaluslabs.ai/v1/images/variations \\\n    -H 'Content-Type: multipart/form-data' \\\n    -H 'User-Agent: Dedalus-SDK' \\\n    -H 'X-SDK-Version: 1.0.0' \\\n    -H \"Authorization: Bearer $DEDALUS_API_KEY\" \\\n    -F 'image=@/path/to/image'",
@@ -701,6 +746,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'ocr->process',
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$ocrResponse = $client->ocr->process(\n  document: ['documentURL' => 'document_url', 'type' => 'type'], model: 'model'\n);\n\nvar_dump($ocrResponse);",
+      },
+      csharp: {
+        method: 'Ocr.Process',
+        example:
+          'OcrProcessParams parameters = new()\n{\n    Document = new()\n    {\n        DocumentUrl = "document_url",\n        Type = "type",\n    },\n};\n\nvar ocrResponse = await client.Ocr.Process(parameters);\n\nConsole.WriteLine(ocrResponse);',
       },
       http: {
         example:
@@ -793,6 +843,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         method: 'responses->create',
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$response = $client->responses->create(\n  background: true,\n  conversation: 'string',\n  credentials: [\n    'connectionName' => 'external-service', 'values' => ['api_key' => 'sk-...']\n  ],\n  frequencyPenalty: 0,\n  include: ['message.output_text.logprobs'],\n  input: 'What is the capital of France?',\n  instructions: 'You are a helpful assistant.',\n  maxOutputTokens: 1000,\n  maxToolCalls: 10,\n  mcpServers: 'dedalus-labs/example-server',\n  metadata: ['foo' => 'string'],\n  model: 'openai/gpt-4o',\n  parallelToolCalls: true,\n  presencePenalty: 0,\n  previousResponseID: 'previous_response_id',\n  prompt: [\n    'id' => 'id', 'variables' => ['foo' => 'string'], 'version' => 'version'\n  ],\n  promptCacheKey: 'prompt_cache_key',\n  reasoning: ['foo' => 'string'],\n  safetyIdentifier: 'safety_identifier',\n  serviceTier: 'auto',\n  store: true,\n  stream: true,\n  streamOptions: ['include_usage' => true],\n  temperature: 0,\n  text: ['type' => 'text'],\n  toolChoice: 'auto',\n  tools: [\n    [\n      'function' => [\n        'description' => null, 'name' => null, 'parameters' => null\n      ],\n      'type' => 'function',\n    ],\n  ],\n  topLogprobs: 5,\n  topP: 0.1,\n  truncation: 'auto',\n  user: 'user',\n);\n\nvar_dump($response);",
+      },
+      csharp: {
+        method: 'Responses.Create',
+        example:
+          'ResponseCreateParams parameters = new();\n\nvar response = await client.Responses.Create(parameters);\n\nConsole.WriteLine(response);',
       },
       http: {
         example:
@@ -916,6 +971,11 @@ const EMBEDDED_METHODS: MethodEntry[] = [
         example:
           "<?php\n\nrequire_once dirname(__DIR__) . '/vendor/autoload.php';\n\n$client = new Client(apiKey: 'My API Key', environment: 'development');\n\n$chatCompletion = $client->chat->completions->create(\n  model: 'openai/gpt-5',\n  agentAttributes: ['accuracy' => 0.9, 'complexity' => 0.8],\n  audio: ['format' => 'mp3', 'voice' => 'alloy'],\n  automaticToolExecution: true,\n  cachedContent: 'cached_content',\n  correlationID: 'correlation_id',\n  credentials: [\n    'connectionName' => 'external-service', 'values' => ['api_key' => 'sk-...']\n  ],\n  deferred: true,\n  deferredCalls: [\n    [\n      'id' => 'id',\n      'name' => 'name',\n      'arguments' => ['foo' => 'string'],\n      'blockedBy' => ['string'],\n      'dependencies' => ['string'],\n      'venue' => 'venue',\n    ],\n  ],\n  frequencyPenalty: -2,\n  functionCall: 'function_call',\n  functions: [\n    [\n      'name' => 'name',\n      'description' => 'description',\n      'parameters' => ['foo' => 'bar'],\n    ],\n  ],\n  generationConfig: ['foo' => 'string'],\n  guardrails: [['foo' => 'bar']],\n  handoffConfig: ['foo' => 'bar'],\n  handoffMode: true,\n  inferenceGeo: 'inference_geo',\n  logitBias: ['foo' => 0],\n  logprobs: true,\n  maxCompletionTokens: 0,\n  maxTokens: 1,\n  maxTurns: 5,\n  mcpServers: 'dedalus-labs/example-server',\n  messages: [['content' => 'string', 'role' => 'developer', 'name' => 'name']],\n  metadata: ['foo' => 'string'],\n  modalities: ['string'],\n  modelAttributes: ['gpt-5' => ['accuracy' => 0.95, 'speed' => 0.6]],\n  n: 1,\n  outputConfig: ['foo' => 'string'],\n  parallelToolCalls: true,\n  prediction: ['content' => 'string', 'type' => 'content'],\n  presencePenalty: -2,\n  promptCacheKey: 'prompt_cache_key',\n  promptCacheRetention: 'prompt_cache_retention',\n  promptMode: 'reasoning',\n  reasoningEffort: 'reasoning_effort',\n  responseFormat: ['type' => 'text'],\n  safePrompt: true,\n  safetyIdentifier: 'safety_identifier',\n  safetySettings: [\n    [\n      'category' => 'HARM_CATEGORY_UNSPECIFIED',\n      'threshold' => 'HARM_BLOCK_THRESHOLD_UNSPECIFIED',\n    ],\n  ],\n  searchParameters: ['foo' => 'string'],\n  seed: 0,\n  serviceTier: 'service_tier',\n  speed: 'standard',\n  stop: ['string'],\n  store: true,\n  streamOptions: ['foo' => 'string'],\n  systemInstruction: ['foo' => 'string'],\n  temperature: 0,\n  thinking: ['budgetTokens' => 1024, 'type' => 'enabled'],\n  toolChoice: 'string',\n  toolConfig: ['foo' => 'string'],\n  tools: [['function' => ['name' => 'name'], 'type' => 'function']],\n  topK: 0,\n  topLogprobs: 0,\n  topP: 0,\n  user: 'user',\n  verbosity: 'verbosity',\n  webSearchOptions: ['foo' => 'string'],\n);\n\nvar_dump($chatCompletion);",
       },
+      csharp: {
+        method: 'Chat.Completions.Create',
+        example:
+          'CompletionCreateParams parameters = new() { Model = "openai/gpt-5" };\n\nvar chatCompletion = await client.Chat.Completions.Create(parameters);\n\nConsole.WriteLine(chatCompletion);',
+      },
       http: {
         example:
           'curl https://api.dedaluslabs.ai/v1/chat/completions \\\n    -H \'Content-Type: application/json\' \\\n    -H \'User-Agent: Dedalus-SDK\' \\\n    -H \'X-SDK-Version: 1.0.0\' \\\n    -H "Authorization: Bearer $DEDALUS_API_KEY" \\\n    -d \'{\n          "model": "openai/gpt-5",\n          "agent_attributes": {\n            "accuracy": 0.9,\n            "complexity": 0.8\n          },\n          "audio": {\n            "format": "mp3",\n            "voice": "alloy"\n          },\n          "credentials": {\n            "connection_name": "external-service",\n            "values": {\n              "api_key": "sk-..."\n            }\n          },\n          "max_turns": 5,\n          "mcp_servers": "dedalus-labs/example-server",\n          "model_attributes": {\n            "gpt-5": {\n              "accuracy": 0.95,\n              "speed": 0.6\n            }\n          }\n        }\'',
@@ -929,6 +989,11 @@ const EMBEDDED_READMES: { language: string; content: string }[] = [
     language: 'cli',
     content:
       "# Dedalus CLI\n\nThe official CLI for the [Dedalus REST API](https://docs.dedaluslabs.ai).\n\nIt is generated with [Stainless](https://www.stainless.com/).\n\n## Installation\n\n### Installing with Go\n\nTo test or install the CLI locally, you need [Go](https://go.dev/doc/install) version 1.22 or later installed.\n\n~~~sh\ngo install 'github.com/stainless-sdks/dedalus-sdk-cli/cmd/dedalus-sdk@latest'\n~~~\n\nOnce you have run `go install`, the binary is placed in your Go bin directory:\n\n- **Default location**: `$HOME/go/bin` (or `$GOPATH/bin` if GOPATH is set)\n- **Check your path**: Run `go env GOPATH` to see the base directory\n\nIf commands aren't found after installation, add the Go bin directory to your PATH:\n\n~~~sh\n# Add to your shell profile (.zshrc, .bashrc, etc.)\nexport PATH=\"$PATH:$(go env GOPATH)/bin\"\n~~~\n\n### Running Locally\n\nAfter cloning the git repository for this project, you can use the\n`scripts/run` script to run the tool locally:\n\n~~~sh\n./scripts/run args...\n~~~\n\n## Usage\n\nThe CLI follows a resource-based command structure:\n\n~~~sh\ndedalus-sdk [resource] <command> [flags...]\n~~~\n\n~~~sh\ndedalus-sdk chat:completions create \\\n  --api-key 'My API Key' \\\n  --model openai/gpt-5-nano \\\n  --message '{content: You are Stephen Dedalus. Respond in morose Joycean malaise., role: system}' \\\n  --message \"{content: 'Hello, how are you today?', role: user}\"\n~~~\n\nFor details about specific commands, use the `--help` flag.\n\n### Environment variables\n\n| Environment variable     | Description                                                          | Required | Default value                 |\n| ------------------------ | -------------------------------------------------------------------- | -------- | ----------------------------- |\n| `DEDALUS_API_KEY`        | API key for Bearer token authentication.                             | no       | `null`                        |\n| `DEDALUS_X_API_KEY`      | API key for X-API-Key header authentication.                         | no       | `null`                        |\n| `DEDALUS_AS_URL`         | MCP Authorization Server URL                                         | no       | `\"https://as.dedaluslabs.ai\"` |\n| `DEDALUS_ORG_ID`         | Organization ID for request scoping.                                 | no       | `null`                        |\n| `DEDALUS_PROVIDER`       | Provider name for BYOK mode (e.g., 'google', 'openai', 'anthropic'). | no       | `null`                        |\n| `DEDALUS_PROVIDER_KEY`   | Provider API key for BYOK mode.                                      | no       | `null`                        |\n| `DEDALUS_PROVIDER_MODEL` | Model identifier for BYOK provider.                                  | no       | `null`                        |\n\n### Global flags\n\n- `--api-key` - API key for Bearer token authentication. (can also be set with `DEDALUS_API_KEY` env var)\n- `--x-api-key` - API key for X-API-Key header authentication. (can also be set with `DEDALUS_X_API_KEY` env var)\n- `--as-base-url` - MCP Authorization Server URL (can also be set with `DEDALUS_AS_URL` env var)\n- `--dedalus-org-id` - Organization ID for request scoping. (can also be set with `DEDALUS_ORG_ID` env var)\n- `--provider` - Provider name for BYOK mode (e.g., 'google', 'openai', 'anthropic'). (can also be set with `DEDALUS_PROVIDER` env var)\n- `--provider-key` - Provider API key for BYOK mode. (can also be set with `DEDALUS_PROVIDER_KEY` env var)\n- `--provider-model` - Model identifier for BYOK provider. (can also be set with `DEDALUS_PROVIDER_MODEL` env var)\n- `--help` - Show command line usage\n- `--debug` - Enable debug logging (includes HTTP request/response details)\n- `--version`, `-v` - Show the CLI version\n- `--base-url` - Use a custom API backend URL\n- `--format` - Change the output format (`auto`, `explore`, `json`, `jsonl`, `pretty`, `raw`, `yaml`)\n- `--format-error` - Change the output format for errors (`auto`, `explore`, `json`, `jsonl`, `pretty`, `raw`, `yaml`)\n- `--transform` - Transform the data output using [GJSON syntax](https://github.com/tidwall/gjson/blob/master/SYNTAX.md)\n- `--transform-error` - Transform the error output using [GJSON syntax](https://github.com/tidwall/gjson/blob/master/SYNTAX.md)\n\n### Passing files as arguments\n\nTo pass files to your API, you can use the `@myfile.ext` syntax:\n\n~~~bash\ndedalus-sdk <command> --arg @abe.jpg\n~~~\n\nFiles can also be passed inside JSON or YAML blobs:\n\n~~~bash\ndedalus-sdk <command> --arg '{image: \"@abe.jpg\"}'\n# Equivalent:\ndedalus-sdk <command> <<YAML\narg:\n  image: \"@abe.jpg\"\nYAML\n~~~\n\nIf you need to pass a string literal that begins with an `@` sign, you can\nescape the `@` sign to avoid accidentally passing a file.\n\n~~~bash\ndedalus-sdk <command> --username '\\@abe'\n~~~\n\n#### Explicit encoding\n\nFor JSON endpoints, the CLI tool does filetype sniffing to determine whether the\nfile contents should be sent as a string literal (for plain text files) or as a\nbase64-encoded string literal (for binary files). If you need to explicitly send\nthe file as either plain text or base64-encoded data, you can use\n`@file://myfile.txt` (for string encoding) or `@data://myfile.dat` (for\nbase64-encoding). Note that absolute paths will begin with `@file://` or\n`@data://`, followed by a third `/` (for example, `@file:///tmp/file.txt`).\n\n~~~bash\ndedalus-sdk <command> --arg @data://file.txt\n~~~\n\n## Linking different Go SDK versions\n\nYou can link the CLI against a different version of the Dedalus Go SDK\nfor development purposes using the `./scripts/link` script.\n\nTo link to a specific version from a repository (version can be a branch,\ngit tag, or commit hash):\n\n~~~bash\n./scripts/link github.com/org/repo@version\n~~~\n\nTo link to a local copy of the SDK:\n\n~~~bash\n./scripts/link ../path/to/githubcomdedaluslabsdedalussdkgo-go\n~~~\n\nIf you run the link script without any arguments, it will default to `../githubcomdedaluslabsdedalussdkgo-go`.\n",
+  },
+  {
+    language: 'csharp',
+    content:
+      '# Dedalus C# API Library\n\nThe Dedalus C# SDK provides convenient access to the [Dedalus REST API](https://docs.dedaluslabs.ai) from applications written in   C#.\n\n## Installation\n\n```bash\ngit clone git@github.com:stainless-sdks/dedalus-sdk-csharp.git\ndotnet add reference dedalus-sdk-csharp/src/DedalusSdk\n```\n\n## Requirements\n\nThis library requires .NET Standard 2.0 or later.\n\n## Usage\n\nSee the [`examples`](examples) directory for complete and runnable examples.\n\n```csharp\nDedalusClient client = new();\n\nCompletionCreateParams parameters = new()\n{\n    Model = "openai/gpt-5-nano",\n    Messages =\n    [\n        new ChatCompletionSystemMessageParam(\n            new ChatCompletionSystemMessageParamContent(\n                "You are Stephen Dedalus. Respond in morose Joycean malaise."\n            )\n        ),\n        new ChatCompletionUserMessageParam(\n            new ChatCompletionUserMessageParamContent(\n                "Hello, how are you today?"\n            )\n        ),\n    ],\n};\n\nvar chatCompletion = await client.Chat.Completions.Create(parameters);\n\nConsole.WriteLine(chatCompletion);\n```',
   },
   {
     language: 'go',
